@@ -13,3 +13,4 @@ new messages (display the messages in debug mode)
         - port
 
 * Run basic tests with an IRC client (e.g. IRSSI)
+* Choose our reference IRC client
