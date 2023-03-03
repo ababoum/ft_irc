@@ -12,28 +12,27 @@
 
 #include "Client.hpp"
 
-
 Client::Client(int fd)
-: _fd(fd)
-{}
+	: _fd(fd)
+{
+}
 
 Client::Client(const Client &other)
-: _fd(other.getFd())
+	: _fd(other.getFd())
 {
 	*this = other;
 }
 
 Client::~Client()
 {
-	
 }
 
-Client &	Client::operator=(const Client &rhs)
+Client &Client::operator=(const Client &rhs)
 {
 	return *this;
 }
 
-int	Client::getFd() const
+int Client::getFd() const
 {
 	return _fd;
 }

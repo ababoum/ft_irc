@@ -8,11 +8,12 @@ public:
 	Server(const Server &other);
 	~Server();
 
-	Server &	operator=(const Server &rhs);
+	Server &operator=(const Server &rhs);
 
 private:
 	int _socket_ft;
-	int _port
+	int _port;
+	std::string _password;
 }
 
 #endif /* SERVER_HPP */
