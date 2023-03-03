@@ -6,7 +6,7 @@
 /*   By: bregneau <bregneau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 19:16:44 by bregneau          #+#    #+#             */
-/*   Updated: 2023/03/01 19:39:45 by bregneau         ###   ########.fr       */
+/*   Updated: 2023/03/03 15:05:48 by bregneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ Client::~Client()
 
 Client &	Client::operator=(const Client &rhs)
 {
-	return *this
+	return *this;
 }
 
 int	Client::getFd() const
