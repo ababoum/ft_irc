@@ -6,7 +6,7 @@
 /*   By: mriant <mriant@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 18:27:56 by bregneau          #+#    #+#             */
-/*   Updated: 2023/03/06 15:52:06 by mriant           ###   ########.fr       */
+/*   Updated: 2023/03/06 16:46:18 by mriant           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,5 +23,7 @@
 #include <iostream>
 #include <cstdio>
 #include <arpa/inet.h>
+
+#define MAX_CLIENTS 1000
 
 #endif /* FT_IRC_HPP */

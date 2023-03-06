@@ -19,6 +19,7 @@ public:
 
 private:
 	int _socket_fd;
+	int _client_fd;
 	int _port;
 	std::string _password;
 

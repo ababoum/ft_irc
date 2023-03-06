@@ -6,7 +6,7 @@
 /*   By: mriant <mriant@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 19:17:37 by bregneau          #+#    #+#             */
-/*   Updated: 2023/03/06 16:02:43 by mriant           ###   ########.fr       */
+/*   Updated: 2023/03/06 17:02:41 by mriant           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,7 @@ std::string Server::getPassword() const
 void Server::launch()
 {
 	struct sockaddr_in tmp;
+	socklen_t addr_len;
 
 	_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (_socket_fd < 0)
@@ -76,7 +77,30 @@ void Server::launch()
 	if (bind(_socket_fd, (struct sockaddr *)&tmp, sizeof(tmp)) < 0)
 	{
 		perror("bind failed");
-		return ;
+		return;
 	}
 	std::cout << "Socket binded" << std::endl;
+	if (listen(_socket_fd, MAX_CLIENTS) < 0)
+	{
+		perror("In listen");
+		return;
+	}
+	std::cout << "Socket is listening" << std::endl;
+	while (1)
+	{
+		std::cout << "Waiting for new connection" << std::endl;
+		_client_fd = accept(_socket_fd, (struct sockaddr *)&tmp, &addr_len);
+		if (_client_fd < 0)
+		{
+			perror("In accept");
+			return ;
+		}
+
+		char buffer[30000] = {0};
+		int valread;
+
+		valread = read(_client_fd, buffer, MAX_CLIENTS);
+		std::cout << buffer << std::endl;
+		close(_client_fd);
+	}
 }
