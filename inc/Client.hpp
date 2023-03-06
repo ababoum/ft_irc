@@ -6,7 +6,7 @@
 /*   By: bregneau <bregneau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 19:17:07 by bregneau          #+#    #+#             */
-/*   Updated: 2023/03/01 19:35:05 by bregneau         ###   ########.fr       */
+/*   Updated: 2023/03/06 18:48:37 by bregneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,6 @@ public:
 private:
 	Client();
 	const int _fd;
-}
+};
 
 #endif /* CLIENT_HPP */

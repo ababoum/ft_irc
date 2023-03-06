@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mriant <mriant@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bregneau <bregneau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 18:23:07 by bregneau          #+#    #+#             */
-/*   Updated: 2023/03/06 16:02:16 by mriant           ###   ########.fr       */
+/*   Updated: 2023/03/06 18:47:01 by bregneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Server.hpp"
+#include "ft_irc.hpp"
+
 
 int main(int argc, char **argv)
 {
@@ -21,5 +22,8 @@ int main(int argc, char **argv)
 		return (1);
 	}
 
-	Server test_server(8198, "mdp");
+	int port = ft_parse_port(argv[1]);
+	ft_check_mdp(argv[2]);
+	Server test_server(port, argv[1]);
+	
 }

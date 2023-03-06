@@ -1,6 +1,7 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
+#include <string>
 #include "ft_irc.hpp"
 
 class Server
