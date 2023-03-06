@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: bregneau <bregneau@student.42.fr>          +#+  +:+       +#+         #
+#    By: mriant <mriant@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/01 19:17:00 by bregneau          #+#    #+#              #
-#    Updated: 2023/03/03 14:54:22 by bregneau         ###   ########.fr        #
+#    Updated: 2023/03/06 15:08:57 by mriant           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,8 @@ OBJ_PATH		=	obj/
 
 OBJ_DIRS		=	$(OBJ_PATH)
 
-SRC				=	main.cpp
+SRC				=	main.cpp \
+					Server.cpp
 
 OBJ				=	$(addprefix $(OBJ_PATH),$(SRC:.cpp=.o))
 DEPS			=	$(addprefix $(OBJ_PATH),$(SRC:.cpp=.d))

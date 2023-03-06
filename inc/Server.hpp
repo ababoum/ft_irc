@@ -1,13 +1,13 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include <string>
+#include "ft_irc.hpp"
 
 class Server
 {
 public:
 	Server();
-	Server(int socket_fd, int port, std::string password);
+	Server(int port, std::string password);
 	Server(const Server &other);
 	~Server();
 
@@ -21,6 +21,8 @@ private:
 	int _socket_fd;
 	int _port;
 	std::string _password;
+
+	void launch(void);
 };
 
 #endif /* SERVER_HPP */
