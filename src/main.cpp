@@ -6,7 +6,7 @@
 /*   By: bregneau <bregneau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 18:23:07 by bregneau          #+#    #+#             */
-/*   Updated: 2023/03/06 18:47:01 by bregneau         ###   ########.fr       */
+/*   Updated: 2023/03/07 13:08:10 by bregneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,16 @@ int main(int argc, char **argv)
 		return (1);
 	}
 
-	int port = ft_parse_port(argv[1]);
-	ft_check_mdp(argv[2]);
-	Server test_server(port, argv[1]);
+	try
+	{
+		int port = ft_parse_port(argv[1]);
+		ft_check_password(argv[2]);
+		Server test_server(port, argv[2]);
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << "Error\n" << e.what() << std::endl;
+	}
+	
 	
 }

@@ -6,7 +6,7 @@
 /*   By: bregneau <bregneau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/06 18:44:06 by bregneau          #+#    #+#             */
-/*   Updated: 2023/03/06 18:46:27 by bregneau         ###   ########.fr       */
+/*   Updated: 2023/03/07 13:02:31 by bregneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ int ft_parse_port(const std::string &str)
 	return (port);
 }
 
-void	ft_check_mdp(const std::string &str)
+void	ft_check_password(const std::string &str)
 {
 	if (str.empty())
 		throw std::invalid_argument("Empty password");

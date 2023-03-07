@@ -6,7 +6,7 @@
 /*   By: bregneau <bregneau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 18:27:56 by bregneau          #+#    #+#             */
-/*   Updated: 2023/03/06 18:46:06 by bregneau         ###   ########.fr       */
+/*   Updated: 2023/03/07 13:03:12 by bregneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@
 
 bool	ft_is_number(const std::string &str);
 int		ft_parse_port(const std::string &str);
-void	ft_check_mdp(const std::string &str);
+void	ft_check_password(const std::string &str);
 
 
 #endif /* FT_IRC_HPP */
