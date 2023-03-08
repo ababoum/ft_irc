@@ -21,7 +21,8 @@ OBJ_DIRS		=	$(OBJ_PATH)
 
 SRC				=	main.cpp \
 					Server.cpp \
-					utils.cpp
+					utils.cpp \
+					Client.cpp
 
 OBJ				=	$(addprefix $(OBJ_PATH),$(SRC:.cpp=.o))
 DEPS			=	$(addprefix $(OBJ_PATH),$(SRC:.cpp=.d))

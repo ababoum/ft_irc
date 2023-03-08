@@ -1,15 +1,13 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include <string>
 #include "ft_irc.hpp"
+class Client;
 
 class Server
 {
 public:
-	Server();
 	Server(int port, std::string password);
-	Server(const Server &other);
 	~Server();
 
 	Server &operator=(const Server &rhs);
@@ -19,10 +17,12 @@ public:
 	std::string getPassword(void) const;
 
 private:
+	Server();
+	Server(const Server &other);
 	int _socket_fd;
-	int _client_fd;
 	int _port;
 	std::string _password;
+	std::vector<Client> _clients;
 
 	void launch(void);
 };

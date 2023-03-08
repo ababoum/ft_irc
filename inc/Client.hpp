@@ -13,17 +13,22 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
+#include "ft_irc.hpp"
+
 class Client
 {
 public:
 	Client(int fd);
 	Client(const Client &other);
 	~Client();
-	Client &operator=(const Client &rhs);
 	int getFd() const;
 
 private:
+	Client &operator=(const Client &rhs);
 	Client();
+
+// Attributes
+private:
 	const int _fd;
 };
 

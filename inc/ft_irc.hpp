@@ -21,6 +21,8 @@
 #include <iostream>
 #include <cstdio>
 #include <arpa/inet.h>
+#include <sys/select.h>
+#include <vector>
 
 #include "Server.hpp"
 #include "Client.hpp"

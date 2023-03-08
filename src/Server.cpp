@@ -63,7 +63,10 @@ void Server::launch()
 {
 	struct sockaddr_in tmp;
 	socklen_t addr_len;
-
+    fd_set readfds;
+    fd_set writefds;
+    int opt = 1;
+    
 	_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (_socket_fd < 0)
 	{
@@ -71,6 +74,12 @@ void Server::launch()
 		return;
 	}
 	std::cout << "Socket created" << std::endl;
+    if (setsockopt(_socket_fd, SOL_SOCKET, SO_REUSEADDR, 
+                    &opt, sizeof(opt))) 
+     { 
+        perror("setsockopt"); 
+        return; 
+     }
 	tmp.sin_family = AF_INET;
 	tmp.sin_port = htons(_port);
 	tmp.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -89,18 +98,58 @@ void Server::launch()
 	while (1)
 	{
 		std::cout << "Waiting for new connection" << std::endl;
-		_client_fd = accept(_socket_fd, (struct sockaddr *)&tmp, &addr_len);
-		if (_client_fd < 0)
-		{
-			perror("In accept");
-			return ;
-		}
+        FD_ZERO(&readfds);
+        FD_ZERO(&writefds);
+        FD_SET(_socket_fd, &readfds);
 
-		char buffer[30000] = {0};
-		int valread;
+        // add all clients to the set of fd to read/write
+        for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+        {
+            FD_SET(it->getFd(), &readfds);
+            FD_SET(it->getFd(), &writefds);
+            std::cout << "Client fd added to select: " << it->getFd() << std::endl;
+        }
+        int ret = select(FD_SETSIZE, &readfds, &writefds, NULL, NULL);
 
-		valread = read(_client_fd, buffer, MAX_CLIENTS);
-		std::cout << buffer << std::endl;
-		close(_client_fd);
+        if (ret < 0)
+        {
+            perror("In select");
+            return;
+        }
+        else if (ret == 0)
+        {
+            std::cout << "Timeout" << std::endl;
+            continue;
+        }
+        else
+        {
+            if (FD_ISSET(_socket_fd, &readfds))
+            {
+                std::cout << "New connection" << std::endl;
+                int _client_fd = accept(_socket_fd, (struct sockaddr *)&tmp, &addr_len);
+                if (_client_fd < 0)
+                {
+                	perror("In accept");
+                	return ;
+                }
+                _clients.push_back(Client(_client_fd));
+                continue;
+            }
+            for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+            {
+                if (FD_ISSET(it->getFd(), &readfds))
+                {
+                    std::cout << "New message" << std::endl;
+                    char buffer[30000] = {0};
+                    if (read(it->getFd(), buffer, MAX_CLIENTS) < 0)
+                    {
+                        perror("In read");
+                        return;
+                    }
+                    std::cout << buffer << std::endl;
+                    continue;
+                }
+            }
+        }
 	}
 }

@@ -20,15 +20,16 @@ Client::Client(int fd)
 Client::Client(const Client &other)
 	: _fd(other.getFd())
 {
-	*this = other;
 }
 
 Client::~Client()
 {
+	close(_fd);
 }
 
 Client &Client::operator=(const Client &rhs)
 {
+	(void)rhs;
 	return *this;
 }
 
