@@ -20,16 +20,17 @@ class Client
 public:
 	Client(int fd);
 	Client(const Client &other);
+	Client &operator=(const Client &rhs);
 	~Client();
 	int getFd() const;
+	static void clearFd(int fd, std::vector<Client> &clients);
 
 private:
-	Client &operator=(const Client &rhs);
 	Client();
 
 // Attributes
 private:
-	const int _fd;
+	int _fd;
 };
 
 #endif /* CLIENT_HPP */

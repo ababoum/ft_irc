@@ -12,6 +12,10 @@
 
 #include "ft_irc.hpp"
 
+static void	ft_exit(int sig_code)
+{
+	throw sig_code;
+}
 
 int main(int argc, char **argv)
 {
@@ -21,7 +25,7 @@ int main(int argc, char **argv)
 		std::cout << argv[0] << " <port> <password>" << std::endl;
 		return (1);
 	}
-
+	signal(SIGINT, ft_exit);
 	try
 	{
 		int port = ft_parse_port(argv[1]);
@@ -31,6 +35,10 @@ int main(int argc, char **argv)
 	catch(const std::exception& e)
 	{
 		std::cerr << "Error\n" << e.what() << std::endl;
+	}
+	catch (int sig_code) {
+		RUNTIME_MSG("\nQuitting ircserv... Thanks!\n");
+		return (sig_code);
 	}
 	
 	

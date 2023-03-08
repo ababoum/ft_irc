@@ -29,11 +29,25 @@ Client::~Client()
 
 Client &Client::operator=(const Client &rhs)
 {
-	(void)rhs;
+	_fd = rhs.getFd();
 	return *this;
 }
 
 int Client::getFd() const
 {
 	return _fd;
+}
+
+void Client::clearFd(int fd, std::vector<Client> &clients)
+{
+	std::vector<Client>::iterator it = clients.begin();
+	while (it != clients.end())
+	{
+		if (it->getFd() == fd)
+		{
+			clients.erase(it);
+			break;
+		}
+		it++;
+	}
 }
