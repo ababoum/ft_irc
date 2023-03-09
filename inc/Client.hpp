@@ -20,16 +20,20 @@ class Client
 public:
 	Client(int fd);
 	Client(const Client &other);
+	Client &operator=(const Client &rhs);
 	~Client();
 	int getFd() const;
+	void append_message_buffer(const std::string &str);
+	void append_message_buffer(const char *str);
+	void clear_message_buffer();
 
 private:
-	Client &operator=(const Client &rhs);
 	Client();
 
 // Attributes
 private:
-	const int _fd;
+	int _fd;
+	std::string _message_buffer;
 };
 
 #endif /* CLIENT_HPP */

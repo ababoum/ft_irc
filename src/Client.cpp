@@ -29,11 +29,26 @@ Client::~Client()
 
 Client &Client::operator=(const Client &rhs)
 {
-	(void)rhs;
+	_fd = rhs.getFd();
 	return *this;
 }
 
 int Client::getFd() const
 {
 	return _fd;
+}
+
+void Client::append_message_buffer(const std::string &str)
+{
+	_message_buffer.append(str);
+}
+
+void Client::append_message_buffer(const char *str)
+{
+	_message_buffer.append(str);
+}
+
+void Client::clear_message_buffer()
+{
+	_message_buffer.clear();
 }
