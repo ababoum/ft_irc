@@ -24,7 +24,7 @@ Client::Client(const Client &other)
 
 Client::~Client()
 {
-	close(_fd);
+	// The client fd needs to be closed by hand when the client disconnects
 }
 
 Client &Client::operator=(const Client &rhs)

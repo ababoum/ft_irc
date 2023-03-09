@@ -143,8 +143,7 @@ void Server::launch()
                     char buffer[30000] = {0};
                     if (read(it->getFd(), buffer, MAX_CLIENTS) < 0)
                     {
-                        perror("In read");
-                        return;
+                        close(it->getFd());
                     }
                     std::cout << buffer << std::endl;
                     continue;
