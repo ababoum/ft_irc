@@ -6,7 +6,7 @@
 /*   By: bregneau <bregneau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 19:17:37 by bregneau          #+#    #+#             */
-/*   Updated: 2023/03/12 21:01:40 by bregneau         ###   ########.fr       */
+/*   Updated: 2023/03/12 22:43:47 by bregneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -213,7 +213,7 @@ void Server::user(Client &client, const std::vector<std::string>& args)
 	client.setServerName(args[3]);
 	client.setRealName(args[4]);
 	
-	client.appendMessageToSend(":ircserv 001 " + client.getNickName() + " :Welcome to ircserv " + client.getNickName() + "!\n");
+	client.appendMessageToSend(":ircserv 001 " + client.getNickname() + " :Welcome to ircserv " + client.getNickname() + "!\n");
 }
 
 void Server::join(Client &client, const std::vector<std::string>& args)
@@ -226,5 +226,5 @@ void Server::join(Client &client, const std::vector<std::string>& args)
 void Server::ping(Client &client, const std::vector<std::string>& args)
 {
 	std::cout << "ping function called" << std::endl;
-	client.appendMessageToSend(":ircserv PONG " + client.getNickName() + " " + args[1] + "\n");
+	client.appendMessageToSend(":ircserv PONG " + client.getNickname() + " " + args[1] + "\n");
 }

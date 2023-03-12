@@ -6,7 +6,7 @@
 /*   By: bregneau <bregneau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 19:17:07 by bregneau          #+#    #+#             */
-/*   Updated: 2023/03/12 19:51:36 by bregneau         ###   ########.fr       */
+/*   Updated: 2023/03/12 22:44:17 by bregneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,11 +38,11 @@ public:
 
 	const std::string &	getMessageReceived() const;
 	const std::string &	getMessageToSend() const;
-	const std::string &	getNickName() const;
-	const std::string &	getUserName() const;
-	const std::string &	getHostName() const;
-	const std::string &	getServerName() const;
-	const std::string &	getRealName() const;
+	const std::string &	getNickname() const;
+	const std::string &	getUsername() const;
+	const std::string &	getHostname() const;
+	const std::string &	getServername() const;
+	const std::string &	getRealname() const;
 	int getFd() const;
 
 private:
@@ -54,11 +54,11 @@ private:
 	bool _is_authentified;
 	std::string _message_received;
 	std::string _message_to_send;
-	std::string _nick_name;
-	std::string _user_name;
-	std::string _host_name;
-	std::string _server_name;
-	std::string _real_name;
+	std::string _nickname;
+	std::string _username;
+	std::string _hostname;
+	std::string _servername;
+	std::string _realname;
 };
 
 #endif /* CLIENT_HPP */

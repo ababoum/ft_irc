@@ -6,7 +6,7 @@
 /*   By: bregneau <bregneau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 19:16:44 by bregneau          #+#    #+#             */
-/*   Updated: 2023/03/12 19:52:24 by bregneau         ###   ########.fr       */
+/*   Updated: 2023/03/12 22:44:17 by bregneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,27 +65,27 @@ void Client::clearMessageToSend()
 
 void Client::setNickName(const std::string &nick_name)
 {
-	_nick_name = nick_name;
+	_nickname = nick_name;
 }
 
 void Client::setUserName(const std::string &user_name)
 {
-	_user_name = user_name;
+	_username = user_name;
 }
 
 void Client::setHostName(const std::string &host_name)
 {
-	_host_name = host_name;
+	_hostname = host_name;
 }
 
 void Client::setServerName(const std::string &server_name)
 {
-	_server_name = server_name;
+	_servername = server_name;
 }
 
 void Client::setRealName(const std::string &real_name)
 {
-	_real_name = real_name;
+	_realname = real_name;
 }
 
 const std::string &	Client::getMessageReceived() const
@@ -98,29 +98,29 @@ const std::string &	Client::getMessageToSend() const
 	return _message_to_send;
 }
 
-const std::string &	Client::getNickName() const
+const std::string &	Client::getNickname() const
 {
-	return _nick_name;
+	return _nickname;
 }
 
-const std::string &	Client::getUserName() const
+const std::string &	Client::getUsername() const
 {
-	return _user_name;
+	return _username;
 }
 
-const std::string &	Client::getHostName() const
+const std::string &	Client::getHostname() const
 {
-	return _host_name;
+	return _hostname;
 }
 
-const std::string &	Client::getServerName() const
+const std::string &	Client::getServername() const
 {
-	return _server_name;
+	return _servername;
 }
 
-const std::string &	Client::getRealName() const
+const std::string &	Client::getRealname() const
 {
-	return _real_name;
+	return _realname;
 }
 
 int Client::getFd() const
