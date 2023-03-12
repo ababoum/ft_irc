@@ -6,7 +6,7 @@
 #    By: bregneau <bregneau@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/01 19:17:00 by bregneau          #+#    #+#              #
-#    Updated: 2023/03/06 18:49:05 by bregneau         ###   ########.fr        #
+#    Updated: 2023/03/12 21:26:39 by bregneau         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,8 @@ OBJ_DIRS		=	$(OBJ_PATH)
 SRC				=	main.cpp \
 					Server.cpp \
 					utils.cpp \
-					Client.cpp
+					Client.cpp \
+					Channel.cpp \
 
 OBJ				=	$(addprefix $(OBJ_PATH),$(SRC:.cpp=.o))
 DEPS			=	$(addprefix $(OBJ_PATH),$(SRC:.cpp=.d))

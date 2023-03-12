@@ -6,7 +6,7 @@
 /*   By: bregneau <bregneau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 19:17:37 by bregneau          #+#    #+#             */
-/*   Updated: 2023/03/12 16:12:39 by bregneau         ###   ########.fr       */
+/*   Updated: 2023/03/12 21:01:40 by bregneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,12 +149,22 @@ void Server::launch()
                     }
                     else
                     {
-                        it->append_message_buffer(buffer);
+                        it->appendMessageReceived(buffer);
                     }
-                    DEBUG(buffer);
+                    INFO(buffer);
                     break;
                 }
             }
+			for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+			{
+				if (FD_ISSET(it->getFd(), &writefds))
+				{
+					DEBUG("Ready to write\n");
+					execute_command(*it);
+					write(it->getFd(), it->getMessageToSend().c_str(), it->getMessageToSend().size());
+					it->clearMessageToSend();
+				}
+			}
         }
     }
 }
@@ -162,28 +172,32 @@ void Server::launch()
 
 void Server::execute_command(Client &client)
 {
-	std::string command_name[] = {"NICK", "USER", "JOIN"};
-	void (Server::*f[])(Client &client, const std::vector<std::string>& args) = {&Server::nick, &Server::user, &Server::join};
+	std::string command_name[] = {"NICK", "USER", "JOIN", "PING"};
+	void (Server::*f[])(Client &client, const std::vector<std::string>& args) = {&Server::nick, &Server::user, &Server::join, &Server::ping};
 
-	// std::string command = _message_buffer.substr(0, _message_buffer.find(" "));
 
-	std::vector<std::string> command = split(client.getMessageBuffer(), ' ');
+	std::vector<std::string> lines = split(client.getMessageReceived(), '\n');
 
-	for (int i = 0; i < 3; i++)
+	for (std::vector<std::string>::iterator it = lines.begin(); it != lines.end(); ++it)
 	{
-		if (command[0] == command_name[i])
-			(this->*f[i])(client, command);
+		// std::cout << "line: " << *it << std::endl;
+		std::vector<std::string> command = split(*it, ' ');
+
+		for (int i = 0; i < 4; i++)
+		{
+			if (command[0] == command_name[i])
+				(this->*f[i])(client, command);
+		}
 	}
+
 	
-	client.clear_message_buffer();
+	client.clearMessageReceived();
 }
 
 void Server::nick(Client &client, const std::vector<std::string>& args)
 {
 	std::cout << "nick function called" << std::endl;
-
-	(void)client;
-	(void)args;
+	client.setNickName(args[1]);
 	//tester si le nick name n'est pas deja pris
 	// _nick_name = args[1];
 }
@@ -192,8 +206,14 @@ void Server::nick(Client &client, const std::vector<std::string>& args)
 void Server::user(Client &client, const std::vector<std::string>& args)
 {
 	std::cout << "user function called" << std::endl;
-	(void)client;
-	(void)args;
+	if (args.size() < 5)
+		return;
+	client.setUserName(args[1]);
+	client.setHostName(args[2]);
+	client.setServerName(args[3]);
+	client.setRealName(args[4]);
+	
+	client.appendMessageToSend(":ircserv 001 " + client.getNickName() + " :Welcome to ircserv " + client.getNickName() + "!\n");
 }
 
 void Server::join(Client &client, const std::vector<std::string>& args)
@@ -201,4 +221,10 @@ void Server::join(Client &client, const std::vector<std::string>& args)
 	std::cout << "join function called" << std::endl;
 	(void)client;
 	(void)args;
+}
+
+void Server::ping(Client &client, const std::vector<std::string>& args)
+{
+	std::cout << "ping function called" << std::endl;
+	client.appendMessageToSend(":ircserv PONG " + client.getNickName() + " " + args[1] + "\n");
 }

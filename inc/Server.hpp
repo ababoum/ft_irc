@@ -20,14 +20,18 @@ public:
 	void nick(Client &client, const std::vector<std::string>& args);
 	void user(Client &client, const std::vector<std::string>& args);
 	void join(Client &client, const std::vector<std::string>& args);
+	void ping(Client &client, const std::vector<std::string>& args);
 
 private:
 	Server();
 	Server(const Server &other);
-	int _socket_fd;
-	int _port;
-	std::string _password;
-	std::vector<Client> _clients;
+
+// Attributes
+private:
+	int 				_socket_fd;
+	int 				_port;
+	std::string			_password;
+	std::vector<Client>	_clients;
 
 	void launch(void);
 };
