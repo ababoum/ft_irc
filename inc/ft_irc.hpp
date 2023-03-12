@@ -6,7 +6,7 @@
 /*   By: bregneau <bregneau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 18:27:56 by bregneau          #+#    #+#             */
-/*   Updated: 2023/03/07 13:03:12 by bregneau         ###   ########.fr       */
+/*   Updated: 2023/03/09 17:37:57 by bregneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,10 @@
 #define INFO(x) std::cerr << ITALIC_TXT << x << RESET_TXT;
 #define RUNTIME_MSG(x) std::cerr << GREEN_TXT << x << RESET_TXT;
 
-bool ft_is_number(const std::string &str);
-int ft_parse_port(const std::string &str);
-void ft_check_password(const std::string &str);
+std::vector<std::string>	split(const std::string &str, char delim);
+
+bool	ft_is_number(const std::string &str);
+int		ft_parse_port(const std::string &str);
+void	ft_check_password(const std::string &str);
 
 #endif /* FT_IRC_HPP */

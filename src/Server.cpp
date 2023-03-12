@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mriant <mriant@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bregneau <bregneau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 19:17:37 by bregneau          #+#    #+#             */
-/*   Updated: 2023/03/06 17:02:41 by mriant           ###   ########.fr       */
+/*   Updated: 2023/03/12 16:12:39 by bregneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,4 +157,48 @@ void Server::launch()
             }
         }
     }
+}
+
+
+void Server::execute_command(Client &client)
+{
+	std::string command_name[] = {"NICK", "USER", "JOIN"};
+	void (Server::*f[])(Client &client, const std::vector<std::string>& args) = {&Server::nick, &Server::user, &Server::join};
+
+	// std::string command = _message_buffer.substr(0, _message_buffer.find(" "));
+
+	std::vector<std::string> command = split(client.getMessageBuffer(), ' ');
+
+	for (int i = 0; i < 3; i++)
+	{
+		if (command[0] == command_name[i])
+			(this->*f[i])(client, command);
+	}
+	
+	client.clear_message_buffer();
+}
+
+void Server::nick(Client &client, const std::vector<std::string>& args)
+{
+	std::cout << "nick function called" << std::endl;
+
+	(void)client;
+	(void)args;
+	//tester si le nick name n'est pas deja pris
+	// _nick_name = args[1];
+}
+
+
+void Server::user(Client &client, const std::vector<std::string>& args)
+{
+	std::cout << "user function called" << std::endl;
+	(void)client;
+	(void)args;
+}
+
+void Server::join(Client &client, const std::vector<std::string>& args)
+{
+	std::cout << "join function called" << std::endl;
+	(void)client;
+	(void)args;
 }

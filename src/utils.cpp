@@ -6,11 +6,31 @@
 /*   By: bregneau <bregneau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/06 18:44:06 by bregneau          #+#    #+#             */
-/*   Updated: 2023/03/07 13:02:31 by bregneau         ###   ########.fr       */
+/*   Updated: 2023/03/09 17:37:24 by bregneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_irc.hpp"
+
+// CPP spliter
+std::vector<std::string>	split(const std::string &str, char delim)
+{
+	std::size_t i = 0;
+	std::vector<std::string> list;
+
+	std::size_t pos = str.find(delim);
+
+	while (pos != std::string::npos)
+	{
+		list.push_back(str.substr(i, pos - i));
+		i = ++pos;
+		pos = str.find(delim, pos);
+	}
+
+	list.push_back(str.substr(i, str.length()));
+
+	return list;
+}
 
 bool ft_is_number(const std::string &str)
 {

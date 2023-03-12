@@ -6,7 +6,7 @@
 /*   By: bregneau <bregneau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 19:16:44 by bregneau          #+#    #+#             */
-/*   Updated: 2023/03/03 15:05:48 by bregneau         ###   ########.fr       */
+/*   Updated: 2023/03/10 16:39:09 by bregneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,12 @@ int Client::getFd() const
 {
 	return _fd;
 }
+
+const std::string &	Client::getMessageBuffer() const
+{
+	return _message_buffer;
+}
+
 
 void Client::append_message_buffer(const std::string &str)
 {

@@ -6,12 +6,11 @@
 /*   By: bregneau <bregneau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 18:23:07 by bregneau          #+#    #+#             */
-/*   Updated: 2023/03/07 13:08:10 by bregneau         ###   ########.fr       */
+/*   Updated: 2023/03/12 16:48:13 by bregneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_irc.hpp"
-
 
 int main(int argc, char **argv)
 {
@@ -35,3 +34,13 @@ int main(int argc, char **argv)
 	
 	
 }
+
+// int main(int argc, char **argv)
+// {
+// 	Client client(-1);
+
+// 	if (argc < 2)
+// 		return 1;
+// 	client.append_message_buffer(argv[1]);
+// 	client.execute_command();
+// }
