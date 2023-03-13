@@ -6,14 +6,16 @@
 /*   By: bregneau <bregneau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 19:16:44 by bregneau          #+#    #+#             */
-/*   Updated: 2023/03/12 22:44:17 by bregneau         ###   ########.fr       */
+/*   Updated: 2023/03/13 18:12:18 by bregneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
 
 Client::Client(int fd)
-	: _fd(fd)
+	: _fd(fd), _is_authentified(false)
+	, _message_received(""), _message_to_send("")
+	, _nickname(""), _username(""), _hostname(""), _servername(""), _realname("")
 {
 }
 
@@ -29,8 +31,24 @@ Client::~Client()
 
 Client &Client::operator=(const Client &rhs)
 {
-	_fd = rhs.getFd();
+	if (this != &rhs)
+	{
+		_fd = rhs.getFd();
+		_is_authentified = rhs.isAuthentified();
+		_message_received = rhs.getMessageReceived();
+		_message_to_send = rhs.getMessageToSend();
+		_nickname = rhs.getNickname();
+		_username = rhs.getUsername();
+		_hostname = rhs.getHostname();
+		_servername = rhs.getServername();
+		_realname = rhs.getRealname();
+	}
 	return *this;
+}
+
+bool Client::isAuthentified()
+{
+	return _is_authentified;
 }
 
 void Client::appendMessageReceived(const std::string &str)
@@ -63,27 +81,32 @@ void Client::clearMessageToSend()
 	_message_to_send.clear();
 }
 
-void Client::setNickName(const std::string &nick_name)
+void Client::setAuthentified()
+{
+	_is_authentified = true;
+}
+
+void Client::setNickname(const std::string &nick_name)
 {
 	_nickname = nick_name;
 }
 
-void Client::setUserName(const std::string &user_name)
+void Client::setUsername(const std::string &user_name)
 {
 	_username = user_name;
 }
 
-void Client::setHostName(const std::string &host_name)
+void Client::setHostname(const std::string &host_name)
 {
 	_hostname = host_name;
 }
 
-void Client::setServerName(const std::string &server_name)
+void Client::setServername(const std::string &server_name)
 {
 	_servername = server_name;
 }
 
-void Client::setRealName(const std::string &real_name)
+void Client::setRealname(const std::string &real_name)
 {
 	_realname = real_name;
 }

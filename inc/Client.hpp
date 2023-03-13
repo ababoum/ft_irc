@@ -6,7 +6,7 @@
 /*   By: bregneau <bregneau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 19:17:07 by bregneau          #+#    #+#             */
-/*   Updated: 2023/03/12 22:44:17 by bregneau         ###   ########.fr       */
+/*   Updated: 2023/03/13 15:48:07 by bregneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,8 @@ public:
 	Client(const Client &other);
 	Client &operator=(const Client &rhs);
 	~Client();
-
+	
+	bool	isAuthentified();
 	void	appendMessageReceived(const std::string &str);
 	void	appendMessageReceived(const char *str);
 	void	appendMessageToSend(const std::string &str);
@@ -30,11 +31,12 @@ public:
 	void	clearMessageReceived();
 	void	clearMessageToSend();
 
-	void	setNickName(const std::string &nick_name);
-	void	setUserName(const std::string &user_name);
-	void	setHostName(const std::string &host_name);
-	void	setServerName(const std::string &server_name);
-	void	setRealName(const std::string &real_name);
+	void	setAuthentified();
+	void	setNickname(const std::string &nick_name);
+	void	setUsername(const std::string &user_name);
+	void	setHostname(const std::string &host_name);
+	void	setServername(const std::string &server_name);
+	void	setRealname(const std::string &real_name);
 
 	const std::string &	getMessageReceived() const;
 	const std::string &	getMessageToSend() const;

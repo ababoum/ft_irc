@@ -16,7 +16,7 @@ public:
 	int getPort(void) const;
 	std::string getPassword(void) const;
 
-	void execute_command(Client &client);
+	void parseCommands(Client &client);
 	void nick(Client &client, const std::vector<std::string>& args);
 	void user(Client &client, const std::vector<std::string>& args);
 	void join(Client &client, const std::vector<std::string>& args);
