@@ -6,7 +6,7 @@
 class Channel
 {
 public:
-	Channel(const std::string &name);
+	Channel(const std::string &name, Client *client);
 	Channel(const Channel &other);
 	~Channel();
 	Channel &operator=(const Channel &rhs);
@@ -15,6 +15,10 @@ public:
 	void	removeClient(Client *client);
 	void	removeClient(const std::string &nickname);
 	void	removeClient(const int fd);
+	void	addOperator(Client *client);
+	void	removeOp(Client *client);
+	void	removeOp(const std::string &nickname);
+	void	removeOp(const int fd);
 
 	std::string	getName() const;
 
@@ -24,8 +28,7 @@ private:
 private:
 	std::string _name;
 	std::vector<Client *> _clients;
-	
-	
+	std::vector<Client *> _operators;
 };
 
 #endif /* CHANNEL_HPP */
