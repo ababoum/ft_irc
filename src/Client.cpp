@@ -6,7 +6,7 @@
 /*   By: bregneau <bregneau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 19:16:44 by bregneau          #+#    #+#             */
-/*   Updated: 2023/03/13 18:12:18 by bregneau         ###   ########.fr       */
+/*   Updated: 2023/03/14 14:27:33 by bregneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,11 +44,6 @@ Client &Client::operator=(const Client &rhs)
 		_realname = rhs.getRealname();
 	}
 	return *this;
-}
-
-bool Client::isAuthentified()
-{
-	return _is_authentified;
 }
 
 void Client::appendMessageReceived(const std::string &str)
@@ -109,6 +104,11 @@ void Client::setServername(const std::string &server_name)
 void Client::setRealname(const std::string &real_name)
 {
 	_realname = real_name;
+}
+
+bool Client::isAuthentified() const
+{
+	return _is_authentified;
 }
 
 const std::string &	Client::getMessageReceived() const

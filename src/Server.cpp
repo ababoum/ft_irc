@@ -6,7 +6,7 @@
 /*   By: bregneau <bregneau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 19:17:37 by bregneau          #+#    #+#             */
-/*   Updated: 2023/03/13 18:06:11 by bregneau         ###   ########.fr       */
+/*   Updated: 2023/03/15 15:33:00 by bregneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,12 +179,16 @@ void Server::parseCommands(Client &client)
 	std::string command_name[] = {"NICK", "USER", "JOIN", "PING"};
 	void (Server::*f[])(Client &client, const std::vector<std::string>& args) = {&Server::nick, &Server::user, &Server::join, &Server::ping};
 
-	std::vector<std::string> lines = split(client.getMessageReceived(), '\n');
+	std::vector<std::string> lines = split(client.getMessageReceived(), "\r\n");
 	for (std::vector<std::string>::iterator it = lines.begin(); it != lines.end(); ++it)
 	{
 		// std::cout << "line: " << *it << std::endl;
 		std::vector<std::string> command = split(*it, ' ');
 
+		if (command[0][0] == '@')
+			command.erase(command.begin());
+		if (command[0][0] == ':')
+			command.erase(command.begin());
 		for (int i = 0; i < 4; i++)
 		{
 			if (command[0] == command_name[i])
@@ -228,7 +232,7 @@ void Server::nick(Client &client, const std::vector<std::string>& args)
 	{
 		client.setAuthentified();
 		// 001 RPL_WELCOME
-		client.appendMessageToSend(":ircserv 001 " + client.getNickname() + " :Welcome to ircserv " + client.getNickname() + "!\n");
+		client.appendMessageToSend(":ircserv 001 " + client.getNickname() + " :Welcome to ircserv " + client.getNickname() + "!\r\n");
 	}
 
 }

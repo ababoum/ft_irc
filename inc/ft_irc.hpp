@@ -6,7 +6,7 @@
 /*   By: bregneau <bregneau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 18:27:56 by bregneau          #+#    #+#             */
-/*   Updated: 2023/03/12 20:09:29 by bregneau         ###   ########.fr       */
+/*   Updated: 2023/03/15 15:10:27 by bregneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@
 #define RUNTIME_MSG(x) std::cerr << GREEN_TXT << x << RESET_TXT;
 
 std::vector<std::string>	split(const std::string &str, char delim);
+std::vector<std::string>	split(const std::string &str, const char *set_delim);
 
 bool	ft_is_number(const std::string &str);
 int		ft_parse_port(const std::string &str);

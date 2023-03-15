@@ -6,7 +6,7 @@
 /*   By: bregneau <bregneau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 19:17:07 by bregneau          #+#    #+#             */
-/*   Updated: 2023/03/13 15:48:07 by bregneau         ###   ########.fr       */
+/*   Updated: 2023/03/14 14:03:05 by bregneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ public:
 	Client &operator=(const Client &rhs);
 	~Client();
 	
-	bool	isAuthentified();
 	void	appendMessageReceived(const std::string &str);
 	void	appendMessageReceived(const char *str);
 	void	appendMessageToSend(const std::string &str);
@@ -38,6 +37,7 @@ public:
 	void	setServername(const std::string &server_name);
 	void	setRealname(const std::string &real_name);
 
+	bool				isAuthentified() const;
 	const std::string &	getMessageReceived() const;
 	const std::string &	getMessageToSend() const;
 	const std::string &	getNickname() const;
