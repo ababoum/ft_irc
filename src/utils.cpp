@@ -6,7 +6,7 @@
 /*   By: bregneau <bregneau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/06 18:44:06 by bregneau          #+#    #+#             */
-/*   Updated: 2023/03/15 15:10:18 by bregneau         ###   ########.fr       */
+/*   Updated: 2023/03/16 15:22:21 by bregneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,20 @@ std::vector<std::string>	split(const std::string &str, char delim)
 
 	while (pos != std::string::npos)
 	{
-		list.push_back(str.substr(i, pos - i));
-		i = ++pos;
+		if (pos == i)
+		{
+			i = ++pos;
+		}
+		else
+		{
+			list.push_back(str.substr(i, pos - i));
+			i = ++pos;
+		}
 		pos = str.find(delim, pos);
 	}
 
-	list.push_back(str.substr(i, str.length()));
+	if (i != str.length())
+		list.push_back(str.substr(i, str.length()));
 
 	return list;
 }
