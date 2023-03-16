@@ -6,7 +6,7 @@
 /*   By: bregneau <bregneau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 19:17:37 by bregneau          #+#    #+#             */
-/*   Updated: 2023/03/15 15:33:00 by bregneau         ###   ########.fr       */
+/*   Updated: 2023/03/16 15:20:36 by bregneau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,23 +173,43 @@ void Server::launch()
     }
 }
 
+void stripPrefix(std::string &line, char c)
+{
+	if (line[0] == c)
+	{
+		size_t pos = line.find_first_of(' ');
+		pos = line.find_first_not_of(' ', pos);
+		line.erase(0, pos);
+	}
+}
 
 void Server::parseCommands(Client &client)
 {
 	std::string command_name[] = {"NICK", "USER", "JOIN", "PING"};
+	size_t nb_commands = sizeof(command_name) / sizeof(command_name[0]);
 	void (Server::*f[])(Client &client, const std::vector<std::string>& args) = {&Server::nick, &Server::user, &Server::join, &Server::ping};
 
 	std::vector<std::string> lines = split(client.getMessageReceived(), "\r\n");
 	for (std::vector<std::string>::iterator it = lines.begin(); it != lines.end(); ++it)
 	{
-		// std::cout << "line: " << *it << std::endl;
-		std::vector<std::string> command = split(*it, ' ');
+		std::string last_param;
+		std::string line(*it);
+		stripPrefix(line, '@');
+		stripPrefix(line, ':');
+		size_t pos = line.find_first_of(':');
+		if (pos != std::string::npos)
+		{
+			last_param = line.substr(pos + 1, line.size() - pos);
+			line = line.substr(0, pos);
 
-		if (command[0][0] == '@')
-			command.erase(command.begin());
-		if (command[0][0] == ':')
-			command.erase(command.begin());
-		for (int i = 0; i < 4; i++)
+		}
+		std::vector<std::string> command = split(line, ' ');
+		if (last_param.size() > 0)
+			command.push_back(last_param);
+
+		for (std::vector<std::string>::iterator it = command.begin(); it != command.end(); ++it)
+			std::cout << *it << std::endl;
+		for (size_t i = 0; i < nb_commands; i++)
 		{
 			if (command[0] == command_name[i])
 				(this->*f[i])(client, command);
@@ -209,19 +229,22 @@ void Server::nick(Client &client, const std::vector<std::string>& args)
 	if (args.size() < 2 )
 	{
 		//431 ERR_NONICKNAMEGIVEN
+		client.appendMessageToSend(":ircserv 431 " + client.getNickname() + " :No nickname given\n");
 		return;
 	}
-	if (args[1].size() > 9 || args[1].size() < 2)
+	std::string nickname(args[1]);
+	if (nickname.size() > 9 || nickname.size() < 2 || nickname.find_first_of(" ,*?!@."))
 	{
 		//432 ERR_ERRONEUSNICKNAME
+		client.appendMessageToSend(":ircserv 432 " + client.getNickname() + " " + nickname + " :Erroneus nickname\n");
 		return;
 	}
 	for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
-		if (it->getNickname() == args[1])
+		if (it->getNickname() == nickname)
 		{
 			//433 ERR_NICKNAMEINUSE;
-			client.appendMessageToSend(":ircserv 433 " + client.getNickname() + " " + args[1] + " :Nickname is already in use.\n");
+			client.appendMessageToSend(":ircserv 433 " + client.getNickname() + " " + nickname + " :Nickname is already in use.\n");
 			return;
 		}
 	}
