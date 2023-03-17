@@ -290,12 +290,17 @@ void Server::join(Client &client, const std::vector<std::string> &args)
 	for (size_t i = 0; i < channels.size(); i++)
 	{
 		// Check name >> 476 ERR_BADCHANMASK + return
-		// Check if Chan exists, if not create chan
-		// int chan_pos = searchChan(channels[i], client);
-		// Add client to chan and chan to client
+		int chan_pos = searchChan(channels[i], client);
+		Channel &channel = _channels[chan_pos];
+		channel.addClient(&client);
+		client.addChan(&channel);
 		// JOIN Message
 		client.appendMessageToSend(":" + client.getNickname() + " JOIN " + args[1] + "\n");
 		// 332 RPL_TOPIC ou 331 RPL_NOTOPIC
+		if (channel.getTopic().size() > 0)
+			client.appendMessageToSend(":ircserv 332 " + channel.getName() + " :" + channel.getTopic() + "\n");
+		else
+			client.appendMessageToSend(":ircserv 331 " + channel.getName() + " :No topic is set\n");
 		// 333 RPL_TOPICWHOTIME
 		// Un 353 RPL_NAMREPLY par users sur le channel
 		// 366 RPL_ENDOFNAMES

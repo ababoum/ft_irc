@@ -26,6 +26,7 @@ public:
 	void	setHostname(const std::string &host_name);
 	void	setServername(const std::string &server_name);
 	void	setRealname(const std::string &real_name);
+	void	addChan(Channel *channel);
 
 	bool				isAuthentified() const;
 	const std::string &	getMessageReceived() const;

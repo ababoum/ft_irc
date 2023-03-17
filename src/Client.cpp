@@ -94,6 +94,12 @@ void Client::setRealname(const std::string &real_name)
 	_realname = real_name;
 }
 
+void Client::addChan(Channel *channel)
+{
+	_joined_channels.push_back(channel);
+}
+
+
 bool Client::isAuthentified() const
 {
 	return _is_authentified;
