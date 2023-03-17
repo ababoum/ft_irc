@@ -14,6 +14,7 @@
 
 #include "Server.hpp"
 #include "Client.hpp"
+#include "Channel.hpp"
 
 #define MAX_CLIENTS 1000
 #define READ_SIZE 4096

@@ -1,5 +1,9 @@
 #include "Channel.hpp"
 
+//==============================================================================
+// Constructors and destructor
+//==============================================================================
+
 Channel::Channel(const std::string &name, Client *client)
 	: _name(name)
 {
@@ -17,11 +21,33 @@ Channel::~Channel()
 {
 }
 
+//==============================================================================
+// Operators
+//==============================================================================
+
 Channel &Channel::operator=(const Channel &rhs)
 {
 	_name = rhs.getName();
 	return *this;
 }
+
+//==============================================================================
+// Getters and Setters
+//==============================================================================
+
+std::string Channel::getName() const
+{
+	return _name;
+}
+
+std::string Channel::getTopic() const
+{
+	return _topic;
+}
+
+//==============================================================================
+// Functions
+//==============================================================================
 
 void Channel::addClient(Client *client)
 {
@@ -106,9 +132,4 @@ void Channel::removeOp(const int fd)
 			break;
 		}
 	}
-}
-
-std::string Channel::getName() const
-{
-	return _name;
 }

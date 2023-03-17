@@ -1,7 +1,7 @@
 #include "ft_irc.hpp"
 
 // CPP spliter
-std::vector<std::string>	split(const std::string &str, char delim)
+std::vector<std::string> split(const std::string &str, char delim)
 {
 	std::size_t i = 0;
 	std::vector<std::string> list;
@@ -28,8 +28,7 @@ std::vector<std::string>	split(const std::string &str, char delim)
 	return list;
 }
 
-
-std::vector<std::string>	split(const std::string &str, const char *set_delim)
+std::vector<std::string> split(const std::string &str, const char *set_delim)
 {
 	std::size_t i = 0;
 	std::vector<std::string> list;
@@ -49,7 +48,7 @@ std::vector<std::string>	split(const std::string &str, const char *set_delim)
 		}
 		pos = str.find_first_of(set_delim, pos);
 	}
-	
+
 	if (i != str.length())
 		list.push_back(str.substr(i, str.length()));
 
@@ -64,7 +63,7 @@ bool ft_is_number(const std::string &str)
 
 int ft_parse_port(const std::string &str)
 {
-	int	port;
+	int port;
 
 	if (!ft_is_number(str))
 		throw std::invalid_argument("Port number is not valid");
@@ -74,7 +73,7 @@ int ft_parse_port(const std::string &str)
 	return (port);
 }
 
-void	ft_check_password(const std::string &str)
+void ft_check_password(const std::string &str)
 {
 	if (str.empty())
 		throw std::invalid_argument("Empty password");

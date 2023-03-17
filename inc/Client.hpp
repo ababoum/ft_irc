@@ -51,7 +51,7 @@ private:
 	std::string _hostname;
 	std::string _servername;
 	std::string _realname;
-	std::vector<Channel *> _joined_channels
+	std::vector<Channel *> _joined_channels;
 };
 
 #endif /* CLIENT_HPP */
