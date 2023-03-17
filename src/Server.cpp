@@ -271,8 +271,29 @@ void Server::user(Client &client, const std::vector<std::string>& args)
 void Server::join(Client &client, const std::vector<std::string>& args)
 {
 	std::cout << "join function called" << std::endl;
-	(void)client;
-	(void)args;
+	if (args.size() == 1)
+	{
+		//461 ERR_NEEDMOREPARAMS
+	}
+	if (args[1] == "0")
+	{
+		// Send PART message to all chans the client is connected to
+		return ;
+	}
+	std::vector<std::string> channels = split(args[1], ",");
+	for (size_t i = 0; i < channels.size(); i++)
+	{
+		// Check name >> 476 ERR_BADCHANMASK + return
+		// Check if Chan exists
+		// If not create chan
+		// else Add client to chan and chan to client
+		// JOIN Message
+		client.appendMessageToSend(":" + client.getNickname() + " JOIN " + args[1] + "\n");
+		// 332 RPL_TOPIC
+		// 333 RPL_TOPICWHOTIME
+		// Un 353 RPL_NAMREPLY par users sur le channel
+		// 366 RPL_ENDOFNAMES
+	}
 }
 
 void Server::ping(Client &client, const std::vector<std::string>& args)
