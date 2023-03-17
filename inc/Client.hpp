@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bregneau <bregneau@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mriant <mriant@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/01 19:17:07 by bregneau          #+#    #+#             */
-/*   Updated: 2023/03/14 14:03:05 by bregneau         ###   ########.fr       */
+/*   Updated: 2023/03/17 14:42:25 by mriant           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 #define CLIENT_HPP
 
 #include "ft_irc.hpp"
+
+class Channel;
 
 class Client
 {
@@ -61,6 +63,7 @@ private:
 	std::string _hostname;
 	std::string _servername;
 	std::string _realname;
+	std::vector<Channel *> _joined_channels
 };
 
 #endif /* CLIENT_HPP */

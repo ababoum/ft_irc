@@ -3,6 +3,7 @@
 
 #include "ft_irc.hpp"
 class Client;
+class Channel;
 
 class Server
 {
@@ -28,10 +29,11 @@ private:
 
 // Attributes
 private:
-	int 				_socket_fd;
-	int 				_port;
-	std::string			_password;
-	std::vector<Client>	_clients;
+	int 					_socket_fd;
+	int 					_port;
+	std::string				_password;
+	std::vector<Client>		_clients;
+	std::vector<Channel>	_channels;
 
 	void launch(void);
 };
