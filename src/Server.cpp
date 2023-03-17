@@ -194,8 +194,6 @@ void Server::parseCommands(Client &client)
 		if (last_param.size() > 0)
 			command.push_back(last_param);
 
-		for (std::vector<std::string>::iterator it = command.begin(); it != command.end(); ++it)
-			std::cout << *it << std::endl;
 		for (size_t i = 0; i < nb_commands; i++)
 		{
 			if (command[0] == command_name[i])
@@ -219,7 +217,7 @@ void Server::nick(Client &client, const std::vector<std::string> &args)
 		return;
 	}
 	std::string nickname(args[1]);
-	if (nickname.size() > 9 || nickname.size() < 2 || nickname.find_first_of(" ,*?!@."))
+	if (nickname.size() > 9 || nickname.size() < 2 || nickname.find_first_of(" ,*?!@.") != std::string::npos)
 	{
 		// 432 ERR_ERRONEUSNICKNAME
 		client.appendMessageToSend(":ircserv 432 " + client.getNickname() + " " + nickname + " :Erroneus nickname\n");
