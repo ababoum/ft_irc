@@ -12,7 +12,7 @@ Channel::Channel(const std::string &name, Client *client)
 }
 
 Channel::Channel(const Channel &other)
-	: _name(other.getName())
+	// : _name(other.getName())
 {
 	*this = other;
 }
@@ -28,6 +28,11 @@ Channel::~Channel()
 Channel &Channel::operator=(const Channel &rhs)
 {
 	_name = rhs.getName();
+	_topic = rhs.getTopic();
+	_topic_set_by = rhs.getTopicSetBy();
+	_topic_set_at = rhs.getTopicSetAt();
+	_clients = rhs._clients;
+	_operators = rhs._operators;
 	return *this;
 }
 
@@ -44,6 +49,17 @@ std::string Channel::getTopic() const
 {
 	return _topic;
 }
+
+Client *Channel::getTopicSetBy() const
+{
+	return _topic_set_by;
+}
+
+time_t Channel::getTopicSetAt() const
+{
+	return _topic_set_at;
+}
+
 
 //==============================================================================
 // Functions

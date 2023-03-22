@@ -22,6 +22,8 @@ public:
 
 	std::string	getName() const;
 	std::string	getTopic() const;
+	Client *getTopicSetBy() const;
+	time_t getTopicSetAt() const;
 
 private:
 	Channel();
@@ -31,6 +33,8 @@ private:
 	std::vector<Client *>	_clients;
 	std::vector<Client *>	_operators;
 	std::string				_topic;
+	Client *				_topic_set_by;
+	time_t					_topic_set_at;
 };
 
 #endif /* CHANNEL_HPP */
