@@ -12,6 +12,7 @@
 #include <sys/select.h>
 #include <vector>
 #include <ctime>
+#include <sstream>
 
 #include "Server.hpp"
 #include "Client.hpp"
@@ -40,8 +41,9 @@
 std::vector<std::string>	split(const std::string &str, char delim);
 std::vector<std::string>	split(const std::string &str, const char *set_delim);
 
-bool	ft_is_number(const std::string &str);
-int		ft_parse_port(const std::string &str);
-void	ft_check_password(const std::string &str);
+bool		ft_is_number(const std::string &str);
+int			ft_parse_port(const std::string &str);
+void		ft_check_password(const std::string &str);
+std::string	ft_itoa(int n);
 
 #endif /* FT_IRC_HPP */

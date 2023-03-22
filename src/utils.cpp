@@ -83,3 +83,13 @@ void ft_check_password(const std::string &str)
 			throw std::invalid_argument("Only printables characters are allowed");
 	}
 }
+
+std::string ft_itoa(int n)
+{
+	std::string result;
+	std::stringstream out;
+	
+	out << n;
+	result = out.str();
+	return result;
+}
