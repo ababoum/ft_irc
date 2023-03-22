@@ -60,6 +60,12 @@ time_t Channel::getTopicSetAt() const
 	return _topic_set_at;
 }
 
+std::vector<Client *> const &Channel::getClients() const
+{
+	return _clients;
+}
+
+
 
 //==============================================================================
 // Functions
@@ -67,11 +73,21 @@ time_t Channel::getTopicSetAt() const
 
 void Channel::addClient(Client *client)
 {
+	for (size_t i = 0; i <_clients.size(); i++)
+	{
+		if (_clients[i]->getNickname() == client->getNickname())
+			return ;
+	}
 	_clients.push_back(client);
 }
 
 void Channel::addOperator(Client *client)
 {
+	for (size_t i = 0; i <_operators.size(); i++)
+	{
+		if (_operators[i]->getNickname() == client->getNickname())
+			return ;
+	}
 	_operators.push_back(client);
 }
 

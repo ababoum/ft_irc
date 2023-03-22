@@ -24,6 +24,7 @@ public:
 	std::string	getTopic() const;
 	Client *getTopicSetBy() const;
 	time_t getTopicSetAt() const;
+	std::vector<Client *> const &getClients() const;
 
 private:
 	Channel();

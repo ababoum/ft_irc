@@ -280,6 +280,8 @@ void Server::join(Client &client, const std::vector<std::string> &args)
 	if (args.size() == 1)
 	{
 		// 461 ERR_NEEDMOREPARAMS
+		client.appendMessageToSend(":ircserv 461 " + client.getNickname() + " JOIN :Not enough parameters\n");
+		return ;
 	}
 	if (args[1] == "0")
 	{
@@ -296,14 +298,24 @@ void Server::join(Client &client, const std::vector<std::string> &args)
 		client.addChan(&channel);
 		// JOIN Message
 		client.appendMessageToSend(":" + client.getNickname() + " JOIN " + args[1] + "\n");
-		// 332 RPL_TOPIC ou 331 RPL_NOTOPIC
+		// 332 RPL_TOPIC + 333 RPL_TOPICWHOTIME si le topic est set
 		if (channel.getTopic().size() > 0)
-			client.appendMessageToSend(":ircserv 332 " + channel.getName() + " :" + channel.getTopic() + "\n");
-		else
-			client.appendMessageToSend(":ircserv 331 " + channel.getName() + " :No topic is set\n");
-		// 333 RPL_TOPICWHOTIME
+		{
+			client.appendMessageToSend(":ircserv 332 " + client.getNickname() + " " + channel.getName() + " :" + channel.getTopic() + "\n");
+			client.appendMessageToSend(":ircserv 333 " + client.getNickname() + " " + channel.getName() + " " + channel.getTopicSetBy()->getNickname() + " " + ft_itoa(channel.getTopicSetAt()) + "\n");
+		}
 		// Un 353 RPL_NAMREPLY par users sur le channel
+		client.appendMessageToSend(":ircserv 353 " + client.getNickname() + " =" + channel.getName() + " :");
+		for (size_t j = 0; j < channel.getClients().size(); j++)
+		{
+			const Client *tmp = channel.getClients()[j];
+			if (j != 0)
+				client.appendMessageToSend(" ");
+			client.appendMessageToSend(tmp->getNickname());
+		}
+		client.appendMessageToSend("\n");
 		// 366 RPL_ENDOFNAMES
+		client.appendMessageToSend(":ircserv 366 " + client.getNickname() + " " + channel.getName() + " :End of /NAMES list\n");
 	}
 }
 
