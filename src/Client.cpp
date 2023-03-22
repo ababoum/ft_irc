@@ -8,8 +8,8 @@ Client::Client(int fd)
 }
 
 Client::Client(const Client &other)
-	: _fd(other.getFd())
 {
+	*this = other;
 }
 
 Client::~Client()

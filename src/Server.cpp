@@ -13,7 +13,6 @@ Server::Server(int port, std::string password)
 }
 
 Server::Server(const Server &other)
-	: _socket_fd(other.getSocketFd()), _port(other.getPort()), _password(other.getPassword())
 {
 	*this = other;
 }
@@ -68,6 +67,7 @@ void Server::launch()
 		perror("setsockopt");
 		return;
 	}
+	memset(&tmp, 0, sizeof(tmp));
 	tmp.sin_family = AF_INET;
 	tmp.sin_port = htons(_port);
 	tmp.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -85,7 +85,7 @@ void Server::launch()
 	INFO("Listening on socket...\n");
 	while (1)
 	{
-		DEBUG("Waiting for new connection\n");
+		// DEBUG("Waiting for new connection\n");
 		FD_ZERO(&readfds);
 		FD_ZERO(&writefds);
 		FD_SET(_socket_fd, &readfds);
@@ -95,9 +95,9 @@ void Server::launch()
 		{
 			FD_SET(it->getFd(), &readfds);
 			FD_SET(it->getFd(), &writefds);
-			DEBUG("Client fd " << it->getFd() << " added to select\n");
+			// DEBUG("Client fd " << it->getFd() << " added to select\n");
 		}
-		int ret = select(FD_SETSIZE, &readfds, 0, NULL, NULL);
+		int ret = select(FD_SETSIZE, &readfds, &writefds, NULL, NULL);
 
 		if (ret < 0)
 		{
@@ -114,6 +114,7 @@ void Server::launch()
 			if (FD_ISSET(_socket_fd, &readfds))
 			{
 				DEBUG("New connection\n");
+				addr_len = sizeof(tmp);
 				int _client_fd = accept(_socket_fd, (struct sockaddr *)&tmp, &addr_len);
 				if (_client_fd < 0)
 				{
@@ -147,12 +148,15 @@ void Server::launch()
 			{
 				if (FD_ISSET(it->getFd(), &writefds))
 				{
-					DEBUG("Ready to write\n");
-					if (*(it->getMessageReceived().end() - 1) == '\n')
+					// DEBUG("Ready to write\n");
+					if (!it->getMessageReceived().empty() && *(it->getMessageReceived().end() - 1) == '\n')
 					{
 						parseCommands(*it);
+						if (!it->getMessageToSend().empty())
+						{
 						write(it->getFd(), it->getMessageToSend().c_str(), it->getMessageToSend().size());
 						DEBUG("Message sent: " << it->getMessageToSend());
+						}
 						it->clearMessageToSend();
 					}
 				}
@@ -197,7 +201,24 @@ void Server::parseCommands(Client &client)
 		for (size_t i = 0; i < nb_commands; i++)
 		{
 			if (command[0] == command_name[i])
-				(this->*f[i])(client, command);
+			{
+				if (command[0] != "NICK"
+					&& command[0] != "USER"
+					&& command[0] != "PASS"
+					&& !client.isAuthentified())
+				{
+					//451
+					client.appendMessageToSend(":ircserv 451 " + client.getNickname() + " :You have not registered\n");
+				}
+				else
+					(this->*f[i])(client, command);
+				break ;
+			}
+			else if (i == nb_commands - 1 && client.isAuthentified())
+			{
+				//421
+				client.appendMessageToSend(":ircserv 421 " + command[0] + " :Unknown command\n");
+			}
 		}
 	}
 

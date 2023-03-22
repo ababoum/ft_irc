@@ -13,6 +13,7 @@
 #include <vector>
 #include <ctime>
 #include <sstream>
+#include <cstring>
 
 #include "Server.hpp"
 #include "Client.hpp"
