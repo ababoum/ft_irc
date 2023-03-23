@@ -9,6 +9,7 @@ OBJ_DIRS		=	$(OBJ_PATH)
 
 SRC				=	main.cpp \
 					Server.cpp \
+					Server_replies.cpp \
 					utils.cpp \
 					Client.cpp \
 					Channel.cpp

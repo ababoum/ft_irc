@@ -20,6 +20,7 @@ public:
 	void	clearMessageReceived();
 	void	clearMessageToSend();
 
+	void	setPass(bool pass);
 	void	setAuthentified();
 	void	setNickname(const std::string &nick_name);
 	void	setUsername(const std::string &user_name);
@@ -28,6 +29,7 @@ public:
 	void	setRealname(const std::string &real_name);
 	void	addChan(Channel *channel);
 
+	bool				isPassOk() const;
 	bool				isAuthentified() const;
 	const std::string &	getMessageReceived() const;
 	const std::string &	getMessageToSend() const;
@@ -43,8 +45,9 @@ private:
 
 	// Attributes
 private:
-	int _fd;
-	bool _is_authentified;
+	int			_fd;
+	bool 		_pass;
+	bool		_is_authentified;
 	std::string _message_received;
 	std::string _message_to_send;
 	std::string _nickname;

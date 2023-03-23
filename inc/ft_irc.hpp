@@ -19,6 +19,7 @@
 #include "Client.hpp"
 #include "Channel.hpp"
 
+#define SERVER_NAME "ircserv"
 #define MAX_CLIENTS 1000
 #define READ_SIZE 4096
 
@@ -38,6 +39,21 @@
 #define FATAL_ERR(x) std::cerr << RED_TXT << x << RESET_TXT;
 #define INFO(x) std::cerr << ITALIC_TXT << x << RESET_TXT;
 #define RUNTIME_MSG(x) std::cerr << GREEN_TXT << x << RESET_TXT;
+
+enum reply_code
+{
+	RPL_WELCOME = 001,
+	ERR_NONICKNAMEGIVEN = 431,
+	ERR_ERRONEUSNICKNAME = 432,
+	ERR_NICKNAMEINUSE = 433,
+	ERR_NOTREGISTERED = 451,
+	ERR_NEEDMOREPARAMS = 461,
+	ERR_ALREADYREGISTRED = 462,
+	ERR_PASSWDMISMATCH = 464,
+	ERR_UNKNOWNCOMMAND = 421,
+
+
+};
 
 std::vector<std::string>	split(const std::string &str, char delim);
 std::vector<std::string>	split(const std::string &str, const char *set_delim);

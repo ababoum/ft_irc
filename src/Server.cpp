@@ -1,12 +1,12 @@
 #include "Server.hpp"
 
 Server::Server()
-	: _socket_fd(0), _port(0), _password("")
+:_socket_fd(0), _port(0), _password("")
 {
 }
 
 Server::Server(int port, std::string password)
-	: _socket_fd(-1), _port(port), _password(password)
+: _name(SERVER_NAME), _socket_fd(-1), _port(port), _password(password)
 {
 	// Check args
 	launch();
@@ -177,9 +177,9 @@ void stripPrefix(std::string &line, char c)
 
 void Server::parseCommands(Client &client)
 {
-	std::string command_name[] = {"NICK", "USER", "JOIN", "PING"};
+	std::string command_name[] = {"PASS", "NICK", "USER", "JOIN", "PING"};
 	size_t nb_commands = sizeof(command_name) / sizeof(command_name[0]);
-	void (Server::*f[])(Client & client, const std::vector<std::string> &args) = {&Server::nick, &Server::user, &Server::join, &Server::ping};
+	void (Server::*f[])(Client &client, const std::vector<std::string>& args) = {&Server::pass, &Server::nick, &Server::user, &Server::join, &Server::ping};
 
 	std::vector<std::string> lines = split(client.getMessageReceived(), "\r\n");
 	for (std::vector<std::string>::iterator it = lines.begin(); it != lines.end(); ++it)
@@ -208,7 +208,7 @@ void Server::parseCommands(Client &client)
 					&& !client.isAuthentified())
 				{
 					//451
-					client.appendMessageToSend(":ircserv 451 " + client.getNickname() + " :You have not registered\n");
+					reply(ERR_NOTREGISTERED, client, command);
 				}
 				else
 					(this->*f[i])(client, command);
@@ -217,7 +217,7 @@ void Server::parseCommands(Client &client)
 			else if (i == nb_commands - 1 && client.isAuthentified())
 			{
 				//421
-				client.appendMessageToSend(":ircserv 421 " + command[0] + " :Unknown command\n");
+				reply(ERR_UNKNOWNCOMMAND, client, command);
 			}
 		}
 	}
@@ -225,61 +225,97 @@ void Server::parseCommands(Client &client)
 	client.clearMessageReceived();
 }
 
-void Server::nick(Client &client, const std::vector<std::string> &args)
+void Server::pass(Client &client, const std::vector<std::string>& args)
 {
-	std::string old_nick(client.getNickname());
-
-	std::cout << "nick function called" << std::endl;
-	// tester si le nick name n'est pas deja pris
+	std::cout << "pass function called" << std::endl;
+	if (!client.isAuthentified() && (!client.getNickname().empty() || !client.getUsername().empty()))
+		return;
 	if (args.size() < 2)
 	{
-		// 431 ERR_NONICKNAMEGIVEN
-		client.appendMessageToSend(":ircserv 431 " + client.getNickname() + " :No nickname given\n");
+		//461 ERR_NEEDMOREPARAMS
+		reply(ERR_NEEDMOREPARAMS, client, args);
+		return;
+	}
+	if (client.isAuthentified())
+	{
+		//462 ERR_ALREADYREGISTRED
+		reply(ERR_ALREADYREGISTRED, client, args);
+		return;
+	}
+	if (args[1] == _password)
+		client.setPass(true);
+	else
+	{
+		//464 ERR_PASSWDMISMATCH
+		reply(ERR_PASSWDMISMATCH, client, args);
+		client.setPass(false);
+	}
+}
+
+void Server::nick(Client &client, const std::vector<std::string>& args)
+{
+	std::cout << "nick function called" << std::endl;
+	if (args.size() < 2 )
+	{
+		//431 ERR_NONICKNAMEGIVEN
+		reply(ERR_NONICKNAMEGIVEN, client, args);
 		return;
 	}
 	std::string nickname(args[1]);
 	if (nickname.size() > 9 || nickname.size() < 2 || nickname.find_first_of(" ,*?!@.") != std::string::npos)
 	{
-		// 432 ERR_ERRONEUSNICKNAME
-		client.appendMessageToSend(":ircserv 432 " + client.getNickname() + " " + nickname + " :Erroneus nickname\n");
+		//432 ERR_ERRONEUSNICKNAME
+		reply(ERR_ERRONEUSNICKNAME, client, args);
 		return;
 	}
+	if (nickname == client.getNickname())
+		return;
 	for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
 		if (it->getNickname() == nickname)
 		{
-			// 433 ERR_NICKNAMEINUSE;
-			client.appendMessageToSend(":ircserv 433 " + client.getNickname() + " " + nickname + " :Nickname is already in use.\n");
+			//433 ERR_NICKNAMEINUSE;
+			reply(ERR_NICKNAMEINUSE, client, args);
 			return;
 		}
 	}
-	client.setNickname(args[1]);
 	if (client.isAuthentified())
-		client.appendMessageToSend(":" + old_nick + " NICK :" + client.getNickname() + "\n");
+		client.appendMessageToSend(":" + client.getNickname() + " NICK :" + nickname + "\n");
 	else if (client.getUsername() != "")
 	{
 		client.setAuthentified();
 		// 001 RPL_WELCOME
-		client.appendMessageToSend(":ircserv 001 " + client.getNickname() + " :Welcome to ircserv " + client.getNickname() + "!\r\n");
+		reply(RPL_WELCOME, client, args);
 	}
+	client.setNickname(args[1]);
+
 }
 
 void Server::user(Client &client, const std::vector<std::string> &args)
 {
 	std::cout << "user function called" << std::endl;
 	if (args.size() < 5)
+	{
+		//461 ERR_NEEDMOREPARAMS
+		reply(ERR_NEEDMOREPARAMS, client, args);
 		return;
+	}
+	if (client.isAuthentified())
+	{
+		//462 ERR_ALREADYREGISTRED
+		reply(ERR_ALREADYREGISTRED, client, args);
+		return;
+	}
 	client.setUsername(args[1]);
 	client.setHostname(args[2]);
 	client.setServername(args[3]);
 	client.setRealname(args[4]);
-
 	if (!client.isAuthentified() && client.getNickname() != "")
 	{
 		client.setAuthentified();
 		// 001 RPL_WELCOME
-		client.appendMessageToSend(":ircserv 001 " + client.getNickname() + " :Welcome to ircserv " + client.getNickname() + "!\n");
-		return;
+		reply(RPL_WELCOME, client, args);
+		return ;
 	}
 }
 

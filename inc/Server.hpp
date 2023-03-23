@@ -2,6 +2,7 @@
 #define SERVER_HPP
 
 #include "ft_irc.hpp"
+
 class Client;
 class Channel;
 
@@ -18,6 +19,12 @@ public:
 	std::string getPassword(void) const;
 
 	void parseCommands(Client &client);
+
+	void reply(int code, Client &client, const std::vector<std::string>& args);
+
+
+
+	void pass(Client &client, const std::vector<std::string>& args);
 	void nick(Client &client, const std::vector<std::string>& args);
 	void user(Client &client, const std::vector<std::string>& args);
 	void join(Client &client, const std::vector<std::string>& args);
@@ -30,6 +37,7 @@ private:
 
 // Attributes
 private:
+	std::string				_name;
 	int 					_socket_fd;
 	int 					_port;
 	std::string				_password;

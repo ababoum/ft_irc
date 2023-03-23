@@ -64,6 +64,11 @@ void Client::clearMessageToSend()
 	_message_to_send.clear();
 }
 
+void Client::setPass(bool pass)
+{
+	_pass = pass;
+}
+
 void Client::setAuthentified()
 {
 	_is_authentified = true;
@@ -99,6 +104,10 @@ void Client::addChan(Channel *channel)
 	_joined_channels.push_back(channel);
 }
 
+bool Client::isPassOk() const
+{
+	return _pass;
+}
 
 bool Client::isAuthentified() const
 {
