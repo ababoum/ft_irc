@@ -3,7 +3,7 @@
 Client::Client(int fd)
 	: _fd(fd), _is_authentified(false)
 	, _message_received(""), _message_to_send("")
-	, _nickname(""), _username(""), _hostname(""), _servername(""), _realname("")
+	, _nickname("*"), _username(""), _hostname(""), _servername(""), _realname("")
 {
 }
 

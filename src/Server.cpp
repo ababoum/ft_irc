@@ -249,7 +249,7 @@ void Server::authentificate(Client &client)
 void Server::pass(Client &client, const std::vector<std::string>& args)
 {
 	std::cout << "pass function called" << std::endl;
-	if (!client.isAuthentified() && (!client.getNickname().empty() || !client.getUsername().empty()))
+	if (!client.isAuthentified() && (client.getNickname() != "*" || !client.getUsername().empty()))
 		return;
 	if (args.size() < 2)
 	{
