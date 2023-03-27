@@ -80,6 +80,7 @@ void Server::launch()
 		return;
 	}
 	INFO("Listening on socket...\n");
+	routine(addr);
 }
 
 void Server::routine(struct sockaddr_in &addr)
