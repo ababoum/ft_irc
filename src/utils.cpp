@@ -68,7 +68,7 @@ int ft_parse_port(const std::string &str)
 	if (!ft_is_number(str))
 		throw std::invalid_argument("Port number is not valid");
 	port = std::atoi(str.c_str());
-	if (port > 65535)
+	if (port > 65535 || port <= 0)
 		throw std::invalid_argument("Bad/illegal port format (max value: 65535)");
 	return (port);
 }

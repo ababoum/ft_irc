@@ -4,7 +4,7 @@ int main(int argc, char **argv)
 {
 	if (argc != 3)
 	{
-		std::cout << "Bad number of arguments :" << std::endl;
+		std::cout << "Wrong number of arguments:" << std::endl;
 		std::cout << argv[0] << " <port> <password>" << std::endl;
 		return (1);
 	}
@@ -15,10 +15,9 @@ int main(int argc, char **argv)
 		ft_check_password(argv[2]);
 		Server test_server(port, argv[2]);
 	}
-	catch(const std::exception& e)
+	catch (const std::exception &e)
 	{
-		std::cerr << "Error\n" << e.what() << std::endl;
+		std::cerr << "Error\n"
+				  << e.what() << std::endl;
 	}
-	
-	
 }
