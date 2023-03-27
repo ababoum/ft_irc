@@ -12,9 +12,9 @@ public:
 	Server(int port, std::string password);
 	~Server();
 
-private:
 	Server &operator=(const Server &rhs);
 
+private:
 	int getSocketFd(void) const;
 	int getPort(void) const;
 	std::string getPassword(void) const;
