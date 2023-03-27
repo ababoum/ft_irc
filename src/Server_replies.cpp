@@ -25,7 +25,7 @@ void Server::reply(int code, Client &client, const std::vector<std::string>& arg
 		message = "451 " + client.getNickname() + " :You have not registered\r\n";
 		break;
 	case ERR_NEEDMOREPARAMS:
-		message = "461 " + client.getNickname() + args[0] + " :Not enough parameters\r\n";
+		message = "461 " + client.getNickname() + " " + args[0] + " :Not enough parameters\r\n";
 		break;
 	case ERR_ALREADYREGISTRED:
 		message = "462 " + client.getNickname() + " :You may not reregister\r\n";
@@ -40,3 +40,38 @@ void Server::reply(int code, Client &client, const std::vector<std::string>& arg
 	}
 	client.appendMessageToSend(message);
 }
+
+void Server::reply(int code, Client &client, const Channel& channel)
+{
+	std::string message;
+
+	switch (code)
+	{
+	case RPL_TOPIC:
+		message = "332 " + client.getNickname() + " " + channel.getName() + " :" + channel.getTopic() + "\r\n";
+		break;
+	case RPL_TOPICWHOTIME:
+		message = "333 " + client.getNickname() + " " + channel.getName() + " " + channel.getTopicSetBy()->getNickname() + " " + ft_itoa(channel.getTopicSetAt()) + "\r\n";
+		break;
+	case RPL_NAMREPLY:
+		message = "353 " + client.getNickname() + " =" + channel.getName() + " :";
+		for (size_t j = 0; j < channel.getClients().size(); j++)
+		{
+			const Client *tmp = channel.getClients()[j];
+			if (j != 0)
+				message += " ";
+			message += tmp->getNickname();
+		}
+		message += "\r\n";
+		break;
+	case RPL_ENDOFNAMES:
+		message = "366 " + client.getNickname() + " " + channel.getName() + " :End of /NAMES list\r\n";
+		break;
+
+	default:
+		DEBUG("reply: unknown code: " << code << "\n");
+		break;
+	}
+	client.appendMessageToSend(message);
+}
+
