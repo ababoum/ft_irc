@@ -154,8 +154,8 @@ void Server::launch()
 						parseCommands(*it);
 						if (!it->getMessageToSend().empty())
 						{
-						write(it->getFd(), it->getMessageToSend().c_str(), it->getMessageToSend().size());
-						DEBUG("Message sent: " << it->getMessageToSend());
+							write(it->getFd(), it->getMessageToSend().c_str(), it->getMessageToSend().size());
+							DEBUG("Message sent: " << it->getMessageToSend());
 						}
 						it->clearMessageToSend();
 					}
@@ -225,6 +225,21 @@ void Server::parseCommands(Client &client)
 	client.clearMessageReceived();
 }
 
+void Server::authentificate(Client &client)
+{
+	if (!client.isPassOk())
+	{
+		//ERROR 
+		reply(ERR_PASSWDMISMATCH, client);
+		client.appendMessageToSend("ERROR :Password is not correct\r\n");
+		// close
+		return;
+	}
+	client.setAuthentified();
+	//001 RPL_WELCOME
+	reply(RPL_WELCOME, client);
+}
+
 void Server::pass(Client &client, const std::vector<std::string>& args)
 {
 	std::cout << "pass function called" << std::endl;
@@ -242,14 +257,7 @@ void Server::pass(Client &client, const std::vector<std::string>& args)
 		reply(ERR_ALREADYREGISTRED, client, args);
 		return;
 	}
-	if (args[1] == _password)
-		client.setPass(true);
-	else
-	{
-		//464 ERR_PASSWDMISMATCH
-		reply(ERR_PASSWDMISMATCH, client, args);
-		client.setPass(false);
-	}
+	client.setPass(args[1] == _password);
 }
 
 void Server::nick(Client &client, const std::vector<std::string>& args)
@@ -283,9 +291,7 @@ void Server::nick(Client &client, const std::vector<std::string>& args)
 		client.appendMessageToSend(":" + client.getNickname() + " NICK :" + nickname + "\n");
 	else if (client.getUsername() != "")
 	{
-		client.setAuthentified();
-		// 001 RPL_WELCOME
-		reply(RPL_WELCOME, client, args);
+		authentificate(client);
 	}
 	client.setNickname(args[1]);
 
@@ -312,10 +318,7 @@ void Server::user(Client &client, const std::vector<std::string> &args)
 	client.setRealname(args[4]);
 	if (!client.isAuthentified() && client.getNickname() != "")
 	{
-		client.setAuthentified();
-		// 001 RPL_WELCOME
-		reply(RPL_WELCOME, client, args);
-		return ;
+		authentificate(client);
 	}
 }
 

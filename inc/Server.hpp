@@ -20,11 +20,13 @@ public:
 
 	void parseCommands(Client &client);
 
-	void reply(int code, Client &client, const std::vector<std::string>& args);
+	void reply(int code, Client &client, const std::vector<std::string>& args = std::vector<std::string>());
 	void reply(int code, Client &client, const Channel& channel);
 
 
 
+	void authentificate(Client &client);
+	
 	void pass(Client &client, const std::vector<std::string>& args);
 	void nick(Client &client, const std::vector<std::string>& args);
 	void user(Client &client, const std::vector<std::string>& args);
