@@ -17,7 +17,8 @@ public:
 	int getSocketFd(void) const;
 	int getPort(void) const;
 	std::string getPassword(void) const;
-
+	int	searchChan(std::string name);
+	int	addChan(std::string name, Client &client);
 	void parseCommands(Client &client);
 
 	void reply(int code, Client &client, const std::vector<std::string>& args);
@@ -29,8 +30,8 @@ public:
 	void nick(Client &client, const std::vector<std::string>& args);
 	void user(Client &client, const std::vector<std::string>& args);
 	void join(Client &client, const std::vector<std::string>& args);
+	void part(Client &client, const std::vector<std::string> &args);
 	void ping(Client &client, const std::vector<std::string>& args);
-	int	 searchChan(std::string name, Client &client);
 
 private:
 	Server();

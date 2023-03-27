@@ -319,13 +319,18 @@ void Server::user(Client &client, const std::vector<std::string> &args)
 	}
 }
 
-int Server::searchChan(std::string name, Client &client)
+int Server::searchChan(std::string name)
 {
 	for (size_t i = 0; i < _channels.size(); i++)
 	{
 		if (_channels[i].getName() == name)
 			return i;
 	}
+	return (-1);
+}
+
+int Server::addChan(std::string name, Client &client)
+{
 	Channel newChannel(name, &client);
 	_channels.push_back(newChannel);
 	return (_channels.size() - 1);
@@ -348,7 +353,9 @@ void Server::join(Client &client, const std::vector<std::string> &args)
 	for (size_t i = 0; i < channels.size(); i++)
 	{
 		// Check name >> 476 ERR_BADCHANMASK + return
-		int chan_pos = searchChan(channels[i], client);
+		int chan_pos = searchChan(channels[i]);
+		if (chan_pos == -1)
+			chan_pos = addChan(channels[i], client);
 		Channel &channel = _channels[chan_pos];
 		channel.addClient(&client);
 		client.addChan(&channel);
@@ -361,8 +368,36 @@ void Server::join(Client &client, const std::vector<std::string> &args)
 		}
 		reply(RPL_NAMREPLY, client, channel);
 		reply(RPL_ENDOFNAMES, client, channel);
+	// BROADCAST TO OTHER CLIENTS IN THE CHANNEL
 	}
 }
+
+void Server::part(Client &client, const std::vector<std::string> &args)
+{
+	std::cout << "part function called" << std::endl;
+	if (args.size() < 2)
+	{
+		reply(ERR_NEEDMOREPARAMS, client, args);
+		return ;
+	}
+	std::vector<std::string> channels = split(args[1], ",");
+	for (size_t i = 0; i < channels.size(); i++)
+	{
+		int chanPos = searchChan(channels[i]);
+		if (chanPos == -1)
+		{
+			// 1 ERR_NOSUCHCHANNEL 403 for each channel that does not exist
+			continue ;
+		}
+		std::vector<Client *> chan_clients = _channels[chanPos].getClients();
+	// 1 PART message for each channel the client is leaving
+	// 1 ERR_NOTONCHANNEL 442 for each channel the client is not on
+	// BROADCAST TO OTHER CLIENTS IN THE CHANNEL
+
+	}
+
+}
+
 
 void Server::ping(Client &client, const std::vector<std::string> &args)
 {
