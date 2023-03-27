@@ -21,6 +21,7 @@ public:
 	void parseCommands(Client &client);
 
 	void reply(int code, Client &client, const std::vector<std::string>& args);
+	void reply(int code, Client &client, const Channel& channel);
 
 
 
