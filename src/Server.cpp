@@ -48,10 +48,7 @@ std::string Server::getPassword() const
 
 void Server::launch()
 {
-	struct sockaddr_in tmp;
-	socklen_t addr_len;
-	fd_set readfds;
-	fd_set writefds;
+	struct sockaddr_in addr;
 	int opt = 1;
 
 	_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -67,11 +64,11 @@ void Server::launch()
 		perror("setsockopt");
 		return;
 	}
-	memset(&tmp, 0, sizeof(tmp));
-	tmp.sin_family = AF_INET;
-	tmp.sin_port = htons(_port);
-	tmp.sin_addr.s_addr = htonl(INADDR_ANY);
-	if (bind(_socket_fd, (struct sockaddr *)&tmp, sizeof(tmp)) < 0)
+	memset(&addr, 0, sizeof(addr));
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(_port);
+	addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	if (bind(_socket_fd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
 	{
 		perror("bind failed");
 		return;
@@ -83,6 +80,14 @@ void Server::launch()
 		return;
 	}
 	INFO("Listening on socket...\n");
+}
+
+void Server::routine(struct sockaddr_in &addr)
+{
+	socklen_t addr_len;
+	fd_set readfds;
+	fd_set writefds;
+	
 	while (1)
 	{
 		// DEBUG("Waiting for new connection\n");
@@ -114,8 +119,8 @@ void Server::launch()
 			if (FD_ISSET(_socket_fd, &readfds))
 			{
 				DEBUG("New connection\n");
-				addr_len = sizeof(tmp);
-				int _client_fd = accept(_socket_fd, (struct sockaddr *)&tmp, &addr_len);
+				addr_len = sizeof(addr);
+				int _client_fd = accept(_socket_fd, (struct sockaddr *)&addr, &addr_len);
 				if (_client_fd < 0)
 				{
 					perror("In accept");
@@ -165,7 +170,7 @@ void Server::launch()
 	}
 }
 
-void stripPrefix(std::string &line, char c)
+static void stripPrefix(std::string &line, char c)
 {
 	if (line[0] == c)
 	{
