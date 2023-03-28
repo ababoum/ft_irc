@@ -224,30 +224,31 @@ void Server::parseCommands(Client &client)
 			last_param = line.substr(pos + 1, line.size() - pos);
 			line = line.substr(0, pos);
 		}
-		std::vector<std::string> command = split(line, ' ');
+		std::vector<std::string> args = split(line, ' ');
 		if (last_param.size() > 0)
-			command.push_back(last_param);
+			args.push_back(last_param);
 
+		std::transform(args[0].begin(), args[0].end(), args[0].begin(), ::toupper);
 		for (size_t i = 0; i < nb_commands; i++)
 		{
-			if (command[0] == command_name[i])
+			if (args[0] == command_name[i])
 			{
-				if (command[0] != "NICK"
-					&& command[0] != "USER"
-					&& command[0] != "PASS"
+				if (args[0] != "NICK"
+					&& args[0] != "USER"
+					&& args[0] != "PASS"
 					&& !client.isAuthentified())
 				{
 					//451
-					reply(ERR_NOTREGISTERED, client, command);
+					reply(ERR_NOTREGISTERED, client, args);
 				}
 				else
-					(this->*f[i])(client, command);
+					(this->*f[i])(client, args);
 				break ;
 			}
 			else if (i == nb_commands - 1 && client.isAuthentified())
 			{
 				//421
-				reply(ERR_UNKNOWNCOMMAND, client, command);
+				reply(ERR_UNKNOWNCOMMAND, client, args);
 			}
 		}
 	}
