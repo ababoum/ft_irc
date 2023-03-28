@@ -17,7 +17,7 @@ SRC				=	main.cpp \
 OBJ				=	$(addprefix $(OBJ_PATH),$(SRC:.cpp=.o))
 DEPS			=	$(addprefix $(OBJ_PATH),$(SRC:.cpp=.d))
 
-CXX				=	c++
+CXX				=	g++
 CXXFLAGS		=	-Wall -Wextra -Werror -std=c++98 -g
 
 all:				$(NAME)

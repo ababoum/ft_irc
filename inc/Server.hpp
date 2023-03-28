@@ -8,6 +8,7 @@ class Channel;
 
 class Server
 {
+
 public:
 	Server(int port, std::string password);
 	~Server();
@@ -22,27 +23,28 @@ private:
 	void launch(void);
 	void routine(struct sockaddr_in &addr);
 
-	void reply(int code, Client &client, const std::vector<std::string>& args = std::vector<std::string>());
-	void reply(int code, Client &client, const Channel& channel);
+	void reply(int code, Client &client, const std::vector<std::string> &args = std::vector<std::string>());
+	void reply(int code, Client &client, const Channel &channel);
+	void who_reply(int code, Client &client, Channel *channel, const Client &target);
+	void reply_mask(int code, Client &client, const std::string &mask);
 
 	void parseCommands(Client &client);
-	
+
 	void authentificate(Client &client);
-	
-	void pass(Client &client, const std::vector<std::string>& args);
-	void nick(Client &client, const std::vector<std::string>& args);
-	void user(Client &client, const std::vector<std::string>& args);
-	void join(Client &client, const std::vector<std::string>& args);
-	void ping(Client &client, const std::vector<std::string>& args);
+
+	void pass(Client &client, const std::vector<std::string> &args);
+	void nick(Client &client, const std::vector<std::string> &args);
+	void user(Client &client, const std::vector<std::string> &args);
+	void join(Client &client, const std::vector<std::string> &args);
+	void ping(Client &client, const std::vector<std::string> &args);
 	void who(Client &client, const std::vector<std::string> &args);
-	int	 searchChan(std::string name, Client &client);
+	int searchChan(std::string name, Client &client);
 
 private:
 	Server();
 	Server(const Server &other);
 
-
-// Attributes
+	// Attributes
 private:
 	std::string				_name;
 	int 					_socket_fd;
@@ -50,7 +52,6 @@ private:
 	std::string				_password;
 	std::vector<Client>		_clients;
 	std::vector<Channel>	_channels;
-
 };
 
 #endif /* SERVER_HPP */

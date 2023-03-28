@@ -1,12 +1,12 @@
 #include "Server.hpp"
 
 Server::Server()
-:_socket_fd(0), _port(0), _password("")
+	: _socket_fd(0), _port(0), _password("")
 {
 }
 
 Server::Server(int port, std::string password)
-: _name(SERVER_NAME), _socket_fd(-1), _port(port), _password(password)
+	: _name(SERVER_NAME), _socket_fd(-1), _port(port), _password(password)
 {
 	// Check args
 	launch();
@@ -88,7 +88,7 @@ void Server::routine(struct sockaddr_in &addr)
 	socklen_t addr_len;
 	fd_set readfds;
 	fd_set writefds;
-	
+
 	while (1)
 	{
 		// DEBUG("Waiting for new connection\n");
@@ -161,7 +161,7 @@ void Server::routine(struct sockaddr_in &addr)
 						if (!it->getMessageToSend().empty())
 						{
 							write(it->getFd(), it->getMessageToSend().c_str(), it->getMessageToSend().size());
-							DEBUG("Message sent: " << it->getMessageToSend());
+							DEBUG("Message sent:\r\n" << it->getMessageToSend());
 						}
 						it->clearMessageToSend();
 					}
@@ -183,9 +183,20 @@ static void stripPrefix(std::string &line, char c)
 
 void Server::parseCommands(Client &client)
 {
-	std::string command_name[] = {"PASS", "NICK", "USER", "JOIN", "PING"};
+	std::string command_name[] = {"PASS",
+								  "NICK",
+								  "USER",
+								  "JOIN",
+								  "PING",
+								  "WHO"};
 	size_t nb_commands = sizeof(command_name) / sizeof(command_name[0]);
-	void (Server::*f[])(Client &client, const std::vector<std::string>& args) = {&Server::pass, &Server::nick, &Server::user, &Server::join, &Server::ping};
+	void (Server::*f[])(Client & client, const std::vector<std::string> &args) = {
+		&Server::pass,
+		&Server::nick,
+		&Server::user,
+		&Server::join,
+		&Server::ping,
+		&Server::who};
 
 	std::vector<std::string> lines = split(client.getMessageReceived(), "\r\n");
 	for (std::vector<std::string>::iterator it = lines.begin(); it != lines.end(); ++it)
@@ -208,26 +219,22 @@ void Server::parseCommands(Client &client)
 		{
 			if (command[0] == command_name[i])
 			{
-				if (command[0] != "NICK"
-					&& command[0] != "USER"
-					&& command[0] != "PASS"
-					&& !client.isAuthentified())
+				if (command[0] != "NICK" && command[0] != "USER" && command[0] != "PASS" && !client.isAuthentified())
 				{
-					//451
+					// 451
 					reply(ERR_NOTREGISTERED, client, command);
 				}
 				else
 					(this->*f[i])(client, command);
-				break ;
+				break;
 			}
 			else if (i == nb_commands - 1 && client.isAuthentified())
 			{
-				//421
+				// 421
 				reply(ERR_UNKNOWNCOMMAND, client, command);
 			}
 		}
 	}
-
 	client.clearMessageReceived();
 }
 
@@ -235,50 +242,50 @@ void Server::authentificate(Client &client)
 {
 	if (!client.isPassOk())
 	{
-		//ERROR 
+		// ERROR
 		reply(ERR_PASSWDMISMATCH, client);
 		client.appendMessageToSend("ERROR :Password is not correct\r\n");
 		// close
 		return;
 	}
 	client.setAuthentified();
-	//001 RPL_WELCOME
+	// 001 RPL_WELCOME
 	reply(RPL_WELCOME, client);
 }
 
-void Server::pass(Client &client, const std::vector<std::string>& args)
+void Server::pass(Client &client, const std::vector<std::string> &args)
 {
 	std::cout << "pass function called" << std::endl;
 	if (!client.isAuthentified() && (client.getNickname() != "*" || !client.getUsername().empty()))
 		return;
 	if (args.size() < 2)
 	{
-		//461 ERR_NEEDMOREPARAMS
+		// 461 ERR_NEEDMOREPARAMS
 		reply(ERR_NEEDMOREPARAMS, client, args);
 		return;
 	}
 	if (client.isAuthentified())
 	{
-		//462 ERR_ALREADYREGISTRED
+		// 462 ERR_ALREADYREGISTRED
 		reply(ERR_ALREADYREGISTRED, client, args);
 		return;
 	}
 	client.setPass(args[1] == _password);
 }
 
-void Server::nick(Client &client, const std::vector<std::string>& args)
+void Server::nick(Client &client, const std::vector<std::string> &args)
 {
 	std::cout << "nick function called" << std::endl;
-	if (args.size() < 2 )
+	if (args.size() < 2)
 	{
-		//431 ERR_NONICKNAMEGIVEN
+		// 431 ERR_NONICKNAMEGIVEN
 		reply(ERR_NONICKNAMEGIVEN, client, args);
 		return;
 	}
 	std::string nickname(args[1]);
 	if (nickname.size() > 9 || nickname.size() < 2 || nickname.find_first_of(" ,*?!@.") != std::string::npos)
 	{
-		//432 ERR_ERRONEUSNICKNAME
+		// 432 ERR_ERRONEUSNICKNAME
 		reply(ERR_ERRONEUSNICKNAME, client, args);
 		return;
 	}
@@ -288,7 +295,7 @@ void Server::nick(Client &client, const std::vector<std::string>& args)
 	{
 		if (it->getNickname() == nickname)
 		{
-			//433 ERR_NICKNAMEINUSE;
+			// 433 ERR_NICKNAMEINUSE;
 			reply(ERR_NICKNAMEINUSE, client, args);
 			return;
 		}
@@ -300,7 +307,6 @@ void Server::nick(Client &client, const std::vector<std::string>& args)
 		authentificate(client);
 	}
 	client.setNickname(args[1]);
-
 }
 
 void Server::user(Client &client, const std::vector<std::string> &args)
@@ -308,13 +314,13 @@ void Server::user(Client &client, const std::vector<std::string> &args)
 	std::cout << "user function called" << std::endl;
 	if (args.size() < 5)
 	{
-		//461 ERR_NEEDMOREPARAMS
+		// 461 ERR_NEEDMOREPARAMS
 		reply(ERR_NEEDMOREPARAMS, client, args);
 		return;
 	}
 	if (client.isAuthentified())
 	{
-		//462 ERR_ALREADYREGISTRED
+		// 462 ERR_ALREADYREGISTRED
 		reply(ERR_ALREADYREGISTRED, client, args);
 		return;
 	}
@@ -346,7 +352,7 @@ void Server::join(Client &client, const std::vector<std::string> &args)
 	if (args.size() == 1)
 	{
 		reply(ERR_NEEDMOREPARAMS, client, args);
-		return ;
+		return;
 	}
 	if (args[1] == "0")
 	{
@@ -386,5 +392,57 @@ void Server::ping(Client &client, const std::vector<std::string> &args)
 void Server::who(Client &client, const std::vector<std::string> &args)
 {
 	std::cout << "who function called" << std::endl;
+	
+	if (args.size() == 1)
+	{
+		reply(ERR_NEEDMOREPARAMS, client, args);
+		return;
+	}
 
+	// We suppose that WHO commands can have multiple arguments
+	for (size_t i = 1; i < args.size(); i++)
+	{
+		// Check if the argument is a channel name
+		if (args[i][0] == '#')
+		{
+			// Check if the channel exists
+			bool found = false;
+			for (size_t j = 0; j < _channels.size(); j++)
+			{
+				if (_channels[j].getName() == args[i])
+				{
+					found = true;
+					for (size_t k = 0; k < _channels[j].getClients().size(); k++)
+					{
+						who_reply(RPL_WHOREPLY, client, &_channels[j], *_channels[j].getClients()[k]);
+					}
+					reply_mask(RPL_ENDOFWHO, client, args[i]);
+				}
+			}
+			if (!found)
+			{
+				// 403
+				reply(ERR_NOSUCHCHANNEL, client, args);
+			}
+		}
+		else
+		{
+			// Check if the user exists
+			bool found = false;
+			for (size_t j = 0; j < _clients.size(); j++)
+			{
+				if (_clients[j].getNickname() == args[i])
+				{
+					found = true;
+					who_reply(RPL_WHOREPLY, client, NULL, _clients[j]);
+					reply_mask(RPL_ENDOFWHO, client, args[i]);
+				}
+			}
+			if (!found)
+			{
+				// 401
+				reply(ERR_NOSUCHNICK, client, args);
+			}
+		}
+	}
 }
