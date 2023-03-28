@@ -15,6 +15,7 @@ public:
 
 	Server &operator=(const Server &rhs);
 
+
 private:
 	int getSocketFd(void) const;
 	int getPort(void) const;
@@ -41,6 +42,7 @@ private:
 	void join(Client &client, const std::vector<std::string> &args);
 	void ping(Client &client, const std::vector<std::string> &args);
 	void who(Client &client, const std::vector<std::string> &args);
+	void quit(Client &client, const std::vector<std::string> &args);
 	int searchChan(std::string name, Client &client);
 
 private:

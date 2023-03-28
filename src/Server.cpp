@@ -177,14 +177,16 @@ void Server::writing(fd_set writefds)
 					if (!it->getMessageToSend().empty())
 					{
 						write(it->getFd(), it->getMessageToSend().c_str(), it->getMessageToSend().size());
-						DEBUG("Message sent: " << it->getMessageToSend());
+						DEBUG("Message sent: \n" << it->getMessageToSend());
 						it->clearMessageToSend();
 					}
 				}
 				catch (std::exception &e) 
 				{
-					it->appendMessageToSend("ERROR : " + std::string(e.what()) + "\r\n");
+					it->appendMessageToSend("ERROR :" + std::string(e.what()) + "\r\n");
 					write(it->getFd(), it->getMessageToSend().c_str(), it->getMessageToSend().size());
+					DEBUG("Message sent: \n" << it->getMessageToSend());
+					// think to remove client from channels
 					close(it->getFd());
 					_clients.erase(it);
 				}
@@ -212,7 +214,8 @@ void Server::parseCommands(Client &client)
 								  "USER",
 								  "JOIN",
 								  "PING",
-								  "WHO"};
+								  "WHO",
+								  "QUIT"};
 	size_t nb_commands = sizeof(command_name) / sizeof(command_name[0]);
 	void (Server::*f[])(Client & client, const std::vector<std::string> &args) = {
 		&Server::pass,
@@ -220,7 +223,8 @@ void Server::parseCommands(Client &client)
 		&Server::user,
 		&Server::join,
 		&Server::ping,
-		&Server::who};
+		&Server::who,
+		&Server::quit};
 
 	std::vector<std::string> lines = split(client.getMessageReceived(), "\r\n");
 	for (std::vector<std::string>::iterator it = lines.begin(); it != lines.end(); ++it)
@@ -472,4 +476,14 @@ void Server::who(Client &client, const std::vector<std::string> &args)
 			}
 		}
 	}
+}
+
+void Server::quit(Client &client, const std::vector<std::string> &args)
+{
+	(void)client;
+	std::cout << "quit function called" << std::endl;
+	if (args.size() == 1)
+		throw std::runtime_error("Quit");
+	else
+		throw std::runtime_error("Quit :" + args[1]);
 }
