@@ -138,7 +138,6 @@ void Server::routine(struct sockaddr_in &addr)
 
 void Server::reading(fd_set readfds)
 {
-
 	for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
 		if (FD_ISSET(it->getFd(), &readfds))
@@ -171,13 +170,26 @@ void Server::writing(fd_set writefds)
 			// DEBUG("Ready to write\n");
 			if (!it->getMessageReceived().empty() && *(it->getMessageReceived().end() - 1) == '\n')
 			{
-				parseCommands(*it);
-				if (!it->getMessageToSend().empty())
+				// parseCommands(*it);
+				try
 				{
-					write(it->getFd(), it->getMessageToSend().c_str(), it->getMessageToSend().size());
-					DEBUG("Message sent: " << it->getMessageToSend());
+					parseCommands(*it);
+					if (!it->getMessageToSend().empty())
+					{
+						write(it->getFd(), it->getMessageToSend().c_str(), it->getMessageToSend().size());
+						DEBUG("Message sent: " << it->getMessageToSend());
+						it->clearMessageToSend();
+					}
 				}
-				it->clearMessageToSend();
+				catch (std::exception &e) 
+				{
+					it->appendMessageToSend("ERROR : " + std::string(e.what()) + "\r\n");
+					write(it->getFd(), it->getMessageToSend().c_str(), it->getMessageToSend().size());
+					close(it->getFd());
+					_clients.erase(it);
+				}
+				break;
+
 			}
 		}
 	}
@@ -256,8 +268,7 @@ void Server::authentificate(Client &client)
 	{
 		// ERROR
 		reply(ERR_PASSWDMISMATCH, client);
-		client.appendMessageToSend("ERROR :Password is not correct\r\n");
-		// close
+		throw std::invalid_argument("Password is not correct");
 		return;
 	}
 	client.setAuthentified();
