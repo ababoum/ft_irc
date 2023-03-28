@@ -14,17 +14,21 @@ public:
 
 	Server &operator=(const Server &rhs);
 
+private:
 	int getSocketFd(void) const;
 	int getPort(void) const;
 	std::string getPassword(void) const;
 
-	void parseCommands(Client &client);
+	void launch(void);
+	void routine(struct sockaddr_in &addr);
 
-	void reply(int code, Client &client, const std::vector<std::string>& args);
+	void reply(int code, Client &client, const std::vector<std::string>& args = std::vector<std::string>());
 	void reply(int code, Client &client, const Channel& channel);
 
-
-
+	void parseCommands(Client &client);
+	
+	void authentificate(Client &client);
+	
 	void pass(Client &client, const std::vector<std::string>& args);
 	void nick(Client &client, const std::vector<std::string>& args);
 	void user(Client &client, const std::vector<std::string>& args);
@@ -37,6 +41,7 @@ private:
 	Server();
 	Server(const Server &other);
 
+
 // Attributes
 private:
 	std::string				_name;
@@ -46,7 +51,6 @@ private:
 	std::vector<Client>		_clients;
 	std::vector<Channel>	_channels;
 
-	void launch(void);
 };
 
 #endif /* SERVER_HPP */

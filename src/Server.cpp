@@ -48,10 +48,7 @@ std::string Server::getPassword() const
 
 void Server::launch()
 {
-	struct sockaddr_in tmp;
-	socklen_t addr_len;
-	fd_set readfds;
-	fd_set writefds;
+	struct sockaddr_in addr;
 	int opt = 1;
 
 	_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -67,11 +64,11 @@ void Server::launch()
 		perror("setsockopt");
 		return;
 	}
-	memset(&tmp, 0, sizeof(tmp));
-	tmp.sin_family = AF_INET;
-	tmp.sin_port = htons(_port);
-	tmp.sin_addr.s_addr = htonl(INADDR_ANY);
-	if (bind(_socket_fd, (struct sockaddr *)&tmp, sizeof(tmp)) < 0)
+	memset(&addr, 0, sizeof(addr));
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(_port);
+	addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	if (bind(_socket_fd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
 	{
 		perror("bind failed");
 		return;
@@ -83,6 +80,15 @@ void Server::launch()
 		return;
 	}
 	INFO("Listening on socket...\n");
+	routine(addr);
+}
+
+void Server::routine(struct sockaddr_in &addr)
+{
+	socklen_t addr_len;
+	fd_set readfds;
+	fd_set writefds;
+	
 	while (1)
 	{
 		// DEBUG("Waiting for new connection\n");
@@ -114,8 +120,8 @@ void Server::launch()
 			if (FD_ISSET(_socket_fd, &readfds))
 			{
 				DEBUG("New connection\n");
-				addr_len = sizeof(tmp);
-				int _client_fd = accept(_socket_fd, (struct sockaddr *)&tmp, &addr_len);
+				addr_len = sizeof(addr);
+				int _client_fd = accept(_socket_fd, (struct sockaddr *)&addr, &addr_len);
 				if (_client_fd < 0)
 				{
 					perror("In accept");
@@ -154,8 +160,8 @@ void Server::launch()
 						parseCommands(*it);
 						if (!it->getMessageToSend().empty())
 						{
-						write(it->getFd(), it->getMessageToSend().c_str(), it->getMessageToSend().size());
-						DEBUG("Message sent: " << it->getMessageToSend());
+							write(it->getFd(), it->getMessageToSend().c_str(), it->getMessageToSend().size());
+							DEBUG("Message sent: " << it->getMessageToSend());
 						}
 						it->clearMessageToSend();
 					}
@@ -165,7 +171,7 @@ void Server::launch()
 	}
 }
 
-void stripPrefix(std::string &line, char c)
+static void stripPrefix(std::string &line, char c)
 {
 	if (line[0] == c)
 	{
@@ -225,10 +231,25 @@ void Server::parseCommands(Client &client)
 	client.clearMessageReceived();
 }
 
+void Server::authentificate(Client &client)
+{
+	if (!client.isPassOk())
+	{
+		//ERROR 
+		reply(ERR_PASSWDMISMATCH, client);
+		client.appendMessageToSend("ERROR :Password is not correct\r\n");
+		// close
+		return;
+	}
+	client.setAuthentified();
+	//001 RPL_WELCOME
+	reply(RPL_WELCOME, client);
+}
+
 void Server::pass(Client &client, const std::vector<std::string>& args)
 {
 	std::cout << "pass function called" << std::endl;
-	if (!client.isAuthentified() && (!client.getNickname().empty() || !client.getUsername().empty()))
+	if (!client.isAuthentified() && (client.getNickname() != "*" || !client.getUsername().empty()))
 		return;
 	if (args.size() < 2)
 	{
@@ -242,14 +263,7 @@ void Server::pass(Client &client, const std::vector<std::string>& args)
 		reply(ERR_ALREADYREGISTRED, client, args);
 		return;
 	}
-	if (args[1] == _password)
-		client.setPass(true);
-	else
-	{
-		//464 ERR_PASSWDMISMATCH
-		reply(ERR_PASSWDMISMATCH, client, args);
-		client.setPass(false);
-	}
+	client.setPass(args[1] == _password);
 }
 
 void Server::nick(Client &client, const std::vector<std::string>& args)
@@ -283,9 +297,7 @@ void Server::nick(Client &client, const std::vector<std::string>& args)
 		client.appendMessageToSend(":" + client.getNickname() + " NICK :" + nickname + "\n");
 	else if (client.getUsername() != "")
 	{
-		client.setAuthentified();
-		// 001 RPL_WELCOME
-		reply(RPL_WELCOME, client, args);
+		authentificate(client);
 	}
 	client.setNickname(args[1]);
 
@@ -312,10 +324,7 @@ void Server::user(Client &client, const std::vector<std::string> &args)
 	client.setRealname(args[4]);
 	if (!client.isAuthentified() && client.getNickname() != "")
 	{
-		client.setAuthentified();
-		// 001 RPL_WELCOME
-		reply(RPL_WELCOME, client, args);
-		return ;
+		authentificate(client);
 	}
 }
 
