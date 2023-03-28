@@ -12,7 +12,7 @@ Channel::Channel(const std::string &name, Client *client)
 }
 
 Channel::Channel(const Channel &other)
-	// : _name(other.getName())
+// : _name(other.getName())
 {
 	*this = other;
 }
@@ -65,28 +65,26 @@ std::vector<Client *> const &Channel::getClients() const
 	return _clients;
 }
 
-
-
 //==============================================================================
 // Functions
 //==============================================================================
 
 void Channel::addClient(Client *client)
 {
-	for (size_t i = 0; i <_clients.size(); i++)
+	for (size_t i = 0; i < _clients.size(); i++)
 	{
 		if (_clients[i]->getNickname() == client->getNickname())
-			return ;
+			return;
 	}
 	_clients.push_back(client);
 }
 
 void Channel::addOperator(Client *client)
 {
-	for (size_t i = 0; i <_operators.size(); i++)
+	for (size_t i = 0; i < _operators.size(); i++)
 	{
 		if (_operators[i]->getNickname() == client->getNickname())
-			return ;
+			return;
 	}
 	_operators.push_back(client);
 }
@@ -163,5 +161,34 @@ void Channel::removeOp(const int fd)
 			_clients.erase(it);
 			break;
 		}
+	}
+}
+
+// *
+// * Broadcast a message to all clients in the channel.
+// *
+// * @param message The message to broadcast.
+// *
+void Channel::fullBroadcast(const std::string &message)
+{
+	for (size_t i = 0; i < _clients.size(); i++)
+	{
+		_clients[i]->appendMessageToSend(message);
+	}
+}
+
+// *
+// * Broadcast a message to all clients in the channel except the one specified
+// * in the second argument.
+// *
+// * @param message The message to broadcast.
+// * @param clientToExclude The client to exclude from the broadcast.
+// *
+void Channel::broadcast(const std::string &message, Client *clientToExclude)
+{
+	for (size_t i = 0; i < _clients.size(); i++)
+	{
+		if (_clients[i] != clientToExclude)
+			_clients[i]->appendMessageToSend(message);
 	}
 }

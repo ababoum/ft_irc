@@ -20,6 +20,9 @@ public:
 	void	removeOp(const std::string &nickname);
 	void	removeOp(const int fd);
 
+	void	fullBroadcast(const std::string &message);
+	void	broadcast(const std::string &message, Client *clientToExclude);
+
 	std::string	getName() const;
 	std::string	getTopic() const;
 	Client *getTopicSetBy() const;

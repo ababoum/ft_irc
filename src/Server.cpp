@@ -353,7 +353,8 @@ void Server::join(Client &client, const std::vector<std::string> &args)
 		channel.addClient(&client);
 		client.addChan(&channel);
 		// JOIN Message
-		client.appendMessageToSend(":" + client.getNickname() + " JOIN " + args[1] + "\n");
+		std::string message = ":" + client.getNickname() + " JOIN " + channels[i] + "\n";
+		client.appendMessageToSend(message);
 		if (channel.getTopic().size() > 0)
 		{
 			reply(RPL_TOPIC, client, channel);
@@ -361,6 +362,9 @@ void Server::join(Client &client, const std::vector<std::string> &args)
 		}
 		reply(RPL_NAMREPLY, client, channel);
 		reply(RPL_ENDOFNAMES, client, channel);
+		// Broadcast join message to all other clients in the channel
+		// The message is the same as the one sent to the main client
+		channel.broadcast(message, &client);
 	}
 }
 
@@ -368,4 +372,10 @@ void Server::ping(Client &client, const std::vector<std::string> &args)
 {
 	std::cout << "ping function called" << std::endl;
 	client.appendMessageToSend(":ircserv PONG " + client.getNickname() + " " + args[1] + "\n");
+}
+
+void Server::who(Client &client, const std::vector<std::string> &args)
+{
+	std::cout << "who function called" << std::endl;
+
 }

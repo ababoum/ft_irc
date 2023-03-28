@@ -14,3 +14,4 @@ new messages (display the messages in debug mode)
 
 * Run basic tests with an IRC client (e.g. IRSSI)
 * Choose our reference IRC client
+* Do the WHOXXX commands

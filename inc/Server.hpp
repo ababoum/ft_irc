@@ -30,6 +30,7 @@ public:
 	void user(Client &client, const std::vector<std::string>& args);
 	void join(Client &client, const std::vector<std::string>& args);
 	void ping(Client &client, const std::vector<std::string>& args);
+	void who(Client &client, const std::vector<std::string> &args);
 	int	 searchChan(std::string name, Client &client);
 
 private:
