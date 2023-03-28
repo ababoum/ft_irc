@@ -9,6 +9,12 @@ void Server::reply(int code, Client &client, const std::vector<std::string> &arg
 	case RPL_WELCOME:
 		message = "001 " + client.getNickname() + " :Welcome to " + _name + " " + client.getNickname() + "!" + client.getUsername() + "@" + client.getServername() + "\r\n";
 		break;
+	case ERR_NOSUCHNICK:
+		message = "401 " + client.getNickname() + " " + args[1] + " :No such nick/channel\r\n";
+		break;
+	case ERR_NOSUCHCHANNEL:
+		message = "403 " + client.getNickname() + " " + args[1] + " :No such channel\r\n";
+		break;
 	case ERR_UNKNOWNCOMMAND:
 		message = "421 " + client.getNickname() + " " + args[0] + " :Unknown command\r\n";
 		break;
@@ -32,12 +38,6 @@ void Server::reply(int code, Client &client, const std::vector<std::string> &arg
 		break;
 	case ERR_PASSWDMISMATCH:
 		message = "464 " + client.getNickname() + " :Password incorrect\r\n";
-		break;
-	case ERR_NOSUCHCHANNEL:
-		message = "403 " + client.getNickname() + " " + args[1] + " :No such channel\r\n";
-		break;
-	case ERR_NOSUCHNICK:
-		message = "401 " + client.getNickname() + " " + args[1] + " :No such nick/channel\r\n";
 		break;
 
 	default:
