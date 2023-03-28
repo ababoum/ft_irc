@@ -244,18 +244,21 @@ void Server::parseCommands(Client &client)
 		{
 			if (args[0] == command_name[i])
 			{
-				if (args[0] != "NICK" && args[0] != "USER" && args[0] != "PASS" && !client.isAuthentified())
+				if (args[0] != "NICK"
+					&& args[0] != "USER"
+					&& args[0] != "PASS"
+					&& !client.isAuthentified())
 				{
-					// 451
+					//451
 					reply(ERR_NOTREGISTERED, client, args);
 				}
 				else
 					(this->*f[i])(client, args);
-				break;
+				break ;
 			}
 			else if (i == nb_commands - 1 && client.isAuthentified())
 			{
-				// 421
+				//421
 				reply(ERR_UNKNOWNCOMMAND, client, args);
 			}
 		}
