@@ -21,6 +21,9 @@ private:
 
 	void launch(void);
 	void routine(struct sockaddr_in &addr);
+	void reading(fd_set readfds);
+	void writing(fd_set writefds);
+
 
 	void reply(int code, Client &client, const std::vector<std::string>& args = std::vector<std::string>());
 	void reply(int code, Client &client, const Channel& channel);

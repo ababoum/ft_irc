@@ -130,42 +130,54 @@ void Server::routine(struct sockaddr_in &addr)
 				_clients.push_back(Client(_client_fd));
 				continue;
 			}
-			for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+			reading(readfds);
+			writing(writefds);
+		}
+	}
+}
+
+void Server::reading(fd_set readfds)
+{
+
+	for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+	{
+		if (FD_ISSET(it->getFd(), &readfds))
+		{
+			DEBUG("New message\n");
+			char buffer[READ_SIZE + 1] = {0};
+			int read_val = read(it->getFd(), buffer, READ_SIZE);
+			if (read_val <= 0)
 			{
-				if (FD_ISSET(it->getFd(), &readfds))
-				{
-					DEBUG("New message\n");
-					char buffer[READ_SIZE + 1] = {0};
-					int read_val = read(it->getFd(), buffer, READ_SIZE);
-					if (read_val <= 0)
-					{
-						close(it->getFd());
-						_clients.erase(it);
-					}
-					else
-					{
-						it->appendMessageReceived(buffer);
-					}
-					INFO(buffer);
-					break;
-				}
+				close(it->getFd());
+				_clients.erase(it);
 			}
-			for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+			else
 			{
-				if (FD_ISSET(it->getFd(), &writefds))
+				it->appendMessageReceived(buffer);
+			}
+			INFO(buffer);
+			break;
+		}
+	}
+
+}
+
+void Server::writing(fd_set writefds)
+{
+	for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+	{
+		if (FD_ISSET(it->getFd(), &writefds))
+		{
+			// DEBUG("Ready to write\n");
+			if (!it->getMessageReceived().empty() && *(it->getMessageReceived().end() - 1) == '\n')
+			{
+				parseCommands(*it);
+				if (!it->getMessageToSend().empty())
 				{
-					// DEBUG("Ready to write\n");
-					if (!it->getMessageReceived().empty() && *(it->getMessageReceived().end() - 1) == '\n')
-					{
-						parseCommands(*it);
-						if (!it->getMessageToSend().empty())
-						{
-							write(it->getFd(), it->getMessageToSend().c_str(), it->getMessageToSend().size());
-							DEBUG("Message sent: " << it->getMessageToSend());
-						}
-						it->clearMessageToSend();
-					}
+					write(it->getFd(), it->getMessageToSend().c_str(), it->getMessageToSend().size());
+					DEBUG("Message sent: " << it->getMessageToSend());
 				}
+				it->clearMessageToSend();
 			}
 		}
 	}
@@ -386,5 +398,6 @@ void Server::ping(Client &client, const std::vector<std::string> &args)
 void Server::who(Client &client, const std::vector<std::string> &args)
 {
 	std::cout << "who function called" << std::endl;
-
+	(void)args;
+	(void)client;
 }
