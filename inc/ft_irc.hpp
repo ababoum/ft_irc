@@ -14,6 +14,7 @@
 #include <ctime>
 #include <sstream>
 #include <cstring>
+#include <algorithm>
 
 #include "Server.hpp"
 #include "Client.hpp"
@@ -43,10 +44,15 @@
 enum reply_code
 {
 	RPL_WELCOME = 001,
+	RPL_ENDOFWHO = 315,
 	RPL_TOPIC = 332,
 	RPL_TOPICWHOTIME = 333,
+	RPL_WHOREPLY = 352,
 	RPL_NAMREPLY = 353,
 	RPL_ENDOFNAMES = 366,
+	ERR_NOSUCHNICK = 401,
+	ERR_NOSUCHCHANNEL = 403,
+	ERR_UNKNOWNCOMMAND = 421,
 	ERR_NONICKNAMEGIVEN = 431,
 	ERR_ERRONEUSNICKNAME = 432,
 	ERR_NICKNAMEINUSE = 433,
@@ -54,9 +60,6 @@ enum reply_code
 	ERR_NEEDMOREPARAMS = 461,
 	ERR_ALREADYREGISTRED = 462,
 	ERR_PASSWDMISMATCH = 464,
-	ERR_UNKNOWNCOMMAND = 421,
-
-
 };
 
 std::vector<std::string>	split(const std::string &str, char delim);

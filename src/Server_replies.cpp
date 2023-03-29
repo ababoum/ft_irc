@@ -1,6 +1,6 @@
 #include "Server.hpp"
 
-void Server::reply(int code, Client &client, const std::vector<std::string>& args)
+void Server::reply(int code, Client &client, const std::vector<std::string> &args)
 {
 	std::string message;
 
@@ -8,6 +8,12 @@ void Server::reply(int code, Client &client, const std::vector<std::string>& arg
 	{
 	case RPL_WELCOME:
 		message = "001 " + client.getNickname() + " :Welcome to " + _name + " " + client.getNickname() + "!" + client.getUsername() + "@" + client.getServername() + "\r\n";
+		break;
+	case ERR_NOSUCHNICK:
+		message = "401 " + client.getNickname() + " " + args[1] + " :No such nick/channel\r\n";
+		break;
+	case ERR_NOSUCHCHANNEL:
+		message = "403 " + client.getNickname() + " " + args[1] + " :No such channel\r\n";
 		break;
 	case ERR_UNKNOWNCOMMAND:
 		message = "421 " + client.getNickname() + " " + args[0] + " :Unknown command\r\n";
@@ -33,7 +39,7 @@ void Server::reply(int code, Client &client, const std::vector<std::string>& arg
 	case ERR_PASSWDMISMATCH:
 		message = "464 " + client.getNickname() + " :Password incorrect\r\n";
 		break;
-	
+
 	default:
 		DEBUG("reply: unknown code: " << code << "\n");
 		break;
@@ -41,7 +47,7 @@ void Server::reply(int code, Client &client, const std::vector<std::string>& arg
 	client.appendMessageToSend(message);
 }
 
-void Server::reply(int code, Client &client, const Channel& channel)
+void Server::reply(int code, Client &client, const Channel &channel)
 {
 	std::string message;
 
@@ -75,3 +81,41 @@ void Server::reply(int code, Client &client, const Channel& channel)
 	client.appendMessageToSend(message);
 }
 
+void Server::who_reply(int code, Client &client, Channel *channel, const Client &target)
+{
+	std::string message;
+	std::string channel_name = channel == NULL ? "*" : channel->getName();
+
+	switch (code)
+	{
+	case RPL_WHOREPLY:
+		message = "352 " + client.getNickname() + " " + channel_name +
+				  " " + target.getUsername() + " " + target.getServername() +
+				  " " + target.getNickname() + " H :0 " + target.getRealname() +
+				  "\r\n";
+		break;
+
+	default:
+		DEBUG("reply: unknown code: " << code << "\n");
+		break;
+	}
+	client.appendMessageToSend(message);
+}
+
+void Server::reply_mask(int code, Client &client, const std::string &mask)
+{
+	std::string message;
+
+	switch (code)
+	{
+	case RPL_ENDOFWHO:
+		message = "315 " + client.getNickname() + " " +
+				  mask + " :End of WHO list\r\n";
+		break;
+
+	default:
+		DEBUG("reply: unknown code: " << code << "\n");
+		break;
+	}
+	client.appendMessageToSend(message);
+}

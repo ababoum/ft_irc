@@ -8,45 +8,56 @@ class Channel;
 
 class Server
 {
+
 public:
 	Server(int port, std::string password);
 	~Server();
 
 	Server &operator=(const Server &rhs);
 
+private:
 	int getSocketFd(void) const;
 	int getPort(void) const;
 	std::string getPassword(void) const;
 	int	searchChan(std::string name);
 	int	addChan(std::string name, Client &client);
+
+	void launch(void);
+	void routine(struct sockaddr_in &addr);
+	void reading(fd_set readfds);
+	void writing(fd_set writefds);
+
+
+	void reply(int code, Client &client, const std::vector<std::string> &args = std::vector<std::string>());
+	void reply(int code, Client &client, const Channel &channel);
+	void who_reply(int code, Client &client, Channel *channel, const Client &target);
+	void reply_mask(int code, Client &client, const std::string &mask);
+
 	void parseCommands(Client &client);
 
-	void reply(int code, Client &client, const std::vector<std::string>& args);
-	void reply(int code, Client &client, const Channel& channel);
+	void authentificate(Client &client);
 
-
-
-	void pass(Client &client, const std::vector<std::string>& args);
-	void nick(Client &client, const std::vector<std::string>& args);
-	void user(Client &client, const std::vector<std::string>& args);
-	void join(Client &client, const std::vector<std::string>& args);
+	void pass(Client &client, const std::vector<std::string> &args);
+	void nick(Client &client, const std::vector<std::string> &args);
+	void user(Client &client, const std::vector<std::string> &args);
+	void join(Client &client, const std::vector<std::string> &args);
 	void part(Client &client, const std::vector<std::string> &args);
-	void ping(Client &client, const std::vector<std::string>& args);
+	void ping(Client &client, const std::vector<std::string> &args);
+	void who(Client &client, const std::vector<std::string> &args);
+	void quit(Client &client, const std::vector<std::string> &args);
 
 private:
 	Server();
 	Server(const Server &other);
 
-// Attributes
+	// Attributes
 private:
 	std::string				_name;
 	int 					_socket_fd;
 	int 					_port;
 	std::string				_password;
-	std::vector<Client>		_clients;
+	std::vector<Client*>	_clients;
 	std::vector<Channel>	_channels;
-
-	void launch(void);
 };
 
 #endif /* SERVER_HPP */

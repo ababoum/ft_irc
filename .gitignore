@@ -4,3 +4,5 @@
 obj/
 ircserv
 .vscode
+a.out
+debug
