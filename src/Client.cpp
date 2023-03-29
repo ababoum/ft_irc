@@ -14,6 +14,10 @@ Client::Client(const Client &other)
 
 Client::~Client()
 {
+	for (std::vector<Channel *>::iterator it = _joined_channels.begin(); it != _joined_channels.end(); ++it)
+	{
+		(*it)->removeClient(this);
+	}
 	// The client fd needs to be closed by hand when the client disconnects
 }
 
@@ -147,6 +151,11 @@ const std::string &	Client::getServername() const
 const std::string &	Client::getRealname() const
 {
 	return _realname;
+}
+
+const std::vector<Channel *> &	Client::getJoinedChannels() const
+{
+	return _joined_channels;
 }
 
 int Client::getFd() const
