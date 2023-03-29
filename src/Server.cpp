@@ -242,6 +242,7 @@ void Server::parseCommands(Client &client)
 								  "NICK",
 								  "USER",
 								  "JOIN",
+								  "PART",
 								  "PING",
 								  "WHO",
 								  "QUIT"};
@@ -251,6 +252,7 @@ void Server::parseCommands(Client &client)
 		&Server::nick,
 		&Server::user,
 		&Server::join,
+		&Server::part,
 		&Server::ping,
 		&Server::who,
 		&Server::quit};
@@ -464,20 +466,28 @@ void Server::part(Client &client, const std::vector<std::string> &args)
 		if (!channel)
 		{
 			// 1 ERR_NOSUCHCHANNEL 403 for each channel that does not exist
+			reply(ERR_NOSUCHCHANNEL, client, channels[i]);
 			continue ;
 		}
 		Client *chan_client = channel->searchClient(client.getNickname());
 		if (!chan_client)
 		{
 			// 1 ERR_NOTONCHANNEL 442 for each channel the client is not on
+			reply(ERR_NOTONCHANNEL, client, *channel);
 			continue ;
 		}
 	// 1 PART message for each channel the client is leaving
 	// BROADCAST TO OTHER CLIENTS IN THE CHANNEL
+		std::string message = ":" + client.getNickname() + " PART " + channel->getName();
+		if (args.size() > 2)
+			message += " " + args[2];
+		message += "\r\n";
+		channel->fullBroadcast(message);
+		channel->removeClient(client.getNickname());
+		client.removeChan(channel->getName());
 	}
 
 }
-
 
 void Server::ping(Client &client, const std::vector<std::string> &args)
 {

@@ -1,7 +1,7 @@
 #include "Client.hpp"
 
 Client::Client(int fd)
-	: _fd(fd), _is_authentified(false)
+	: _fd(fd), _is_authentified(false), _fatal_error(false)
 	, _message_received(""), _message_to_send("")
 	, _nickname("*"), _username(""), _hostname(""), _servername(""), _realname("")
 {
@@ -23,6 +23,7 @@ Client &Client::operator=(const Client &rhs)
 	{
 		_fd = rhs.getFd();
 		_is_authentified = rhs.isAuthentified();
+		_fatal_error = rhs.isFatalError();
 		_message_received = rhs.getMessageReceived();
 		_message_to_send = rhs.getMessageToSend();
 		_nickname = rhs.getNickname();
@@ -74,6 +75,12 @@ void Client::setAuthentified()
 	_is_authentified = true;
 }
 
+void	Client::setFatalError()
+{
+	_fatal_error = true;
+}
+
+
 void Client::setNickname(const std::string &nick_name)
 {
 	_nickname = nick_name;
@@ -104,6 +111,20 @@ void Client::addChan(Channel *channel)
 	_joined_channels.push_back(channel);
 }
 
+void Client::removeChan(std::string name)
+{
+	for (std::vector<Channel *>::iterator it = _joined_channels.begin();
+			it != _joined_channels.end(); it++)
+	{
+		if ((*it)->getName() == name)
+		{
+			_joined_channels.erase(it);
+			break ;
+		}
+	}
+}
+
+
 bool Client::isPassOk() const
 {
 	return _pass;
@@ -113,6 +134,12 @@ bool Client::isAuthentified() const
 {
 	return _is_authentified;
 }
+
+bool Client::isFatalError() const
+{
+	return _fatal_error;
+}
+
 
 const std::string &	Client::getMessageReceived() const
 {
