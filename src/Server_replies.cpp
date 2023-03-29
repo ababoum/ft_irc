@@ -12,9 +12,6 @@ void Server::reply(int code, Client &client, const std::vector<std::string> &arg
 	case ERR_NOSUCHNICK:
 		message = "401 " + client.getNickname() + " " + args[1] + " :No such nick/channel\r\n";
 		break;
-	case ERR_NOSUCHCHANNEL:
-		message = "403 " + client.getNickname() + " " + args[1] + " :No such channel\r\n";
-		break;
 	case ERR_UNKNOWNCOMMAND:
 		message = "421 " + client.getNickname() + " " + args[0] + " :Unknown command\r\n";
 		break;
@@ -102,7 +99,7 @@ void Server::who_reply(int code, Client &client, Channel *channel, const Client 
 	client.appendMessageToSend(message);
 }
 
-void Server::reply_mask(int code, Client &client, const std::string &mask)
+void Server::reply(int code, Client &client, const std::string &mask)
 {
 	std::string message;
 
@@ -111,6 +108,9 @@ void Server::reply_mask(int code, Client &client, const std::string &mask)
 	case RPL_ENDOFWHO:
 		message = "315 " + client.getNickname() + " " +
 				  mask + " :End of WHO list\r\n";
+		break;
+	case ERR_NOSUCHCHANNEL:
+		message = "403 " + client.getNickname() + " " + mask + " :No such channel\r\n";
 		break;
 
 	default:

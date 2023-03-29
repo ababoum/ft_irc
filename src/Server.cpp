@@ -370,21 +370,21 @@ void Server::user(Client &client, const std::vector<std::string> &args)
 	}
 }
 
-int Server::searchChan(std::string name)
+Channel *Server::searchChan(std::string name)
 {
 	for (size_t i = 0; i < _channels.size(); i++)
 	{
-		if (_channels[i].getName() == name)
-			return i;
+		if (_channels[i]->getName() == name)
+			return _channels[i];
 	}
-	return (-1);
+	return (NULL);
 }
 
-int Server::addChan(std::string name, Client &client)
+Channel *Server::addChan(std::string name, Client *client)
 {
-	Channel newChannel(name, &client);
+	Channel *newChannel = new Channel(name, client);
 	_channels.push_back(newChannel);
-	return (_channels.size() - 1);
+	return newChannel;
 }
 
 void Server::join(Client &client, const std::vector<std::string> &args)
@@ -404,25 +404,24 @@ void Server::join(Client &client, const std::vector<std::string> &args)
 	for (size_t i = 0; i < channels.size(); i++)
 	{
 		// Check name >> 476 ERR_BADCHANMASK + return
-		int chan_pos = searchChan(channels[i]);
-		if (chan_pos == -1)
-			chan_pos = addChan(channels[i], client);
-		Channel &channel = _channels[chan_pos];
-		channel.addClient(&client);
-		client.addChan(&channel);
+		Channel *channel = searchChan(channels[i]);
+		if (!channel)
+			channel = addChan(channels[i], &client);
+		channel->addClient(&client);
+		client.addChan(channel);
 		// JOIN Message
 		std::string message = ":" + client.getNickname() + " JOIN " + channels[i] + "\n";
-		client.appendMessageToSend(message);
-		if (channel.getTopic().size() > 0)
-		{
-			reply(RPL_TOPIC, client, channel);
-			reply(RPL_TOPICWHOTIME, client, channel);
-		}
-		reply(RPL_NAMREPLY, client, channel);
-		reply(RPL_ENDOFNAMES, client, channel);
 		// Broadcast join message to all other clients in the channel
 		// The message is the same as the one sent to the main client
-		channel.broadcast(message, &client);
+		channel->fullBroadcast(message);
+		// client.appendMessageToSend(message);
+		if (channel->getTopic().size() > 0)
+		{
+			reply(RPL_TOPIC, client, *channel);
+			reply(RPL_TOPICWHOTIME, client, *channel);
+		}
+		reply(RPL_NAMREPLY, client, *channel);
+		reply(RPL_ENDOFNAMES, client, *channel);
 	}
 }
 
@@ -437,17 +436,20 @@ void Server::part(Client &client, const std::vector<std::string> &args)
 	std::vector<std::string> channels = split(args[1], ",");
 	for (size_t i = 0; i < channels.size(); i++)
 	{
-		int chanPos = searchChan(channels[i]);
-		if (chanPos == -1)
+		Channel *channel = searchChan(channels[i]);
+		if (!channel)
 		{
 			// 1 ERR_NOSUCHCHANNEL 403 for each channel that does not exist
 			continue ;
 		}
-		std::vector<Client *> chan_clients = _channels[chanPos].getClients();
+		Client *chan_client = channel->searchClient(client.getNickname());
+		if (!chan_client)
+		{
+			// 1 ERR_NOTONCHANNEL 442 for each channel the client is not on
+			continue ;
+		}
 	// 1 PART message for each channel the client is leaving
-	// 1 ERR_NOTONCHANNEL 442 for each channel the client is not on
 	// BROADCAST TO OTHER CLIENTS IN THE CHANNEL
-
 	}
 
 }
@@ -476,23 +478,23 @@ void Server::who(Client &client, const std::vector<std::string> &args)
 		if (args[i][0] == '#')
 		{
 			// Check if the channel exists
-			bool found = false;
+			Channel *found = NULL;
 			for (size_t j = 0; j < _channels.size(); j++)
 			{
-				if (_channels[j].getName() == args[i])
+				if (_channels[j]->getName() == args[i])
 				{
-					found = true;
-					for (size_t k = 0; k < _channels[j].getClients().size(); k++)
+					found = _channels[j];
+					for (size_t k = 0; k < found->getClients().size(); k++)
 					{
-						who_reply(RPL_WHOREPLY, client, &_channels[j], *_channels[j].getClients()[k]);
+						who_reply(RPL_WHOREPLY, client, found, *found->getClients()[k]);
 					}
-					reply_mask(RPL_ENDOFWHO, client, args[i]);
+					reply(RPL_ENDOFWHO, client, args[i]);
 				}
 			}
 			if (!found)
 			{
 				// 403
-				reply(ERR_NOSUCHCHANNEL, client, args);
+				reply(ERR_NOSUCHCHANNEL, client, args[i]);
 			}
 		}
 		else
@@ -505,7 +507,7 @@ void Server::who(Client &client, const std::vector<std::string> &args)
 				{
 					found = true;
 					who_reply(RPL_WHOREPLY, client, NULL, *_clients[j]);
-					reply_mask(RPL_ENDOFWHO, client, args[i]);
+					reply(RPL_ENDOFWHO, client, args[i]);
 				}
 			}
 			if (!found)

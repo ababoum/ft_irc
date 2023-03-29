@@ -28,6 +28,8 @@ public:
 	Client *getTopicSetBy() const;
 	time_t getTopicSetAt() const;
 	std::vector<Client *> const &getClients() const;
+	Client * searchClient(const std::string &nickname) const;
+	Client * searchClient(const int fd) const;
 
 private:
 	Channel();

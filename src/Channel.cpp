@@ -65,6 +65,16 @@ std::vector<Client *> const &Channel::getClients() const
 	return _clients;
 }
 
+Client *Channel::searchClient(const std::string &nickname) const
+{
+	for (size_t i = 0; i < _clients.size(); i++)
+	{
+		if (_clients[i]->getNickname() == nickname)
+			return _clients[i];
+	}
+	return NULL;
+}
+
 //==============================================================================
 // Functions
 //==============================================================================
