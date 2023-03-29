@@ -491,7 +491,7 @@ void Server::part(Client &client, const std::vector<std::string> &args)
 void Server::ping(Client &client, const std::vector<std::string> &args)
 {
 	std::cout << "ping function called" << std::endl;
-	client.appendMessageToSend(":ircserv PONG " + client.getNickname() + " " + args[1] + "\n");
+	client.appendMessageToSend("PONG " + _name + " " + args[1] + "\n");
 }
 
 // Warning: what happens if we query about both a channel and a nickname?
