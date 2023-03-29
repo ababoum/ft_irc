@@ -77,6 +77,9 @@ void Server::reply(int code, Client &client, const Channel &channel)
 	case RPL_ENDOFNAMES:
 		message = "366 " + client.getNickname() + " " + channel.getName() + " :End of /NAMES list\r\n";
 		break;
+	case ERR_NOTONCHANNEL:
+		message = "442 " + client.getNickname() + " " + channel.getName() + " :You're not on that channel\r\n";
+		break;
 
 	default:
 		DEBUG("reply: unknown code: " << code << "\n");

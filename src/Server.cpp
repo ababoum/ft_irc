@@ -162,6 +162,19 @@ void Server::reading(fd_set readfds)
 				client->appendMessageReceived(buffer);
 			}
 			INFO(buffer);
+			if (!client->getMessageReceived().empty() && *(client->getMessageReceived().end() - 1) == '\n')
+			{
+				try
+				{
+					parseCommands(*client);
+				}
+				catch (std::exception &e) 
+				{
+					client->appendMessageToSend("ERROR :" + std::string(e.what()) + "\r\n");
+					client->setFatalError();
+				}
+			}
+
 			break;
 		}
 	}
@@ -175,29 +188,16 @@ void Server::writing(fd_set writefds)
 		Client *client = *it;
 		if (FD_ISSET(client->getFd(), &writefds))
 		{
-			// DEBUG("Ready to write\n");
-			if (!client->getMessageReceived().empty() && *(client->getMessageReceived().end() - 1) == '\n')
+			if (!client->getMessageToSend().empty())
 			{
-				// parseCommands(*it);
-				try
-				{
-					parseCommands(*client);
-					if (!client->getMessageToSend().empty())
-					{
-						write(client->getFd(), client->getMessageToSend().c_str(), client->getMessageToSend().size());
-						DEBUG("Message sent: \n" << client->getMessageToSend());
-						client->clearMessageToSend();
-					}
-				}
-				catch (std::exception &e) 
-				{
-					client->appendMessageToSend("ERROR :" + std::string(e.what()) + "\r\n");
-					write(client->getFd(), client->getMessageToSend().c_str(), client->getMessageToSend().size());
-					DEBUG("Message sent: \n" << client->getMessageToSend());
-					closeConnection(it);
-				}
+				write(client->getFd(), client->getMessageToSend().c_str(), client->getMessageToSend().size());
+				DEBUG("Message sent: \n" << client->getMessageToSend());
+				client->clearMessageToSend();
+			}
+			if(client->isFatalError())
+			{
+				closeConnection(it);
 				break;
-
 			}
 		}
 	}
@@ -238,6 +238,7 @@ void Server::parseCommands(Client &client)
 								  "NICK",
 								  "USER",
 								  "JOIN",
+								  "PART",
 								  "PING",
 								  "WHO",
 								  "WHOIS",
@@ -248,6 +249,7 @@ void Server::parseCommands(Client &client)
 		&Server::nick,
 		&Server::user,
 		&Server::join,
+		&Server::part,
 		&Server::ping,
 		&Server::who,
 		&Server::whois,
@@ -463,16 +465,25 @@ void Server::part(Client &client, const std::vector<std::string> &args)
 		if (!channel)
 		{
 			// 1 ERR_NOSUCHCHANNEL 403 for each channel that does not exist
+			reply(ERR_NOSUCHCHANNEL, client, channels[i]);
 			continue ;
 		}
 		Client *chan_client = channel->searchClient(client.getNickname());
 		if (!chan_client)
 		{
 			// 1 ERR_NOTONCHANNEL 442 for each channel the client is not on
+			reply(ERR_NOTONCHANNEL, client, *channel);
 			continue ;
 		}
 	// 1 PART message for each channel the client is leaving
 	// BROADCAST TO OTHER CLIENTS IN THE CHANNEL
+		std::string message = ":" + client.getNickname() + " PART " + channel->getName();
+		if (args.size() > 2)
+			message += " " + args[2];
+		message += "\r\n";
+		channel->fullBroadcast(message);
+		channel->removeClient(client.getNickname());
+		client.removeChan(channel->getName());
 	}
 
 }
