@@ -97,10 +97,11 @@ void Server::routine(struct sockaddr_in &addr)
 		FD_SET(_socket_fd, &readfds);
 
 		// add all clients to the set of fd to read/write
-		for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+		for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
 		{
-			FD_SET(it->getFd(), &readfds);
-			FD_SET(it->getFd(), &writefds);
+			Client *client = *it;
+			FD_SET(client->getFd(), &readfds);
+			FD_SET(client->getFd(), &writefds);
 			// DEBUG("Client fd " << it->getFd() << " added to select\n");
 		}
 		int ret = select(FD_SETSIZE, &readfds, &writefds, NULL, NULL);
@@ -127,7 +128,7 @@ void Server::routine(struct sockaddr_in &addr)
 					perror("In accept");
 					return;
 				}
-				_clients.push_back(Client(_client_fd));
+				_clients.push_back(new Client(_client_fd));
 				continue;
 			}
 			reading(readfds);
@@ -138,21 +139,23 @@ void Server::routine(struct sockaddr_in &addr)
 
 void Server::reading(fd_set readfds)
 {
-	for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+	for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
-		if (FD_ISSET(it->getFd(), &readfds))
+		Client *client = *it;
+		if (FD_ISSET(client->getFd(), &readfds))
 		{
 			DEBUG("New message\n");
 			char buffer[READ_SIZE + 1] = {0};
-			int read_val = read(it->getFd(), buffer, READ_SIZE);
+			int read_val = read(client->getFd(), buffer, READ_SIZE);
 			if (read_val <= 0)
 			{
-				close(it->getFd());
+				close(client->getFd());
+				delete client;
 				_clients.erase(it);
 			}
 			else
 			{
-				it->appendMessageReceived(buffer);
+				client->appendMessageReceived(buffer);
 			}
 			INFO(buffer);
 			break;
@@ -163,31 +166,33 @@ void Server::reading(fd_set readfds)
 
 void Server::writing(fd_set writefds)
 {
-	for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+	for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
-		if (FD_ISSET(it->getFd(), &writefds))
+		Client *client = *it;
+		if (FD_ISSET(client->getFd(), &writefds))
 		{
 			// DEBUG("Ready to write\n");
-			if (!it->getMessageReceived().empty() && *(it->getMessageReceived().end() - 1) == '\n')
+			if (!client->getMessageReceived().empty() && *(client->getMessageReceived().end() - 1) == '\n')
 			{
 				// parseCommands(*it);
 				try
 				{
-					parseCommands(*it);
-					if (!it->getMessageToSend().empty())
+					parseCommands(*client);
+					if (!client->getMessageToSend().empty())
 					{
-						write(it->getFd(), it->getMessageToSend().c_str(), it->getMessageToSend().size());
-						DEBUG("Message sent: \n" << it->getMessageToSend());
-						it->clearMessageToSend();
+						write(client->getFd(), client->getMessageToSend().c_str(), client->getMessageToSend().size());
+						DEBUG("Message sent: \n" << client->getMessageToSend());
+						client->clearMessageToSend();
 					}
 				}
 				catch (std::exception &e) 
 				{
-					it->appendMessageToSend("ERROR :" + std::string(e.what()) + "\r\n");
-					write(it->getFd(), it->getMessageToSend().c_str(), it->getMessageToSend().size());
-					DEBUG("Message sent: \n" << it->getMessageToSend());
+					client->appendMessageToSend("ERROR :" + std::string(e.what()) + "\r\n");
+					write(client->getFd(), client->getMessageToSend().c_str(), client->getMessageToSend().size());
+					DEBUG("Message sent: \n" << client->getMessageToSend());
 					// think to remove client from channels
-					close(it->getFd());
+					close(client->getFd());
+					delete client;
 					_clients.erase(it);
 				}
 				break;
@@ -322,9 +327,9 @@ void Server::nick(Client &client, const std::vector<std::string> &args)
 	}
 	if (nickname == client.getNickname())
 		return;
-	for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+	for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
-		if (it->getNickname() == nickname)
+		if ((*it)->getNickname() == nickname)
 		{
 			// 433 ERR_NICKNAMEINUSE;
 			reply(ERR_NICKNAMEINUSE, client, args);
@@ -462,10 +467,10 @@ void Server::who(Client &client, const std::vector<std::string> &args)
 			bool found = false;
 			for (size_t j = 0; j < _clients.size(); j++)
 			{
-				if (_clients[j].getNickname() == args[i])
+				if (_clients[j]->getNickname() == args[i])
 				{
 					found = true;
-					who_reply(RPL_WHOREPLY, client, NULL, _clients[j]);
+					who_reply(RPL_WHOREPLY, client, NULL, *_clients[j]);
 					reply_mask(RPL_ENDOFWHO, client, args[i]);
 				}
 			}

@@ -55,7 +55,7 @@ private:
 	int 					_socket_fd;
 	int 					_port;
 	std::string				_password;
-	std::vector<Client>		_clients;
+	std::vector<Client*>	_clients;
 	std::vector<Channel>	_channels;
 };
 
