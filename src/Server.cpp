@@ -158,6 +158,31 @@ void Server::reading(fd_set readfds)
 				client->appendMessageReceived(buffer);
 			}
 			INFO(buffer);
+			if (!client->getMessageReceived().empty() && *(client->getMessageReceived().end() - 1) == '\n')
+			{
+				try
+				{
+					parseCommands(*client);
+					// if (!client->getMessageToSend().empty())
+					// {
+					// 	write(client->getFd(), client->getMessageToSend().c_str(), client->getMessageToSend().size());
+					// 	DEBUG("Message sent: \n" << client->getMessageToSend());
+					// 	client->clearMessageToSend();
+					// }
+				}
+				catch (std::exception &e) 
+				{
+					client->appendMessageToSend("ERROR :" + std::string(e.what()) + "\r\n");
+					client->setFatalError();
+					// write(client->getFd(), client->getMessageToSend().c_str(), client->getMessageToSend().size());
+					// DEBUG("Message sent: \n" << client->getMessageToSend());
+					// // think to remove client from channels
+					// close(client->getFd());
+					// delete client;
+					// _clients.erase(it);
+				}
+			}
+
 			break;
 		}
 	}
@@ -172,32 +197,31 @@ void Server::writing(fd_set writefds)
 		if (FD_ISSET(client->getFd(), &writefds))
 		{
 			// DEBUG("Ready to write\n");
-			if (!client->getMessageReceived().empty() && *(client->getMessageReceived().end() - 1) == '\n')
+			// if (!client->getMessageReceived().empty() && *(client->getMessageReceived().end() - 1) == '\n')
+			// {
+			// 	// parseCommands(*it);
+			// 	try
+			// 	{
+			// 		parseCommands(*client);
+			if (!client->getMessageToSend().empty())
 			{
-				// parseCommands(*it);
-				try
-				{
-					parseCommands(*client);
-					if (!client->getMessageToSend().empty())
-					{
-						write(client->getFd(), client->getMessageToSend().c_str(), client->getMessageToSend().size());
-						DEBUG("Message sent: \n" << client->getMessageToSend());
-						client->clearMessageToSend();
-					}
-				}
-				catch (std::exception &e) 
-				{
-					client->appendMessageToSend("ERROR :" + std::string(e.what()) + "\r\n");
-					write(client->getFd(), client->getMessageToSend().c_str(), client->getMessageToSend().size());
-					DEBUG("Message sent: \n" << client->getMessageToSend());
-					// think to remove client from channels
-					close(client->getFd());
-					delete client;
-					_clients.erase(it);
-				}
-				break;
-
+				write(client->getFd(), client->getMessageToSend().c_str(), client->getMessageToSend().size());
+				DEBUG("Message sent: \n" << client->getMessageToSend());
+				client->clearMessageToSend();
 			}
+			if(client->isFatalError())
+			{
+				// think to remove client from channels
+				close(client->getFd());
+				delete client;
+				_clients.erase(it);
+				break;
+			}
+				// }
+				// catch (std::exception &e) 
+				// {
+					// client->appendMessageToSend("ERROR :" + std::string(e.what()) + "\r\n");
+				// }
 		}
 	}
 }
