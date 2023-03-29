@@ -38,6 +38,7 @@ public:
 	const std::string &	getHostname() const;
 	const std::string &	getServername() const;
 	const std::string &	getRealname() const;
+	const std::vector<Channel *> &getJoinedChannels() const;
 	int getFd() const;
 
 private:

@@ -3,14 +3,12 @@
 void Server::reply(int code, Client &client, const std::vector<std::string> &args)
 {
 	std::string message;
+	std::string nicks = "";
 
 	switch (code)
 	{
 	case RPL_WELCOME:
 		message = "001 " + client.getNickname() + " :Welcome to " + _name + " " + client.getNickname() + "!" + client.getUsername() + "@" + client.getServername() + "\r\n";
-		break;
-	case ERR_NOSUCHNICK:
-		message = "401 " + client.getNickname() + " " + args[1] + " :No such nick/channel\r\n";
 		break;
 	case ERR_UNKNOWNCOMMAND:
 		message = "421 " + client.getNickname() + " " + args[0] + " :Unknown command\r\n";
@@ -35,6 +33,15 @@ void Server::reply(int code, Client &client, const std::vector<std::string> &arg
 		break;
 	case ERR_PASSWDMISMATCH:
 		message = "464 " + client.getNickname() + " :Password incorrect\r\n";
+		break;
+	case RPL_ENDOFWHOIS:
+		for (size_t i = 1; i < args.size(); i++)
+		{
+			nicks += args[i];
+			if (i != args.size() - 1)
+				nicks += " ";
+		}
+		message = "318 " + client.getNickname() + " " + nicks + " :End of /WHOIS list\r\n";
 		break;
 
 	default:
@@ -91,6 +98,21 @@ void Server::who_reply(int code, Client &client, Channel *channel, const Client 
 				  " " + target.getNickname() + " H :0 " + target.getRealname() +
 				  "\r\n";
 		break;
+	case RPL_WHOISUSER:
+		message = "311 " + client.getNickname() + " " + target.getNickname() +
+				  " " + target.getUsername() + " " + target.getServername() +
+				  " * :" + target.getRealname() + "\r\n";
+		break;
+	case RPL_WHOISCHANNELS:
+		message = "319 " + client.getNickname() + " " + target.getNickname() + " :";
+		for (size_t i = 0; i < target.getJoinedChannels().size(); i++)
+		{
+			if (i != 0)
+				message += " ";
+			message += target.getJoinedChannels()[i]->getName();
+		}
+		message += "\r\n";
+		break;
 
 	default:
 		DEBUG("reply: unknown code: " << code << "\n");
@@ -111,6 +133,9 @@ void Server::reply(int code, Client &client, const std::string &mask)
 		break;
 	case ERR_NOSUCHCHANNEL:
 		message = "403 " + client.getNickname() + " " + mask + " :No such channel\r\n";
+		break;
+	case ERR_NOSUCHNICK:
+		message = "401 " + client.getNickname() + " " + mask + " :No such nick/channel\r\n";
 		break;
 
 	default:

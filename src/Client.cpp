@@ -153,3 +153,8 @@ int Client::getFd() const
 {
 	return _fd;
 }
+
+const std::vector<Channel *> &	Client::getJoinedChannels() const
+{
+	return _joined_channels;
+}

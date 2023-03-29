@@ -220,6 +220,7 @@ void Server::parseCommands(Client &client)
 								  "JOIN",
 								  "PING",
 								  "WHO",
+								  "WHOIS",
 								  "QUIT"};
 	size_t nb_commands = sizeof(command_name) / sizeof(command_name[0]);
 	void (Server::*f[])(Client & client, const std::vector<std::string> &args) = {
@@ -229,6 +230,7 @@ void Server::parseCommands(Client &client)
 		&Server::join,
 		&Server::ping,
 		&Server::who,
+		&Server::whois,
 		&Server::quit};
 
 	std::vector<std::string> lines = split(client.getMessageReceived(), "\r\n");
@@ -461,6 +463,7 @@ void Server::ping(Client &client, const std::vector<std::string> &args)
 	client.appendMessageToSend(":ircserv PONG " + client.getNickname() + " " + args[1] + "\n");
 }
 
+// Warning: what happens if we query about both a channel and a nickname?
 void Server::who(Client &client, const std::vector<std::string> &args)
 {
 	std::cout << "who function called" << std::endl;
@@ -471,7 +474,7 @@ void Server::who(Client &client, const std::vector<std::string> &args)
 		return;
 	}
 
-	// We suppose that WHO commands can have multiple arguments
+	// WHO command can have multiple arguments
 	for (size_t i = 1; i < args.size(); i++)
 	{
 		// Check if the argument is a channel name
@@ -513,10 +516,44 @@ void Server::who(Client &client, const std::vector<std::string> &args)
 			if (!found)
 			{
 				// 401
-				reply(ERR_NOSUCHNICK, client, args);
+				reply(ERR_NOSUCHNICK, client, args[i]);
 			}
 		}
 	}
+}
+
+void Server::whois(Client &client, const std::vector<std::string> &args)
+{
+	std::cout << "who function called" << std::endl;
+	
+	if (args.size() == 1)
+	{
+		reply(ERR_NONICKNAMEGIVEN, client, args);
+		return;
+	}
+
+	// WHOIS command can have multiple arguments
+	for (size_t i = 1; i < args.size(); i++)
+	{
+		// Check if the nickname exists
+		bool found = false;
+		for (size_t j = 0; j < _clients.size(); j++)
+		{
+			if (_clients[j]->getNickname() == args[i])
+			{
+				found = true;
+				who_reply(RPL_WHOISUSER, client, NULL, *_clients[j]);
+				who_reply(RPL_WHOISCHANNELS, client, NULL, *_clients[j]);
+				// We can add more if necessary...
+			}
+		}
+		if (!found)
+		{
+			// 401
+			reply(ERR_NOSUCHNICK, client, args[i]);
+		}
+	}
+	reply(RPL_ENDOFWHOIS, client, args);
 }
 
 void Server::quit(Client &client, const std::vector<std::string> &args)
