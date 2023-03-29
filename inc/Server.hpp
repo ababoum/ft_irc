@@ -26,6 +26,7 @@ private:
 	void routine(struct sockaddr_in &addr);
 	void reading(fd_set readfds);
 	void writing(fd_set writefds);
+	void closeConnection(std::vector<Client*>::iterator it);
 
 
 	void reply(int code, Client &client, const std::vector<std::string> &args = std::vector<std::string>());

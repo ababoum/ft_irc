@@ -145,11 +145,15 @@ void Server::reading(fd_set readfds)
 		if (FD_ISSET(client->getFd(), &readfds))
 		{
 			DEBUG("New message\n");
+			DEBUG("Nb clients: " << _clients.size() << "\n");
+			DEBUG("Nb channels: " << _channels.size() << "\n");
+
 			char buffer[READ_SIZE + 1] = {0};
 			int read_val = read(client->getFd(), buffer, READ_SIZE);
 			if (read_val <= 0)
 			{
 				close(client->getFd());
+				DEBUG("delete client\n")
 				delete client;
 				_clients.erase(it);
 			}
@@ -190,16 +194,32 @@ void Server::writing(fd_set writefds)
 					client->appendMessageToSend("ERROR :" + std::string(e.what()) + "\r\n");
 					write(client->getFd(), client->getMessageToSend().c_str(), client->getMessageToSend().size());
 					DEBUG("Message sent: \n" << client->getMessageToSend());
-					// think to remove client from channels
-					close(client->getFd());
-					delete client;
-					_clients.erase(it);
+					closeConnection(it);
 				}
 				break;
 
 			}
 		}
 	}
+}
+
+void Server::closeConnection(std::vector<Client*>::iterator client_it)
+{
+	Client *client = *client_it;
+	std::vector<Channel *> joined_channels = client->getJoinedChannels();
+	for (std::vector<Channel *>::iterator it = joined_channels.begin(); it != joined_channels.end(); ++it)
+	{
+		Channel *channel = *it;
+		channel->removeClient(client);
+		if (channel->getClients().empty())
+		{
+			delete channel;
+			_channels.erase(std::find(_channels.begin(), _channels.end(), channel));
+		}
+	}
+	close(client->getFd());
+	delete client;
+	_clients.erase(client_it);
 }
 
 static void stripPrefix(std::string &line, char c)
@@ -258,6 +278,7 @@ void Server::parseCommands(Client &client)
 				if (args[0] != "NICK"
 					&& args[0] != "USER"
 					&& args[0] != "PASS"
+					&& args[0] != "QUIT"
 					&& !client.isAuthentified())
 				{
 					//451
@@ -455,7 +476,6 @@ void Server::part(Client &client, const std::vector<std::string> &args)
 	}
 
 }
-
 
 void Server::ping(Client &client, const std::vector<std::string> &args)
 {
