@@ -144,7 +144,7 @@ void Channel::removeOp(Client *client)
 	{
 		if (*it == client)
 		{
-			_clients.erase(it);
+			_operators.erase(it);
 			break;
 		}
 	}
@@ -156,7 +156,7 @@ void Channel::removeOp(const std::string &nickname)
 	{
 		if ((*it)->getNickname() == nickname)
 		{
-			_clients.erase(it);
+			_operators.erase(it);
 			break;
 		}
 	}
