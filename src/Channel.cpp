@@ -168,7 +168,7 @@ void Channel::removeOp(const int fd)
 	{
 		if ((*it)->getFd() == fd)
 		{
-			_clients.erase(it);
+			_operators.erase(it);
 			break;
 		}
 	}

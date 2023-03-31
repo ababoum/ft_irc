@@ -64,7 +64,7 @@ void Server::reply(int code, Client &client, const Channel &channel)
 		message = "333 " + client.getNickname() + " " + channel.getName() + " " + channel.getTopicSetBy()->getNickname() + " " + ft_itoa(channel.getTopicSetAt()) + "\r\n";
 		break;
 	case RPL_NAMREPLY:
-		message = "353 " + client.getNickname() + " =" + channel.getName() + " :";
+		message = "353 " + client.getNickname() + " = " + channel.getName() + " :";
 		for (size_t j = 0; j < channel.getClients().size(); j++)
 		{
 			const Client *tmp = channel.getClients()[j];
