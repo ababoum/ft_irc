@@ -21,6 +21,7 @@ private:
 	std::string getPassword(void) const;
 	Channel	*searchChan(std::string name);
 	Channel	*addChan(std::string name, Client *client);
+	Client *searchClient(std::string nickname);
 
 	void launch(void);
 	void routine(struct sockaddr_in &addr);
@@ -46,6 +47,7 @@ private:
 	void ping(Client &client, const std::vector<std::string> &args);
 	void who(Client &client, const std::vector<std::string> &args);
 	void whois(Client &client, const std::vector<std::string> &args);
+	void privmsg(Client &client, const std::vector<std::string> &args);
 	void quit(Client &client, const std::vector<std::string> &args);
 
 private:

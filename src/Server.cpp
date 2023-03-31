@@ -184,15 +184,21 @@ void Server::writing(fd_set writefds)
 					parseCommands(*client);
 					if (!client->getMessageToSend().empty())
 					{
-						write(client->getFd(), client->getMessageToSend().c_str(), client->getMessageToSend().size());
-						DEBUG("Message sent: \n" << client->getMessageToSend());
+						write(client->getFd(),
+							  client->getMessageToSend().c_str(),
+							  client->getMessageToSend().size());
+						DEBUG("Message sent: \n"
+							  << client->getMessageToSend());
 						client->clearMessageToSend();
 					}
 				}
 				catch (std::exception &e) 
 				{
-					client->appendMessageToSend("ERROR :" + std::string(e.what()) + "\r\n");
-					write(client->getFd(), client->getMessageToSend().c_str(), client->getMessageToSend().size());
+					client->appendMessageToSend("ERROR :" +
+												std::string(e.what()) + "\r\n");
+					write(client->getFd(),
+						  client->getMessageToSend().c_str(),
+						  client->getMessageToSend().size());
 					DEBUG("Message sent: \n" << client->getMessageToSend());
 					closeConnection(it);
 				}
@@ -241,6 +247,7 @@ void Server::parseCommands(Client &client)
 								  "PING",
 								  "WHO",
 								  "WHOIS",
+								  "PRIVMSG",
 								  "QUIT"};
 	size_t nb_commands = sizeof(command_name) / sizeof(command_name[0]);
 	void (Server::*f[])(Client & client, const std::vector<std::string> &args) = {
@@ -251,6 +258,7 @@ void Server::parseCommands(Client &client)
 		&Server::ping,
 		&Server::who,
 		&Server::whois,
+		&Server::privmsg,
 		&Server::quit};
 
 	std::vector<std::string> lines = split(client.getMessageReceived(), "\r\n");
@@ -410,6 +418,16 @@ Channel *Server::addChan(std::string name, Client *client)
 	return newChannel;
 }
 
+Client *Server::searchClient(std::string nickname)
+{
+	for (size_t i = 0; i < _clients.size(); i++)
+	{
+		if (_clients[i]->getNickname() == nickname)
+			return _clients[i];
+	}
+	return (NULL);
+}
+
 void Server::join(Client &client, const std::vector<std::string> &args)
 {
 	std::cout << "join function called" << std::endl;
@@ -544,7 +562,7 @@ void Server::who(Client &client, const std::vector<std::string> &args)
 
 void Server::whois(Client &client, const std::vector<std::string> &args)
 {
-	std::cout << "who function called" << std::endl;
+	RUNTIME_MSG("who function called");
 	
 	if (args.size() == 1)
 	{
@@ -576,10 +594,57 @@ void Server::whois(Client &client, const std::vector<std::string> &args)
 	reply(RPL_ENDOFWHOIS, client, args);
 }
 
+void Server::privmsg(Client &client, const std::vector<std::string> &args)
+{
+	RUNTIME_MSG("privmsg function called\n");
+
+	if (args.size() < 3)
+	{
+		reply(ERR_NEEDMOREPARAMS, client, args);
+		return;
+	}
+	// Check if the target is a channel
+	if (args[1][0] == '#')
+	{
+		Channel *channel = searchChan(args[1]);
+		if (!channel)
+		{
+			reply(ERR_NOSUCHCHANNEL, client, args[1]);
+			return;
+		}
+		// Check if the client is in the channel
+		Client *chan_client = channel->searchClient(client.getNickname());
+		if (!chan_client)
+		{
+			reply(ERR_NOTONCHANNEL, client, args[1]);
+			return;
+		}
+		// Send the message to all the clients in the channel
+		std::string message = ":" + client.getNickname() +
+							  " PRIVMSG " + args[1] + " :" + args[2] + "\r\n";
+		channel->broadcast(message, chan_client);
+	}
+	else
+	{
+		// Check if the target exists
+		Client *target = searchClient(args[1]);
+		if (!target)
+		{
+			reply(ERR_NOSUCHNICK, client, args[1]);
+			return;
+		}
+		// Send the message to the target
+		std::string message = ":" + client.getNickname() +
+							  " PRIVMSG " + args[1] + " :" + args[2] + "\r\n";
+		target->appendMessageToSend(message);
+	}
+}
+
 void Server::quit(Client &client, const std::vector<std::string> &args)
 {
 	(void)client;
-	std::cout << "quit function called" << std::endl;
+	RUNTIME_MSG("quit function called");
+
 	if (args.size() == 1)
 		throw std::runtime_error("Quit");
 	else
