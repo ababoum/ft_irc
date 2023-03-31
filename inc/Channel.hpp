@@ -11,6 +11,9 @@ public:
 	~Channel();
 	Channel &operator=(const Channel &rhs);
 
+
+	static bool isChannelNameValid(const std::string &name);
+
 	void	addClient(Client *client);
 	void	removeClient(Client *client);
 	void	removeClient(const std::string &nickname);
@@ -23,13 +26,14 @@ public:
 	void	fullBroadcast(const std::string &message);
 	void	broadcast(const std::string &message, Client *clientToExclude);
 
-	std::string	getName() const;
-	std::string	getTopic() const;
+	std::string getName() const;
+	std::string getTopic() const;
 	Client *getTopicSetBy() const;
 	time_t getTopicSetAt() const;
 	std::vector<Client *> const &getClients() const;
-	Client * searchClient(const std::string &nickname) const;
-	Client * searchClient(const int fd) const;
+	Client *searchClient(const std::string &nickname) const;
+	Client *searchClient(const int fd) const;
+	bool isOperator(Client *client) const;
 
 private:
 	Channel();

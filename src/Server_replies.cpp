@@ -80,6 +80,9 @@ void Server::reply(int code, Client &client, const Channel &channel)
 	case ERR_NOTONCHANNEL:
 		message = "442 " + client.getNickname() + " " + channel.getName() + " :You're not on that channel\r\n";
 		break;
+	case ERR_CHANOPRIVSNEEDED:
+		message = "482 " + client.getNickname() + " " + channel.getName() + " :You're not channel operator\r\n";
+		break;
 
 	default:
 		DEBUG("reply: unknown code: " << code << "\n");
@@ -88,7 +91,7 @@ void Server::reply(int code, Client &client, const Channel &channel)
 	client.appendMessageToSend(message);
 }
 
-void Server::who_reply(int code, Client &client, Channel *channel, const Client &target)
+void Server::reply(int code, Client &client, Channel *channel, const Client &target)
 {
 	std::string message;
 	std::string channel_name = channel == NULL ? "*" : channel->getName();
@@ -117,6 +120,8 @@ void Server::who_reply(int code, Client &client, Channel *channel, const Client 
 		message += "\r\n";
 		break;
 
+
+
 	default:
 		DEBUG("reply: unknown code: " << code << "\n");
 		break;
@@ -139,6 +144,26 @@ void Server::reply(int code, Client &client, const std::string &mask)
 		break;
 	case ERR_NOSUCHNICK:
 		message = "401 " + client.getNickname() + " " + mask + " :No such nick/channel\r\n";
+		break;
+
+	default:
+		DEBUG("reply: unknown code: " << code << "\n");
+		break;
+	}
+	client.appendMessageToSend(message);
+}
+
+void Server::reply(int code, Client &client, Channel* channel, const std::string &mask)
+{
+	std::string message;
+	std::string channel_name = channel == NULL ? "*" : channel->getName();
+
+
+	switch (code)
+	{
+	case ERR_USERNOTINCHANNEL:
+		message = "441 " + client.getNickname() + " " + 
+			mask + " " + channel_name + " :They aren't on that channel\r\n";
 		break;
 
 	default:

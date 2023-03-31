@@ -12,7 +12,6 @@ Channel::Channel(const std::string &name, Client *client)
 }
 
 Channel::Channel(const Channel &other)
-// : _name(other.getName())
 {
 	*this = other;
 }
@@ -78,6 +77,20 @@ Client *Channel::searchClient(const std::string &nickname) const
 //==============================================================================
 // Functions
 //==============================================================================
+
+bool Channel::isChannelNameValid(const std::string &name)
+{
+	bool res = true;
+
+	if (name.empty())
+		return false;
+	else if (name.find(' ') != std::string::npos ||
+			 name.find(',') != std::string::npos ||
+			 name.find(0x07) != std::string::npos)
+		return false;
+
+	return res;
+}
 
 void Channel::addClient(Client *client)
 {
@@ -172,6 +185,16 @@ void Channel::removeOp(const int fd)
 			break;
 		}
 	}
+}
+
+bool Channel::isOperator(Client *client) const
+{
+	for (size_t i = 0; i < _operators.size(); i++)
+	{
+		if (_operators[i]->getNickname() == client->getNickname())
+			return true;
+	}
+	return false;
 }
 
 // *

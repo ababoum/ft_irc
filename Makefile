@@ -10,6 +10,10 @@ OBJ_DIRS		=	$(OBJ_PATH)
 SRC				=	main.cpp \
 					Server.cpp \
 					Server_replies.cpp \
+					USER_QUERIES.cpp \
+					CHAN_OPS.cpp \
+					CONNECTION.cpp \
+					MSG.cpp \
 					utils.cpp \
 					Client.cpp \
 					Channel.cpp

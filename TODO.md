@@ -5,8 +5,9 @@
 * Implement the WHO/WHOIS commands
 * Implement the operator commands
 * Change the Makefile back to c++ compiler at the end of the development
-* Concatenate the client commands when they are sent in parts or if the buffer
-is too long
+* Concatenate the client commands when they are sent in parts or if the buffer is too long
+* Check the channel name value according to the RFC
+
 
 # Points of attention
 

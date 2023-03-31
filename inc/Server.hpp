@@ -32,8 +32,9 @@ private:
 
 	void reply(int code, Client &client, const std::vector<std::string> &args = std::vector<std::string>());
 	void reply(int code, Client &client, const Channel &channel);
-	void who_reply(int code, Client &client, Channel *channel, const Client &target);
+	void reply(int code, Client &client, Channel *channel, const Client &target);
 	void reply(int code, Client &client, const std::string &mask);
+	void reply(int code, Client &client, Channel* channel, const std::string &mask);
 
 	void parseCommands(Client &client);
 
@@ -44,6 +45,7 @@ private:
 	void user(Client &client, const std::vector<std::string> &args);
 	void join(Client &client, const std::vector<std::string> &args);
 	void part(Client &client, const std::vector<std::string> &args);
+	void kick(Client &client, const std::vector<std::string> &args);
 	void ping(Client &client, const std::vector<std::string> &args);
 	void who(Client &client, const std::vector<std::string> &args);
 	void whois(Client &client, const std::vector<std::string> &args);

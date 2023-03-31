@@ -12,6 +12,8 @@ public:
 	Client(const Client &other);
 	Client &operator=(const Client &rhs);
 	~Client();
+
+	static bool	isNicknameValid(const std::string &nickname);
 	
 	void	appendMessageReceived(const std::string &str);
 	void	appendMessageReceived(const char *str);
