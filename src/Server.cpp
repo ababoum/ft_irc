@@ -211,13 +211,14 @@ void Server::closeConnection(std::vector<Client*>::iterator client_it)
 	std::vector<Channel *> joined_channels = client->getJoinedChannels();
 	for (std::vector<Channel *>::iterator it = joined_channels.begin(); it != joined_channels.end(); ++it)
 	{
-		Channel *channel = *it;
-		channel->removeClient(client);
-		if (channel->getClients().empty())
-		{
-			delete channel;
-			_channels.erase(std::find(_channels.begin(), _channels.end(), channel));
-		}
+		removeClientFromChannel(client, *it);
+		// Channel *channel = *it;
+		// channel->removeClient(client);
+		// if (channel->getClients().empty())
+		// {
+		// 	delete channel;
+		// 	_channels.erase(std::find(_channels.begin(), _channels.end(), channel));
+		// }
 	}
 	close(client->getFd());
 	delete client;
@@ -345,4 +346,14 @@ Client *Server::searchClient(std::string nickname)
 			return _clients[i];
 	}
 	return (NULL);
+}
+
+void Server::removeClientFromChannel(Client *client, Channel *channel)
+{
+	channel->removeClient(client);
+	if (channel->getClients().empty())
+	{
+		delete channel;
+		_channels.erase(std::find(_channels.begin(), _channels.end(), channel));
+	}
 }

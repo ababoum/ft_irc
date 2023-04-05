@@ -185,10 +185,8 @@ const std::string &	Client::getMessageToSend() const
 	return _message_to_send;
 }
 
-const std::string 	Client::getNickname() const
+const std::string &	Client::getNickname() const
 {
-	if (_nickname.empty())
-		return ("*");
 	return _nickname;
 }
 
