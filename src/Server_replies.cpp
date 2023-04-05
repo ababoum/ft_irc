@@ -2,20 +2,23 @@
 
 void Server::reply(int code, Client &client, const std::vector<std::string> &args)
 {
+	std::string nickname(client.getNickname());
 	std::string message;
 	std::string nicks = "";
-	std::string prefix = SSTR(code) + " " + client.getNickname() + " ";
+	std::string prefix = SSTR(code) + " " + nickname + " ";
 
+	if (nickname.empty())
+		nickname = "*";
 	switch (code)
 	{
 	case RPL_WELCOME:
-		message = "001 " + client.getNickname() + " :Welcome to " + _name + " " + client.getNickname() + "!" + client.getUsername() + "@" + client.getServername() + "\r\n";
+		message = "001 " + nickname + " :Welcome to " + _name + " " + nickname + "!" + client.getUsername() + "@" + client.getServername() + "\r\n";
 		break;
 	case ERR_UNKNOWNCOMMAND:
 		message = prefix + args[0] + " :Unknown command\r\n";
 		break;
 	case ERR_NONICKNAMEGIVEN:
-		message = "431 " + client.getNickname() + " :No nickname given\r\n";
+		message = "431 " + nickname + " :No nickname given\r\n";
 		break;
 	case ERR_ERRONEUSNICKNAME:
 		message = prefix + args[1] + " :Erroneus nickname\r\n";
@@ -54,8 +57,9 @@ void Server::reply(int code, Client &client, const std::vector<std::string> &arg
 
 void Server::reply(int code, Client &client, const Channel &channel)
 {
+	std::string nickname(client.getNickname());
 	std::string message;
-	std::string prefix = SSTR(code) + " " + client.getNickname() + " ";
+	std::string prefix = SSTR(code) + " " + nickname + " ";
 
 	switch (code)
 	{
@@ -95,9 +99,10 @@ void Server::reply(int code, Client &client, const Channel &channel)
 
 void Server::reply(int code, Client &client, Channel *channel, const Client &target)
 {
+	std::string nickname(client.getNickname());
 	std::string message;
 	std::string channel_name = channel == NULL ? "*" : channel->getName();
-	std::string prefix = SSTR(code) + " " + client.getNickname() + " ";
+	std::string prefix = SSTR(code) + " " + nickname + " ";
 
 	switch (code)
 	{
@@ -142,8 +147,9 @@ void Server::reply(int code, Client &client, Channel *channel, const Client &tar
 
 void Server::reply(int code, Client &client, const std::string &mask)
 {
+	std::string nickname(client.getNickname());
 	std::string message;
-	std::string prefix = SSTR(code) + " " + client.getNickname() + " ";
+	std::string prefix = SSTR(code) + " " + nickname + " ";
 
 	switch (code)
 	{
@@ -170,9 +176,10 @@ void Server::reply(int code, Client &client, const std::string &mask)
 
 void Server::reply(int code, Client &client, Channel *channel, const std::string &mask)
 {
+	std::string nickname(client.getNickname());
 	std::string message;
 	std::string channel_name = channel == NULL ? "*" : channel->getName();
-	std::string prefix = SSTR(code) + " " + client.getNickname() + " ";
+	std::string prefix = SSTR(code) + " " + nickname + " ";
 
 	switch (code)
 	{

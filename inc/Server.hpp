@@ -22,6 +22,7 @@ private:
 	Channel	*searchChan(std::string name);
 	Channel	*addChan(std::string name, Client *client);
 	Client *searchClient(std::string nickname);
+	void removeClientFromChannel(Client *client, Channel *channel);
 
 	void launch(void);
 	void routine(struct sockaddr_in &addr);
