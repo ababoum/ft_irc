@@ -3,12 +3,12 @@
 void Server::reply(int code, Client &client, const std::vector<std::string> &args)
 {
 	std::string nickname(client.getNickname());
+	if (nickname.empty())
+		nickname = "*";
 	std::string message;
 	std::string nicks = "";
 	std::string prefix = SSTR(code) + " " + nickname + " ";
 
-	if (nickname.empty())
-		nickname = "*";
 	switch (code)
 	{
 	case RPL_WELCOME:
