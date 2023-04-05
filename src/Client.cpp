@@ -14,10 +14,6 @@ Client::Client(const Client &other)
 
 Client::~Client()
 {
-	for (std::vector<Channel *>::iterator it = _joined_channels.begin(); it != _joined_channels.end(); ++it)
-	{
-		(*it)->removeClient(this);
-	}
 	// The client fd needs to be closed by hand when the client disconnects
 }
 

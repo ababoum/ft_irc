@@ -133,7 +133,7 @@ void Server::part(Client &client, const std::vector<std::string> &args)
 			message += " " + args[2];
 		message += "\r\n";
 		channel->fullBroadcast(message);
-		channel->removeClient(client.getNickname());
 		client.removeChan(channel->getName());
+		removeClientFromChannel(&client, channel);
 	}
 }

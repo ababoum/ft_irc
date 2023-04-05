@@ -152,15 +152,12 @@ void Server::reading(fd_set readfds)
 			int read_val = read(client->getFd(), buffer, READ_SIZE);
 			if (read_val <= 0)
 			{
-				close(client->getFd());
-				DEBUG("delete client\n")
-				delete client;
-				_clients.erase(it);
+				INFO("Client disconnected\n");
+				closeConnection(it);
+				return ;
 			}
 			else
-			{
 				client->appendMessageReceived(buffer);
-			}
 			INFO(buffer);
 			if (!client->getMessageReceived().empty() && *(client->getMessageReceived().end() - 1) == '\n')
 			{
@@ -210,16 +207,7 @@ void Server::closeConnection(std::vector<Client*>::iterator client_it)
 	Client *client = *client_it;
 	std::vector<Channel *> joined_channels = client->getJoinedChannels();
 	for (std::vector<Channel *>::iterator it = joined_channels.begin(); it != joined_channels.end(); ++it)
-	{
 		removeClientFromChannel(client, *it);
-		// Channel *channel = *it;
-		// channel->removeClient(client);
-		// if (channel->getClients().empty())
-		// {
-		// 	delete channel;
-		// 	_channels.erase(std::find(_channels.begin(), _channels.end(), channel));
-		// }
-	}
 	close(client->getFd());
 	delete client;
 	_clients.erase(client_it);
