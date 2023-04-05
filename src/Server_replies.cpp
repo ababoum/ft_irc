@@ -4,6 +4,7 @@ void Server::reply(int code, Client &client, const std::vector<std::string> &arg
 {
 	std::string message;
 	std::string nicks = "";
+	std::string prefix = SSTR(code) + " " + client.getNickname() + " ";
 
 	switch (code)
 	{
@@ -11,28 +12,28 @@ void Server::reply(int code, Client &client, const std::vector<std::string> &arg
 		message = "001 " + client.getNickname() + " :Welcome to " + _name + " " + client.getNickname() + "!" + client.getUsername() + "@" + client.getServername() + "\r\n";
 		break;
 	case ERR_UNKNOWNCOMMAND:
-		message = "421 " + client.getNickname() + " " + args[0] + " :Unknown command\r\n";
+		message = prefix + args[0] + " :Unknown command\r\n";
 		break;
 	case ERR_NONICKNAMEGIVEN:
 		message = "431 " + client.getNickname() + " :No nickname given\r\n";
 		break;
 	case ERR_ERRONEUSNICKNAME:
-		message = "432 " + client.getNickname() + " " + args[1] + " :Erroneus nickname\r\n";
+		message = prefix + args[1] + " :Erroneus nickname\r\n";
 		break;
 	case ERR_NICKNAMEINUSE:
-		message = "433 " + client.getNickname() + " " + args[1] + " :Nickname is already in use.\r\n";
+		message = prefix + args[1] + " :Nickname is already in use.\r\n";
 		break;
 	case ERR_NOTREGISTERED:
-		message = "451 " + client.getNickname() + " :You have not registered\r\n";
+		message = prefix + ":You have not registered\r\n";
 		break;
 	case ERR_NEEDMOREPARAMS:
-		message = "461 " + client.getNickname() + " " + args[0] + " :Not enough parameters\r\n";
+		message = prefix + args[0] + " :Not enough parameters\r\n";
 		break;
 	case ERR_ALREADYREGISTRED:
-		message = "462 " + client.getNickname() + " :You may not reregister\r\n";
+		message = prefix + ":You may not reregister\r\n";
 		break;
 	case ERR_PASSWDMISMATCH:
-		message = "464 " + client.getNickname() + " :Password incorrect\r\n";
+		message = prefix + ":Password incorrect\r\n";
 		break;
 	case RPL_ENDOFWHOIS:
 		for (size_t i = 1; i < args.size(); i++)
@@ -41,7 +42,7 @@ void Server::reply(int code, Client &client, const std::vector<std::string> &arg
 			if (i != args.size() - 1)
 				nicks += " ";
 		}
-		message = "318 " + client.getNickname() + " " + nicks + " :End of /WHOIS list\r\n";
+		message = prefix + nicks + " :End of /WHOIS list\r\n";
 		break;
 
 	default:
@@ -54,17 +55,18 @@ void Server::reply(int code, Client &client, const std::vector<std::string> &arg
 void Server::reply(int code, Client &client, const Channel &channel)
 {
 	std::string message;
+	std::string prefix = SSTR(code) + " " + client.getNickname() + " ";
 
 	switch (code)
 	{
 	case RPL_TOPIC:
-		message = "332 " + client.getNickname() + " " + channel.getName() + " :" + channel.getTopic() + "\r\n";
+		message = prefix + channel.getName() + " :" + channel.getTopic() + "\r\n";
 		break;
 	case RPL_TOPICWHOTIME:
-		message = "333 " + client.getNickname() + " " + channel.getName() + " " + channel.getTopicSetBy()->getNickname() + " " + ft_itoa(channel.getTopicSetAt()) + "\r\n";
+		message = prefix + channel.getName() + " " + channel.getTopicSetBy()->getNickname() + " " + ft_itoa(channel.getTopicSetAt()) + "\r\n";
 		break;
 	case RPL_NAMREPLY:
-		message = "353 " + client.getNickname() + " = " + channel.getName() + " :";
+		message = prefix + "= " + channel.getName() + " :";
 		for (size_t j = 0; j < channel.getClients().size(); j++)
 		{
 			const Client *tmp = channel.getClients()[j];
@@ -75,13 +77,13 @@ void Server::reply(int code, Client &client, const Channel &channel)
 		message += "\r\n";
 		break;
 	case RPL_ENDOFNAMES:
-		message = "366 " + client.getNickname() + " " + channel.getName() + " :End of /NAMES list\r\n";
+		message = prefix + channel.getName() + " :End of /NAMES list\r\n";
 		break;
 	case ERR_NOTONCHANNEL:
-		message = "442 " + client.getNickname() + " " + channel.getName() + " :You're not on that channel\r\n";
+		message = prefix + channel.getName() + " :You're not on that channel\r\n";
 		break;
 	case ERR_CHANOPRIVSNEEDED:
-		message = "482 " + client.getNickname() + " " + channel.getName() + " :You're not channel operator\r\n";
+		message = prefix + channel.getName() + " :You're not channel operator\r\n";
 		break;
 
 	default:
@@ -95,22 +97,23 @@ void Server::reply(int code, Client &client, Channel *channel, const Client &tar
 {
 	std::string message;
 	std::string channel_name = channel == NULL ? "*" : channel->getName();
+	std::string prefix = SSTR(code) + " " + client.getNickname() + " ";
 
 	switch (code)
 	{
 	case RPL_WHOREPLY:
-		message = "352 " + client.getNickname() + " " + channel_name +
+		message = prefix + channel_name +
 				  " " + target.getUsername() + " " + target.getServername() +
 				  " " + target.getNickname() + " H :0 " + target.getRealname() +
 				  "\r\n";
 		break;
 	case RPL_WHOISUSER:
-		message = "311 " + client.getNickname() + " " + target.getNickname() +
+		message = prefix + target.getNickname() +
 				  " " + target.getUsername() + " " + target.getServername() +
 				  " * :" + target.getRealname() + "\r\n";
 		break;
 	case RPL_WHOISCHANNELS:
-		message = "319 " + client.getNickname() + " " + target.getNickname() + " :";
+		message = prefix + target.getNickname() + " :";
 		for (size_t i = 0; i < target.getJoinedChannels().size(); i++)
 		{
 			if (i != 0)
@@ -120,7 +123,15 @@ void Server::reply(int code, Client &client, Channel *channel, const Client &tar
 		message += "\r\n";
 		break;
 
+	case RPL_INVITING:
+		message = prefix + target.getNickname() +
+				  " " + channel_name + "\r\n";
+		break;
 
+	case ERR_USERONCHANNEL:
+		message = prefix + target.getNickname() +
+				  " " + channel_name + " :is already on channel\r\n";
+		break;
 
 	default:
 		DEBUG("reply: unknown code: " << code << "\n");
@@ -132,18 +143,22 @@ void Server::reply(int code, Client &client, Channel *channel, const Client &tar
 void Server::reply(int code, Client &client, const std::string &mask)
 {
 	std::string message;
+	std::string prefix = SSTR(code) + " " + client.getNickname() + " ";
 
 	switch (code)
 	{
 	case RPL_ENDOFWHO:
-		message = "315 " + client.getNickname() + " " +
-				  mask + " :End of WHO list\r\n";
+		message = prefix + mask + " :End of WHO list\r\n";
 		break;
 	case ERR_NOSUCHCHANNEL:
-		message = "403 " + client.getNickname() + " " + mask + " :No such channel\r\n";
+		message = prefix + mask + " :No such channel\r\n";
 		break;
 	case ERR_NOSUCHNICK:
-		message = "401 " + client.getNickname() + " " + mask + " :No such nick/channel\r\n";
+		message = prefix + mask + " :No such nick/channel\r\n";
+		break;
+
+	case ERR_BADCHANMASK:
+		message = prefix + mask + " :Bad Channel Mask\r\n";
 		break;
 
 	default:
@@ -153,17 +168,17 @@ void Server::reply(int code, Client &client, const std::string &mask)
 	client.appendMessageToSend(message);
 }
 
-void Server::reply(int code, Client &client, Channel* channel, const std::string &mask)
+void Server::reply(int code, Client &client, Channel *channel, const std::string &mask)
 {
 	std::string message;
 	std::string channel_name = channel == NULL ? "*" : channel->getName();
-
+	std::string prefix = SSTR(code) + " " + client.getNickname() + " ";
 
 	switch (code)
 	{
 	case ERR_USERNOTINCHANNEL:
-		message = "441 " + client.getNickname() + " " + 
-			mask + " " + channel_name + " :They aren't on that channel\r\n";
+		message = prefix + mask + " " + channel_name +
+				  " :They aren't on that channel\r\n";
 		break;
 
 	default:

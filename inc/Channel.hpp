@@ -11,7 +11,6 @@ public:
 	~Channel();
 	Channel &operator=(const Channel &rhs);
 
-
 	static bool isChannelNameValid(const std::string &name);
 
 	void	addClient(Client *client);

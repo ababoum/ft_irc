@@ -41,6 +41,9 @@
 #define INFO(x) std::cerr << ITALIC_TXT << x << RESET_TXT;
 #define RUNTIME_MSG(x) std::cerr << GREEN_TXT << x << RESET_TXT;
 
+#define SSTR( x ) static_cast< std::ostringstream & >( \
+        ( std::ostringstream() << std::dec << x ) ).str()
+
 enum reply_code
 {
 	RPL_WELCOME = 001,
@@ -50,6 +53,7 @@ enum reply_code
 	RPL_WHOISCHANNELS = 319,
 	RPL_TOPIC = 332,
 	RPL_TOPICWHOTIME = 333,
+	RPL_INVITING = 341,
 	RPL_WHOREPLY = 352,
 	RPL_NAMREPLY = 353,
 	RPL_ENDOFNAMES = 366,
@@ -61,10 +65,12 @@ enum reply_code
 	ERR_NICKNAMEINUSE = 433,
 	ERR_USERNOTINCHANNEL = 441,
 	ERR_NOTONCHANNEL = 442,
+	ERR_USERONCHANNEL = 443,
 	ERR_NOTREGISTERED = 451,
 	ERR_NEEDMOREPARAMS = 461,
 	ERR_ALREADYREGISTRED = 462,
 	ERR_PASSWDMISMATCH = 464,
+	ERR_BADCHANMASK = 476,
 	ERR_CHANOPRIVSNEEDED = 482,
 };
 

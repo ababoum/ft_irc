@@ -46,6 +46,7 @@ private:
 	void join(Client &client, const std::vector<std::string> &args);
 	void part(Client &client, const std::vector<std::string> &args);
 	void kick(Client &client, const std::vector<std::string> &args);
+	void invite(Client &client, const std::vector<std::string> &args);
 	void ping(Client &client, const std::vector<std::string> &args);
 	void who(Client &client, const std::vector<std::string> &args);
 	void whois(Client &client, const std::vector<std::string> &args);

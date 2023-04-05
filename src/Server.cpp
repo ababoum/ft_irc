@@ -178,7 +178,6 @@ void Server::reading(fd_set readfds)
 			break;
 		}
 	}
-
 }
 
 void Server::writing(fd_set writefds)
@@ -242,6 +241,7 @@ void Server::parseCommands(Client &client)
 								  "JOIN",
 								  "PART",
 								  "KICK",
+								  "INVITE",
 								  "PING",
 								  "WHO",
 								  "WHOIS",
@@ -255,6 +255,7 @@ void Server::parseCommands(Client &client)
 		&Server::join,
 		&Server::part,
 		&Server::kick,
+		&Server::invite,
 		&Server::ping,
 		&Server::who,
 		&Server::whois,
