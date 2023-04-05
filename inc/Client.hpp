@@ -38,7 +38,7 @@ public:
 	bool				isFatalError() const;
 	const std::string &	getMessageReceived() const;
 	const std::string &	getMessageToSend() const;
-	const std::string &	getNickname() const;
+	const std::string 	getNickname() const;
 	const std::string &	getUsername() const;
 	const std::string &	getHostname() const;
 	const std::string &	getServername() const;

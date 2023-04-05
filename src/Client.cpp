@@ -3,7 +3,7 @@
 Client::Client(int fd)
 	: _fd(fd), _is_authentified(false), _fatal_error(false)
 	, _message_received(""), _message_to_send("")
-	, _nickname("nickname"), _username(""), _hostname(""), _servername(""), _realname("")
+	, _nickname(""), _username(""), _hostname(""), _servername(""), _realname("")
 {
 }
 
@@ -185,8 +185,10 @@ const std::string &	Client::getMessageToSend() const
 	return _message_to_send;
 }
 
-const std::string &	Client::getNickname() const
+const std::string 	Client::getNickname() const
 {
+	if (_nickname.empty())
+		return ("*");
 	return _nickname;
 }
 
