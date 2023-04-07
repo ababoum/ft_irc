@@ -53,6 +53,7 @@ private:
 	void whois(Client &client, const std::vector<std::string> &args);
 	void privmsg(Client &client, const std::vector<std::string> &args);
 	void quit(Client &client, const std::vector<std::string> &args);
+	void topic(Client &client, const std::vector<std::string> &args);
 
 private:
 	Server();
