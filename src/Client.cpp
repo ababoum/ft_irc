@@ -31,6 +31,7 @@ Client &Client::operator=(const Client &rhs)
 		_hostname = rhs.getHostname();
 		_servername = rhs.getServername();
 		_realname = rhs.getRealname();
+		_joined_channels = rhs.getJoinedChannels();
 	}
 	return *this;
 }
@@ -138,7 +139,8 @@ void Client::setRealname(const std::string &real_name)
 
 void Client::addChan(Channel *channel)
 {
-	_joined_channels.push_back(channel);
+	if (std::find(_joined_channels.begin(), _joined_channels.end(), channel) == _joined_channels.end())
+		_joined_channels.push_back(channel);
 }
 
 void Client::removeChan(std::string name)
