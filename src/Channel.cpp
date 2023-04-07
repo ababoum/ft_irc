@@ -84,9 +84,10 @@ bool Channel::isChannelNameValid(const std::string &name)
 
 	if (name.empty())
 		return false;
-	else if (name.find(' ') != std::string::npos ||
-			 name.find(',') != std::string::npos ||
-			 name.find(0x07) != std::string::npos)
+	else if ((name[0] != '#' && name[0] != '&' ) ||
+			  name.find(' ') != std::string::npos ||
+			  name.find(',') != std::string::npos ||
+			  name.find(0x07) != std::string::npos)
 		return false;
 
 	return res;

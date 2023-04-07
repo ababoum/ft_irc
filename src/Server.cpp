@@ -131,13 +131,13 @@ void Server::routine(struct sockaddr_in &addr)
 				_clients.push_back(new Client(_client_fd));
 				continue;
 			}
-			reading(readfds);
-			writing(writefds);
+			if (reading(readfds))
+				writing(writefds);
 		}
 	}
 }
 
-void Server::reading(fd_set readfds)
+bool Server::reading(fd_set readfds)
 {
 	for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
@@ -154,7 +154,7 @@ void Server::reading(fd_set readfds)
 			{
 				INFO("Client disconnected\n");
 				closeConnection(it);
-				return ;
+				return false;
 			}
 			else
 				client->appendMessageReceived(buffer);
@@ -175,6 +175,7 @@ void Server::reading(fd_set readfds)
 			break;
 		}
 	}
+	return true;
 }
 
 void Server::writing(fd_set writefds)
@@ -201,15 +202,21 @@ void Server::writing(fd_set writefds)
 	}
 }
 
-void Server::closeConnection(std::vector<Client*>::iterator client_it)
+void Server::closeConnection(std::vector<Client*>::iterator& client_it)
 {
 	Client *client = *client_it;
 	std::vector<Channel *> joined_channels = client->getJoinedChannels();
+	DEBUG("joined_channels.size()" << joined_channels.size() << "\n");
 	for (std::vector<Channel *>::iterator it = joined_channels.begin(); it != joined_channels.end(); ++it)
+	{
+		DEBUG("COUCOU2\n");
+
+		client->removeChan((*it)->getName());
 		removeClientFromChannel(client, *it);
+	}
 	close(client->getFd());
-	delete client;
 	_clients.erase(client_it);
+	delete client;
 }
 
 static void stripPrefix(std::string &line, char c)
@@ -342,7 +349,7 @@ void Server::removeClientFromChannel(Client *client, Channel *channel)
 	channel->removeClient(client);
 	if (channel->getClients().empty())
 	{
-		delete channel;
 		_channels.erase(std::find(_channels.begin(), _channels.end(), channel));
+		delete channel;
 	}
 }
