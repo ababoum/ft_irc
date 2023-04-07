@@ -207,3 +207,21 @@ void Server::part(Client &client, const std::vector<std::string> &args)
 		removeClientFromChannel(&client, channel);
 	}
 }
+
+void Server::topic(Client &client, const std::vector<std::string> &args)
+{
+	if (args.size() < 2)
+		// ERR_NEEDMOREPARAMS 461
+	else if (args.size() == 2)
+	{
+		// Send topic of chan args[1] to client
+		//(RPL_TOPIC + RPL_TOPICWHOTIME) OR RPL_NOTOPIC
+	}
+	else
+	{
+		// change topic of chan args[1] to args[2]
+		// if protected topic mode, verify permissions
+		// >> si pas de permission ERR_CHANOPRIVSNEED (482)
+		// broadcast to all clients of channel
+	}
+}
