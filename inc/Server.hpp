@@ -52,6 +52,7 @@ private:
 	void who(Client &client, const std::vector<std::string> &args);
 	void whois(Client &client, const std::vector<std::string> &args);
 	void privmsg(Client &client, const std::vector<std::string> &args);
+	void notice(Client &client, const std::vector<std::string> &args);
 	void quit(Client &client, const std::vector<std::string> &args);
 
 private:

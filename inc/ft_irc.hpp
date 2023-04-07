@@ -33,7 +33,6 @@
 #define BOLD_TXT "\e[1m"
 #define ITALIC_TXT "\e[2m"
 #define UL_TXT "\e[4m"
-
 #define RESET_TXT "\e[0m"
 
 #define DEBUG(x) std::cerr << YELLOW_TXT << x << RESET_TXT;
@@ -43,6 +42,8 @@
 
 #define SSTR( x ) static_cast< std::ostringstream & >( \
         ( std::ostringstream() << std::dec << x ) ).str()
+
+#define BOT_NAME "bot"
 
 enum reply_code
 {
@@ -81,5 +82,6 @@ bool		ft_is_number(const std::string &str);
 int			ft_parse_port(const std::string &str);
 void		ft_check_password(const std::string &str);
 std::string	ft_itoa(int n);
+std::string to_lower(const std::string &str);
 
 #endif /* FT_IRC_HPP */

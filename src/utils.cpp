@@ -93,3 +93,11 @@ std::string ft_itoa(int n)
 	result = out.str();
 	return result;
 }
+
+std::string to_lower(const std::string &str)
+{
+	std::string result = "";
+	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it)
+		result += std::tolower(*it);
+	return result;
+}
