@@ -210,6 +210,7 @@ void Server::part(Client &client, const std::vector<std::string> &args)
 
 void Server::topic(Client &client, const std::vector<std::string> &args)
 {
+	RUNTIME_MSG("topic function called\n");
 	if (args.size() < 2)
 	{
 		reply(ERR_NEEDMOREPARAMS, client, args);
@@ -235,11 +236,41 @@ void Server::topic(Client &client, const std::vector<std::string> &args)
 	{
 		// if protected topic mode, verify permissions
 		// >> si pas de permission ERR_CHANOPRIVSNEED (482)
-		// change topic of chan args[1] to args[2]
+		// change topic of channel
 		channel->setTopic(args[2]);
 		channel->setTopicSetBy(&client);
 		channel->setTopicSetAt(time(NULL));
 		std::string message = ":" + client.getHostname() + " TOPIC " + channel->getName() + " " + channel->getTopic() + "\r\n";
 		channel->fullBroadcast(message);
+	}
+}
+
+void Server::names(Client &client, const std::vector<std::string> &args)
+{
+	RUNTIME_MSG("names function called\n");
+	if (args.size() == 1)
+	{
+		for (size_t i = 0; i < _channels.size(); i++)
+		{
+			// if channel mode is not secret OU si le client appartient au channel
+				reply(RPL_NAMREPLY, client, *_channels[i]);
+			// Dans tous les cas :
+			reply(RPL_ENDOFNAMES, client, *_channels[i]);
+		}
+		reply(RPL_NAMREPLY, client, "*");
+		reply(RPL_ENDOFNAMES, client, "*");
+		// Add list of clients on no chan or not in visible chan
+	}
+	else
+	{
+		std::vector<std::string> channels_list = split(args[1], ",");
+		for (size_t i = 0; i < channels_list.size(); i++)
+		{
+			Channel *tmp = searchChan(channels_list[i]);
+			// if channel name valid and existing and not secret
+			if (tmp /*and (not secret OU user has joined channel)*/)
+				reply(RPL_NAMREPLY, client, *tmp);
+			reply(RPL_ENDOFNAMES, client, channels_list[i]);
+		}
 	}
 }

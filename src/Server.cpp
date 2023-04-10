@@ -243,7 +243,8 @@ void Server::parseCommands(Client &client)
 								  "WHOIS",
 								  "PRIVMSG",
 								  "QUIT",
-								  "TOPIC"};
+								  "TOPIC",
+								  "NAMES"};
 	size_t nb_commands = sizeof(command_name) / sizeof(command_name[0]);
 	void (Server::*f[])(Client & client, const std::vector<std::string> &args) = {
 		&Server::pass,
@@ -258,7 +259,8 @@ void Server::parseCommands(Client &client)
 		&Server::whois,
 		&Server::privmsg,
 		&Server::quit,
-		&Server::topic};
+		&Server::topic,
+		&Server::names};
 
 	std::vector<std::string> lines = split(client.getMessageReceived(), "\r\n");
 	for (std::vector<std::string>::iterator it = lines.begin(); it != lines.end(); ++it)

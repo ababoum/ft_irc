@@ -80,6 +80,7 @@ void Server::reply(int code, Client &client, const Channel &channel)
 		for (size_t j = 0; j < channel.getClients().size(); j++)
 		{
 			const std::pair<std::string, Client *> tmp = channel.getClients()[j];
+			// ADD blocage if (invisible mode and requesting client not on chan!!!!!!!!!!!!)
 			if (j != 0)
 				message += " ";
 			message += tmp.first + tmp.second->getNickname();
@@ -161,6 +162,30 @@ void Server::reply(int code, Client &client, const std::string &mask)
 	{
 	case RPL_ENDOFWHO:
 		message = prefix + mask + " :End of WHO list\r\n";
+		break;
+	case RPL_NAMREPLY:
+		message = prefix + "= " + mask + " :";
+		for (size_t i = 0; i < _clients.size(); i++)
+		{
+			// if client is not invisible
+				std::vector<Channel *> channels = _clients[i]->getJoinedChannels();
+				int nb_visible_chan = 0;
+				for (size_t j = 0; j < channels.size(); j++)
+				{
+					// if channels[j] is not secret mode OU if requesting client on chan
+					nb_visible_chan++;
+				}
+				if (nb_visible_chan == 0)
+				{
+					if (i != 0)
+						message += " ";
+					message += _clients[i]->getNickname();
+				}
+		}
+		message += "\r\n";
+		break;
+	case RPL_ENDOFNAMES:
+		message = prefix + mask + " :End of /NAMES list\r\n";
 		break;
 	case ERR_NOSUCHCHANNEL:
 		message = prefix + mask + " :No such channel\r\n";
