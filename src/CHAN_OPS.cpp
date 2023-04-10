@@ -236,11 +236,24 @@ void Server::topic(Client &client, const std::vector<std::string> &args)
 	{
 		// if protected topic mode, verify permissions
 		// >> si pas de permission ERR_CHANOPRIVSNEED (482)
-		// change topic of chan args[1] to args[2]
+		// change topic of channel
 		channel->setTopic(args[2]);
 		channel->setTopicSetBy(&client);
 		channel->setTopicSetAt(time(NULL));
 		std::string message = ":" + client.getHostname() + " TOPIC " + channel->getName() + " " + channel->getTopic() + "\r\n";
 		channel->fullBroadcast(message);
 	}
+}
+
+void Server::names(Client &client, const std::vector<std::string> &args)
+{
+	RUNTIME_MSG("names function called\n");
+	// if args.size() == 1
+		// channels = all chan
+	// else
+		// split args[1] into channels
+	// for each channel
+		// if channel name valid and existing and not secret
+			// RPL_NAMEREPLY for user not invisibles
+		// RPL_ENDOFNAMES
 }
