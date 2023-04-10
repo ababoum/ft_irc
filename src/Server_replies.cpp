@@ -65,12 +65,15 @@ void Server::reply(int code, Client &client, const Channel &channel)
 	{
 	case RPL_NOTOPIC:
 		message = prefix + channel.getName() + " :No topic is set\r\n";
-		break ;
+		break;
 	case RPL_TOPIC:
 		message = prefix + channel.getName() + " :" + channel.getTopic() + "\r\n";
 		break;
 	case RPL_TOPICWHOTIME:
-		message = prefix + channel.getName() + " " + channel.getTopicSetBy()->getNickname() + " " + ft_itoa(channel.getTopicSetAt()) + "\r\n";
+		message = prefix + channel.getName() + " " + channel.getTopicSetBy()->getNickname() 
+				  + "!" + channel.getTopicSetBy()->getUsername() 
+				  + channel.getTopicSetBy()->getHostname() + "@" + channel.getTopicSetBy()->getServername() 
+				  + " " + ft_itoa(channel.getTopicSetAt()) + "\r\n";
 		break;
 	case RPL_NAMREPLY:
 		message = prefix + "= " + channel.getName() + " :";

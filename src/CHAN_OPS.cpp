@@ -239,7 +239,7 @@ void Server::topic(Client &client, const std::vector<std::string> &args)
 		channel->setTopic(args[2]);
 		channel->setTopicSetBy(&client);
 		channel->setTopicSetAt(time(NULL));
-		std::string message = ":ircserv TOPIC " + channel->getName() + " " + channel->getTopic();
+		std::string message = ":" + client.getHostname() + " TOPIC " + channel->getName() + " " + channel->getTopic() + "\r\n";
 		channel->fullBroadcast(message);
 	}
 }
