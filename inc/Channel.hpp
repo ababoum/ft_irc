@@ -13,7 +13,7 @@ public:
 
 	static bool isChannelNameValid(const std::string &name);
 
-	void	addClient(Client *client);
+	void	addClient(std::string mode, Client *client);
 	void	removeClient(Client *client);
 	void	removeClient(const std::string &nickname);
 	void	removeClient(const int fd);
@@ -29,7 +29,7 @@ public:
 	std::string getTopic() const;
 	Client *getTopicSetBy() const;
 	time_t getTopicSetAt() const;
-	std::vector<Client *> const &getClients() const;
+	std::vector<std::pair<std::string, Client *> > const &getClients() const;
 	Client *searchClient(const std::string &nickname) const;
 	Client *searchClient(const int fd) const;
 	bool isOperator(Client *client) const;
@@ -43,7 +43,7 @@ private:
 
 private:
 	std::string 			_name;
-	std::vector<Client *>	_clients;
+	std::vector<std::pair<std::string, Client *> >	_clients;
 	std::vector<Client *>	_operators;
 	std::string				_topic;
 	Client *				_topic_set_by;

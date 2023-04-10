@@ -7,7 +7,7 @@
 Channel::Channel(const std::string &name, Client *client)
 	: _name(name)
 {
-	addClient(client);
+	addClient("@", client);
 	addOperator(client);
 }
 
@@ -59,7 +59,7 @@ time_t Channel::getTopicSetAt() const
 	return _topic_set_at;
 }
 
-std::vector<Client *> const &Channel::getClients() const
+const std::vector<std::pair<std::string, Client *> > &Channel::getClients() const
 {
 	return _clients;
 }
@@ -68,8 +68,8 @@ Client *Channel::searchClient(const std::string &nickname) const
 {
 	for (size_t i = 0; i < _clients.size(); i++)
 	{
-		if (_clients[i]->getNickname() == nickname)
-			return _clients[i];
+		if (_clients[i].second->getNickname() == nickname)
+			return _clients[i].second;
 	}
 	return NULL;
 }
@@ -109,14 +109,14 @@ bool Channel::isChannelNameValid(const std::string &name)
 	return res;
 }
 
-void Channel::addClient(Client *client)
+void Channel::addClient(std::string mode, Client *client)
 {
 	for (size_t i = 0; i < _clients.size(); i++)
 	{
-		if (_clients[i]->getNickname() == client->getNickname())
+		if (_clients[i].second->getNickname() == client->getNickname())
 			return;
 	}
-	_clients.push_back(client);
+	_clients.push_back(std::make_pair(mode, client));
 }
 
 void Channel::addOperator(Client *client)
@@ -131,9 +131,9 @@ void Channel::addOperator(Client *client)
 
 void Channel::removeClient(Client *client)
 {
-	for (std::vector<Client *>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+	for (std::vector<std::pair<std::string, Client *> >::iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
-		if (*it == client)
+		if (it->second == client)
 		{
 			_clients.erase(it);
 			break;
@@ -144,9 +144,9 @@ void Channel::removeClient(Client *client)
 
 void Channel::removeClient(const std::string &nickname)
 {
-	for (std::vector<Client *>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+	for (std::vector<std::pair<std::string, Client *> >::iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
-		if ((*it)->getNickname() == nickname)
+		if (it->second->getNickname() == nickname)
 		{
 			_clients.erase(it);
 			break;
@@ -157,9 +157,9 @@ void Channel::removeClient(const std::string &nickname)
 
 void Channel::removeClient(const int fd)
 {
-	for (std::vector<Client *>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+	for (std::vector<std::pair<std::string, Client *> >::iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
-		if ((*it)->getFd() == fd)
+		if (it->second->getFd() == fd)
 		{
 			_clients.erase(it);
 			break;
@@ -223,7 +223,7 @@ void Channel::fullBroadcast(const std::string &message)
 {
 	for (size_t i = 0; i < _clients.size(); i++)
 	{
-		_clients[i]->appendMessageToSend(message);
+		_clients[i].second->appendMessageToSend(message);
 	}
 }
 
@@ -238,7 +238,7 @@ void Channel::broadcast(const std::string &message, Client *clientToExclude)
 {
 	for (size_t i = 0; i < _clients.size(); i++)
 	{
-		if (_clients[i] != clientToExclude)
-			_clients[i]->appendMessageToSend(message);
+		if (_clients[i].second != clientToExclude)
+			_clients[i].second->appendMessageToSend(message);
 	}
 }

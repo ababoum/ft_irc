@@ -30,7 +30,7 @@ void Server::who(Client &client, const std::vector<std::string> &args)
 					found = _channels[j];
 					for (size_t k = 0; k < found->getClients().size(); k++)
 					{
-						reply(RPL_WHOREPLY, client, found, *found->getClients()[k]);
+						reply(RPL_WHOREPLY, client, found, *found->getClients()[k].second);
 					}
 					reply(RPL_ENDOFWHO, client, args[i]);
 				}

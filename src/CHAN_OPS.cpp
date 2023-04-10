@@ -152,7 +152,7 @@ void Server::join(Client &client, const std::vector<std::string> &args)
 		Channel *channel = searchChan(channels[i]);
 		if (!channel)
 			channel = addChan(channels[i], &client);
-		channel->addClient(&client);
+		channel->addClient("", &client);
 		client.addChan(channel);
 		// JOIN Message
 		std::string message = ":" + client.getNickname() + " JOIN " +

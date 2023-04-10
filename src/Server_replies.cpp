@@ -79,10 +79,10 @@ void Server::reply(int code, Client &client, const Channel &channel)
 		message = prefix + "= " + channel.getName() + " :";
 		for (size_t j = 0; j < channel.getClients().size(); j++)
 		{
-			const Client *tmp = channel.getClients()[j];
+			const std::pair<std::string, Client *> tmp = channel.getClients()[j];
 			if (j != 0)
 				message += " ";
-			message += tmp->getNickname();
+			message += tmp.first + tmp.second->getNickname();
 		}
 		message += "\r\n";
 		break;
