@@ -210,6 +210,7 @@ void Server::part(Client &client, const std::vector<std::string> &args)
 
 void Server::topic(Client &client, const std::vector<std::string> &args)
 {
+	RUNTIME_MSG("topic function called\n");
 	if (args.size() < 2)
 	{
 		reply(ERR_NEEDMOREPARAMS, client, args);
