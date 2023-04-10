@@ -72,7 +72,7 @@ void Server::reply(int code, Client &client, const Channel &channel)
 	case RPL_TOPICWHOTIME:
 		message = prefix + channel.getName() + " " + channel.getTopicSetBy()->getNickname() 
 				  + "!" + channel.getTopicSetBy()->getUsername() 
-				  + channel.getTopicSetBy()->getHostname() + "@" + channel.getTopicSetBy()->getServername() 
+				  + "@" + channel.getTopicSetBy()->getServername() 
 				  + " " + ft_itoa(channel.getTopicSetAt()) + "\r\n";
 		break;
 	case RPL_NAMREPLY:
