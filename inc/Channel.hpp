@@ -34,6 +34,10 @@ public:
 	Client *searchClient(const int fd) const;
 	bool isOperator(Client *client) const;
 
+	void setTopic(const std::string &topic);
+	void setTopicSetBy(Client *client);
+	void setTopicSetAt(time_t timestamp);
+
 private:
 	Channel();
 

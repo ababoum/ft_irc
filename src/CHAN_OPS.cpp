@@ -211,17 +211,35 @@ void Server::part(Client &client, const std::vector<std::string> &args)
 void Server::topic(Client &client, const std::vector<std::string> &args)
 {
 	if (args.size() < 2)
-		// ERR_NEEDMOREPARAMS 461
+	{
+		reply(ERR_NEEDMOREPARAMS, client, args);
+		return ;
+	}
+	Channel *channel = searchChan(args[1]);
+	if (!channel)
+		reply(ERR_NOSUCHCHANNEL, client, args[1]);
+	else if (!channel->searchClient(client.getNickname()))
+		reply(ERR_NOTONCHANNEL, client, *channel);
 	else if (args.size() == 2)
 	{
-		// Send topic of chan args[1] to client
-		//(RPL_TOPIC + RPL_TOPICWHOTIME) OR RPL_NOTOPIC
+		// Send topic of channel args[1] to client
+		if (channel->getTopic() == "")
+			reply(RPL_NOTOPIC, client, *channel);
+		else
+		{
+			reply(RPL_TOPIC, client, *channel);
+			reply(RPL_TOPICWHOTIME, client, *channel);
+		}
 	}
 	else
 	{
-		// change topic of chan args[1] to args[2]
 		// if protected topic mode, verify permissions
 		// >> si pas de permission ERR_CHANOPRIVSNEED (482)
-		// broadcast to all clients of channel
+		// change topic of chan args[1] to args[2]
+		channel->setTopic(args[2]);
+		channel->setTopicSetBy(&client);
+		channel->setTopicSetAt(time(NULL));
+		std::string message = ":ircserv TOPIC " + channel->getName() + " " + channel->getTopic();
+		channel->fullBroadcast(message);
 	}
 }

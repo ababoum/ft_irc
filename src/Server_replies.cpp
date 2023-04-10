@@ -63,6 +63,9 @@ void Server::reply(int code, Client &client, const Channel &channel)
 
 	switch (code)
 	{
+	case RPL_NOTOPIC:
+		message = prefix + channel.getName() + " :No topic is set\r\n";
+		break ;
 	case RPL_TOPIC:
 		message = prefix + channel.getName() + " :" + channel.getTopic() + "\r\n";
 		break;

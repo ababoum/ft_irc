@@ -74,6 +74,22 @@ Client *Channel::searchClient(const std::string &nickname) const
 	return NULL;
 }
 
+void Channel::setTopic(const std::string &topic)
+{
+	_topic = topic;
+}
+
+void Channel::setTopicSetBy(Client *client)
+{
+	_topic_set_by = client;
+}
+
+void Channel::setTopicSetAt(time_t timestamp)
+{
+	_topic_set_at = timestamp;
+}
+
+
 //==============================================================================
 // Functions
 //==============================================================================
