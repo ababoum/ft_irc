@@ -63,6 +63,7 @@ private:
 	std::string _servername;
 	std::string _realname;
 	std::vector<Channel *> _joined_channels;
+	std::string _mode;
 };
 
 #endif /* CLIENT_HPP */

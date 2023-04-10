@@ -206,11 +206,8 @@ void Server::closeConnection(std::vector<Client*>::iterator& client_it)
 {
 	Client *client = *client_it;
 	std::vector<Channel *> joined_channels = client->getJoinedChannels();
-	DEBUG("joined_channels.size()" << joined_channels.size() << "\n");
 	for (std::vector<Channel *>::iterator it = joined_channels.begin(); it != joined_channels.end(); ++it)
 	{
-		DEBUG("COUCOU2\n");
-
 		client->removeChan((*it)->getName());
 		removeClientFromChannel(client, *it);
 	}
@@ -242,6 +239,7 @@ void Server::parseCommands(Client &client)
 								  "WHO",
 								  "WHOIS",
 								  "PRIVMSG",
+								  "MODE",
 								  "QUIT",
 								  "TOPIC",
 								  "NAMES"};
@@ -258,6 +256,7 @@ void Server::parseCommands(Client &client)
 		&Server::who,
 		&Server::whois,
 		&Server::privmsg,
+		&Server::mode,
 		&Server::quit,
 		&Server::topic,
 		&Server::names};

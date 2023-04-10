@@ -48,10 +48,12 @@
 enum reply_code
 {
 	RPL_WELCOME = 001,
+	RPL_UMODEIS = 221,				// ToDo: implement reply
 	RPL_WHOISUSER = 311,
 	RPL_ENDOFWHO = 315,
 	RPL_ENDOFWHOIS = 318,
 	RPL_WHOISCHANNELS = 319,
+	RPL_CHANNELMODEIS = 324,		// ToDo: implement reply
 	RPL_NOTOPIC = 331,
 	RPL_TOPIC = 332,
 	RPL_TOPICWHOTIME = 333,
@@ -74,6 +76,8 @@ enum reply_code
 	ERR_PASSWDMISMATCH = 464,
 	ERR_BADCHANMASK = 476,
 	ERR_CHANOPRIVSNEEDED = 482,
+	ERR_UMODEUNKNOWNFLAG = 501,		// ToDo: implement reply
+	ERR_USERSDONTMATCH = 502		// ToDo: implement reply
 };
 
 std::vector<std::string>	split(const std::string &str, char delim);
