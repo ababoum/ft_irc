@@ -63,6 +63,15 @@ void Server::reply(int code, Client &client, const Channel &channel)
 
 	switch (code)
 	{
+	case RPL_LISTSTART:
+		message = prefix + "Channel :Users Name\r\n";
+		break;
+	case RPL_LIST:
+		message = prefix + channel.getName() + " " + ft_itoa(channel.getClients().size()) + " :" + channel.getTopic() + "\r\n";
+		break;
+	case RPL_LISTEND:
+		message = prefix + " :End of /LIST\r\n";
+		break;
 	case RPL_NOTOPIC:
 		message = prefix + channel.getName() + " :No topic is set\r\n";
 		break;
