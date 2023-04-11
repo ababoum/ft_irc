@@ -6,7 +6,7 @@
 * Change the Makefile back to c++ compiler at the end of the development
 * Concatenate the client commands when they are sent in parts or if the buffer is too long
 * Check the channel name value according to the RFC
-* Once MODE is implemented, review JOIN, TOPIC, NAMES, RPL_NAMEREPLY
+* Once MODE is implemented, review JOIN, TOPIC, NAMES, RPL_NAMEREPLY, LIST
 
 
 # Points of attention

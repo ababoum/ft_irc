@@ -5,6 +5,8 @@
 // NAMES
 // KICK
 // INVITE
+// LIST
+// TOPIC
 
 void Server::invite(Client &client, const std::vector<std::string> &args)
 {
@@ -273,4 +275,15 @@ void Server::names(Client &client, const std::vector<std::string> &args)
 			reply(RPL_ENDOFNAMES, client, channels_list[i]);
 		}
 	}
+}
+
+void Server::list(Client &client, const std::vector<std::string> &args)
+{
+	RUNTIME_MSG("list function called\n");
+	// if args.size == 1
+		// infos about all channels not secret
+	// else
+		// split args[1] into channels
+		// info about these channels
+	// info = RPL_LISTSTART 321 + 1 (RPL_LIST 322) * channels + RPL_LISTEND 323
 }
