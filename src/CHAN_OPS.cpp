@@ -280,10 +280,33 @@ void Server::names(Client &client, const std::vector<std::string> &args)
 void Server::list(Client &client, const std::vector<std::string> &args)
 {
 	RUNTIME_MSG("list function called\n");
-	// if args.size == 1
+	// if no argument is given, send infos about all channels
+	if (args.size() == 1)
+	{
+		reply(RPL_LISTSTART, client, "");
 		// infos about all channels not secret
-	// else
+		for (size_t i = 0; i < _channels.size(); i++)
+		{
+			// if not secret
+			reply(RPL_LIST, client, *_channels[i]);
+		}
+		reply(RPL_LISTEND, client, "");
+	}
+	// else, send infos about given channels
+	else
+	{
 		// split args[1] into channels
+		std::vector<std::string> channels_names = split(args[1], ",");
+		reply(RPL_LISTSTART, client, "");
 		// info about these channels
-	// info = RPL_LISTSTART 321 + 1 (RPL_LIST 322) * channels + RPL_LISTEND 323
+		for (size_t i = 0; i < channels_names.size(); i++)
+		{
+			Channel * channel = searchChan(channels_names[i]);
+			if (channel)
+			{
+				reply(RPL_LIST, client, *channel);
+			}
+		}
+		reply(RPL_LISTEND, client, "");
+	}
 }
