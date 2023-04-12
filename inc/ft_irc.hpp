@@ -11,6 +11,7 @@
 #include <arpa/inet.h>
 #include <sys/select.h>
 #include <vector>
+#include <set>
 #include <ctime>
 #include <sstream>
 #include <cstring>
