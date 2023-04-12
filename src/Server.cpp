@@ -172,7 +172,7 @@ bool Server::reading(fd_set readfds)
 				}
 			}
 
-			break;
+			return false;
 		}
 	}
 	return true;
@@ -192,6 +192,7 @@ void Server::writing(fd_set writefds)
 					client->getMessageToSend().size());
 				DEBUG("Message sent: \n" << client->getMessageToSend());
 				client->clearMessageToSend();
+				break;
 			}
 			if(client->isFatalError())
 			{
