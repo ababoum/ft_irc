@@ -5,6 +5,8 @@
 // NAMES
 // KICK
 // INVITE
+// LIST
+// TOPIC
 
 void Server::invite(Client &client, const std::vector<std::string> &args)
 {
@@ -155,7 +157,7 @@ void Server::join(Client &client, const std::vector<std::string> &args)
 		channel->addClient("", &client);
 		client.addChan(channel);
 		// JOIN Message
-		std::string message = ":" + client.getNickname() + " JOIN " +
+		std::string message = ":" + client.getSource() + " JOIN " +
 							  channels[i] + "\n";
 		// Broadcast join message to all other clients in the channel
 		// The message is the same as the one sent to the main client
@@ -272,5 +274,39 @@ void Server::names(Client &client, const std::vector<std::string> &args)
 				reply(RPL_NAMREPLY, client, *tmp);
 			reply(RPL_ENDOFNAMES, client, channels_list[i]);
 		}
+	}
+}
+
+void Server::list(Client &client, const std::vector<std::string> &args)
+{
+	RUNTIME_MSG("list function called\n");
+	// if no argument is given, send infos about all channels
+	if (args.size() == 1)
+	{
+		reply(RPL_LISTSTART, client, "");
+		// infos about all channels not secret
+		for (size_t i = 0; i < _channels.size(); i++)
+		{
+			// if not secret
+			reply(RPL_LIST, client, *_channels[i]);
+		}
+		reply(RPL_LISTEND, client, "");
+	}
+	// else, send infos about given channels
+	else
+	{
+		// split args[1] into channels
+		std::vector<std::string> channels_names = split(args[1], ",");
+		reply(RPL_LISTSTART, client, "");
+		// info about these channels
+		for (size_t i = 0; i < channels_names.size(); i++)
+		{
+			Channel * channel = searchChan(channels_names[i]);
+			if (channel)
+			{
+				reply(RPL_LIST, client, *channel);
+			}
+		}
+		reply(RPL_LISTEND, client, "");
 	}
 }
