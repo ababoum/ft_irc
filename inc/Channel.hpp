@@ -33,18 +33,22 @@ public:
 	Client *searchClient(const std::string &nickname) const;
 	Client *searchClient(const int fd) const;
 	bool isOperator(Client *client) const;
+	std::vector<Client *> const &getInviteList() const;
 
 	void setTopic(const std::string &topic);
 	void setTopicSetBy(Client *client);
 	void setTopicSetAt(time_t timestamp);
+	void addToInvite(Client *client);
 
 private:
 	Channel();
 
 private:
 	std::string 			_name;
+	std::set<char>			_modes;
 	std::vector<std::pair<std::string, Client *> >	_clients;
 	std::vector<Client *>	_operators;
+	std::vector<Client *>	_invite_list;
 	std::string				_topic;
 	Client *				_topic_set_by;
 	time_t					_topic_set_at;

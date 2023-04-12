@@ -11,7 +11,11 @@
 #include <arpa/inet.h>
 #include <sys/select.h>
 #include <vector>
+<<<<<<< HEAD
 #include <map>
+=======
+#include <set>
+>>>>>>> 916f29e (INVITE: Add invite_list to channel and update invite function accordingly)
 #include <ctime>
 #include <sstream>
 #include <cstring>
