@@ -5,6 +5,35 @@
 // Command: MODE
 //   Parameters: <target> [<modestring> [<mode arguments>...]]
 
+static const std::string CHANNEL_MODES = "oit";
+static const std::string USER_MODES = "io";
+
+static const std::string parseModestring(const std::string &modestring)
+{
+	bool add = true;
+	std::string plus;
+	std::string minus;
+
+	for (size_t i = 0; i < modestring.size(); i++)
+	{
+		if (modestring[i] == '+')
+			add = true;
+		else if (modestring[i] == '-')
+			add = false;
+		else
+		{
+			if (plus.find(modestring[i]) == std::string::npos && minus.find(modestring[i]) == std::string::npos) 
+			{
+				if (add)
+					plus += modestring[i];
+				else
+					minus += modestring[i];
+			}
+		}
+	}
+	return std::string("+") + plus + std::string("-") + minus;
+}
+
 void Server::mode(Client &client, const std::vector<std::string> &args)
 {
 	if (args.size() < 2)
@@ -36,7 +65,8 @@ void Server::mode(Client &client, const std::vector<std::string> &args)
 			// If <modestring> is given,
 			else
 			{
-				std::string modestring = args[2];
+				std::string modestring = parseModestring(args[2]);
+
 				// the user sending the command MUST have appropriate channel privileges on the target channel to change the modes given.
 
 				// If a user does not have appropriate privileges to change modes on the target channel, the server MUST NOT process the message, and ERR_CHANOPRIVSNEEDED (482) numeric is returned.
@@ -77,7 +107,7 @@ void Server::mode(Client &client, const std::vector<std::string> &args)
 			// If <modestring> is given,
 			else
 			{
-				std::string modestring = args[2];
+				std::string modestring = parseModestring(args[2]);
 				// the supplied modes will be applied, and a MODE message will be sent to the user containing the changed modes. 
 				
 				// If one or more modes sent are not implemented on the server, the server MUST apply the modes that are implemented, and then send the ERR_UMODEUNKNOWNFLAG (501) in reply along with the MODE message.
