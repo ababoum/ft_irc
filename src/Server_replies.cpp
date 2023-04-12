@@ -47,6 +47,9 @@ void Server::reply(int code, Client &client, const std::vector<std::string> &arg
 		}
 		message = prefix + nicks + " :End of /WHOIS list\r\n";
 		break;
+	case RPL_YOUREOPER:
+		message = prefix + ":You are now an IRC operator\r\n";
+		break;
 
 	default:
 		DEBUG("reply: unknown code: " << code << "\n");

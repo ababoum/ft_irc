@@ -97,7 +97,7 @@ void Server::routine(struct sockaddr_in &addr)
 		FD_SET(_socket_fd, &readfds);
 
 		// add all clients to the set of fd to read/write
-		for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+		for (std::vector<Client *>::iterator it = _clients.begin(); it != _clients.end(); ++it)
 		{
 			Client *client = *it;
 			FD_SET(client->getFd(), &readfds);
@@ -139,7 +139,7 @@ void Server::routine(struct sockaddr_in &addr)
 
 bool Server::reading(fd_set readfds)
 {
-	for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+	for (std::vector<Client *>::iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
 		Client *client = *it;
 		if (FD_ISSET(client->getFd(), &readfds))
@@ -165,13 +165,12 @@ bool Server::reading(fd_set readfds)
 				{
 					parseCommands(*client);
 				}
-				catch (std::exception &e) 
+				catch (std::exception &e)
 				{
 					client->appendMessageToSend("ERROR :" + std::string(e.what()) + "\r\n");
 					client->setFatalError();
 				}
 			}
-
 			break;
 		}
 	}
@@ -180,7 +179,7 @@ bool Server::reading(fd_set readfds)
 
 void Server::writing(fd_set writefds)
 {
-	for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+	for (std::vector<Client *>::iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
 		Client *client = *it;
 		if (FD_ISSET(client->getFd(), &writefds))
@@ -188,12 +187,13 @@ void Server::writing(fd_set writefds)
 			if (!client->getMessageToSend().empty())
 			{
 				write(client->getFd(),
-					client->getMessageToSend().c_str(), 
-					client->getMessageToSend().size());
-				DEBUG("Message sent: \n" << client->getMessageToSend());
+					  client->getMessageToSend().c_str(),
+					  client->getMessageToSend().size());
+				DEBUG("Message sent: \n"
+					  << client->getMessageToSend());
 				client->clearMessageToSend();
 			}
-			if(client->isFatalError())
+			if (client->isFatalError())
 			{
 				closeConnection(it);
 				break;
@@ -202,7 +202,7 @@ void Server::writing(fd_set writefds)
 	}
 }
 
-void Server::closeConnection(std::vector<Client*>::iterator& client_it)
+void Server::closeConnection(std::vector<Client *>::iterator &client_it)
 {
 	Client *client = *client_it;
 	std::vector<Channel *> joined_channels = client->getJoinedChannels();
@@ -241,6 +241,7 @@ void Server::parseCommands(Client &client)
 								  "PRIVMSG",
 								  "MODE",
 								  "QUIT",
+								  "OPER",
 								  "TOPIC",
 								  "NAMES"};
 	size_t nb_commands = sizeof(command_name) / sizeof(command_name[0]);
@@ -258,6 +259,7 @@ void Server::parseCommands(Client &client)
 		&Server::privmsg,
 		&Server::mode,
 		&Server::quit,
+		&Server::oper,
 		&Server::topic,
 		&Server::names};
 
@@ -289,16 +291,16 @@ void Server::parseCommands(Client &client)
 					&& args[0] != "QUIT"
 					&& !client.isAuthentified())
 				{
-					//451
+					// 451
 					reply(ERR_NOTREGISTERED, client, args);
 				}
 				else
 					(this->*f[i])(client, args);
-				break ;
+				break;
 			}
 			else if (i == nb_commands - 1 && client.isAuthentified())
 			{
-				//421
+				// 421
 				reply(ERR_UNKNOWNCOMMAND, client, args);
 			}
 		}
@@ -355,4 +357,32 @@ void Server::removeClientFromChannel(Client *client, Channel *channel)
 		_channels.erase(std::find(_channels.begin(), _channels.end(), channel));
 		delete channel;
 	}
+}
+
+bool Server::isServerOp(Client *client)
+{
+	return (std::find(_operators.begin(),
+					  _operators.end(),
+					  client) != _operators.end());
+}
+
+std::string Server::addClientToServerOps(Client *client, const std::string &name, const std::string &password)
+{
+	std::string reply;
+	std::map<std::string, std::string> server_ops;
+	server_ops["admin"] = "admin";
+
+	if (isServerOp(client))
+	{
+		reply = "ALREADY OPER";
+		return reply;
+	}
+	if (server_ops.find(name) != server_ops.end() && server_ops[name] == password)
+	{
+		_operators.push_back(client);
+		reply = "OPER";
+	}
+	else
+		reply = "NOT OPER";
+	return reply;
 }

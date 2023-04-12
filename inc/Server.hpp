@@ -23,6 +23,8 @@ private:
 	Channel	*addChan(std::string name, Client *client);
 	Client *searchClient(std::string nickname);
 	void removeClientFromChannel(Client *client, Channel *channel);
+	std::string addClientToServerOps(Client *client, const std::string &name, const std::string &password);
+	bool isServerOp(Client *client);
 
 	void launch(void);
 	void routine(struct sockaddr_in &addr);
@@ -57,6 +59,8 @@ private:
 	void quit(Client &client, const std::vector<std::string> &args);
 	void topic(Client &client, const std::vector<std::string> &args);
 	void names(Client &client, const std::vector<std::string> &args);
+	void oper(Client &client, const std::vector<std::string> &args);
+	void kill(Client &client, const std::vector<std::string> &args);
 
 private:
 	Server();
@@ -68,8 +72,9 @@ private:
 	int 					_socket_fd;
 	int 					_port;
 	std::string				_password;
-	std::vector<Client*>	_clients;
-	std::vector<Channel*>	_channels;
+	std::vector<Client *>	_clients;
+	std::vector<Client *> 	_operators;
+	std::vector<Channel *>	_channels;
 };
 
 #endif /* SERVER_HPP */

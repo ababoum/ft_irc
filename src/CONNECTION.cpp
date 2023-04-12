@@ -5,6 +5,7 @@
 // USER
 // PING
 // QUIT
+// OPER
 
 void Server::pass(Client &client, const std::vector<std::string> &args)
 {
@@ -102,4 +103,26 @@ void Server::quit(Client &client, const std::vector<std::string> &args)
 		throw std::runtime_error("Quit");
 	else
 		throw std::runtime_error("Quit :" + args[1]);
+}
+
+void Server::oper(Client &client, const std::vector<std::string> &args)
+{
+	RUNTIME_MSG("oper function called\n");
+
+	if (args.size() < 3)
+	{
+		reply(ERR_NEEDMOREPARAMS, client, args);
+		return;
+	}
+
+	std::string status = addClientToServerOps(&client, args[1], args[2]);
+	if (status == "OPER" || status == "ALREADY OPER")
+	{
+		reply(RPL_YOUREOPER, client, args);
+		// TODO: add MODE message to indicat the client's new user modes
+	}
+	else
+	{
+		reply(ERR_PASSWDMISMATCH, client, args);
+	}
 }

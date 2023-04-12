@@ -11,6 +11,7 @@
 #include <arpa/inet.h>
 #include <sys/select.h>
 #include <vector>
+#include <map>
 #include <ctime>
 #include <sstream>
 #include <cstring>
@@ -61,6 +62,7 @@ enum reply_code
 	RPL_WHOREPLY = 352,
 	RPL_NAMREPLY = 353,
 	RPL_ENDOFNAMES = 366,
+	RPL_YOUREOPER = 381,
 	ERR_NOSUCHNICK = 401,
 	ERR_NOSUCHCHANNEL = 403,
 	ERR_UNKNOWNCOMMAND = 421,
