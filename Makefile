@@ -14,6 +14,7 @@ SRC				=	main.cpp \
 					SERVER_QUERIES.cpp \
 					CHAN_OPS.cpp \
 					CONNECTION.cpp \
+					OPS_MSG.cpp \
 					MSG.cpp \
 					utils.cpp \
 					Client.cpp \
