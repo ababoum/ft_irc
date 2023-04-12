@@ -32,6 +32,7 @@ Channel &Channel::operator=(const Channel &rhs)
 	_topic_set_at = rhs.getTopicSetAt();
 	_clients = rhs._clients;
 	_operators = rhs._operators;
+	_invite_list = rhs._invite_list;
 	return *this;
 }
 
@@ -73,6 +74,18 @@ Client *Channel::searchClient(const std::string &nickname) const
 	}
 	return NULL;
 }
+
+std::vector<Client *> const &Channel::getInviteList() const
+{
+	return _invite_list;
+}
+
+void Channel::addToInvite(Client *client)
+{
+	if (std::find(_invite_list.begin(), _invite_list.end(), client) == _invite_list.end())
+		_invite_list.push_back(client);
+}
+
 
 void Channel::setTopic(const std::string &topic)
 {

@@ -12,6 +12,7 @@
 #include <sys/select.h>
 #include <vector>
 #include <map>
+#include <set>
 #include <ctime>
 #include <sstream>
 #include <cstring>

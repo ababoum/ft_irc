@@ -66,7 +66,7 @@ void Server::invite(Client &client, const std::vector<std::string> &args)
 	reply(RPL_INVITING, client, channel, *target_client);
 
 	// add the target client to the channel's invited list
-	// TO DO
+	channel->addToInvite(target_client);
 }
 
 void Server::kick(Client &client, const std::vector<std::string> &args)
