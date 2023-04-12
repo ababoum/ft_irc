@@ -157,7 +157,7 @@ void Server::join(Client &client, const std::vector<std::string> &args)
 		channel->addClient("", &client);
 		client.addChan(channel);
 		// JOIN Message
-		std::string message = ":" + client.getNickname() + " JOIN " +
+		std::string message = ":" + client.getSource() + " JOIN " +
 							  channels[i] + "\n";
 		// Broadcast join message to all other clients in the channel
 		// The message is the same as the one sent to the main client
