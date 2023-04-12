@@ -16,7 +16,7 @@ void Server::mode(Client &client, const std::vector<std::string> &args)
 	{
 		std::string target = args[1];
 		// Channel mode
-		if (Channel::isChannelNameValid(target))
+		if (target[0] == '#' || target[0] == '&')
 		{
 			Channel *channel = searchChan(target);
 			// If <target> is a channel that does not exist on the network,

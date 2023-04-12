@@ -12,7 +12,7 @@ void Server::reply(int code, Client &client, const std::vector<std::string> &arg
 	switch (code)
 	{
 	case RPL_WELCOME:
-		message = "001 " + nickname + " :Welcome to " + _name + " " + nickname + "!" + client.getUsername() + "@" + client.getServername() + "\r\n";
+		message = "001 " + nickname + " :Welcome to " + _name + " " + client.getSource() + "\r\n";
 		break;
 	case ERR_UNKNOWNCOMMAND:
 		message = prefix + args[0] + " :Unknown command\r\n";
@@ -66,6 +66,9 @@ void Server::reply(int code, Client &client, const Channel &channel)
 
 	switch (code)
 	{
+	case RPL_LIST:
+		message = ":ircserv " + prefix + channel.getName() + " " + ft_itoa(channel.getClients().size()) + " :" + channel.getTopic() + "\r\n";
+		break;
 	case RPL_NOTOPIC:
 		message = prefix + channel.getName() + " :No topic is set\r\n";
 		break;
@@ -73,10 +76,7 @@ void Server::reply(int code, Client &client, const Channel &channel)
 		message = prefix + channel.getName() + " :" + channel.getTopic() + "\r\n";
 		break;
 	case RPL_TOPICWHOTIME:
-		message = prefix + channel.getName() + " " + channel.getTopicSetBy()->getNickname() 
-				  + "!" + channel.getTopicSetBy()->getUsername() 
-				  + "@" + channel.getTopicSetBy()->getServername() 
-				  + " " + ft_itoa(channel.getTopicSetAt()) + "\r\n";
+		message = prefix + channel.getName() + " " + channel.getTopicSetBy()->getSource() + " " + ft_itoa(channel.getTopicSetAt()) + "\r\n";
 		break;
 	case RPL_NAMREPLY:
 		message = prefix + "= " + channel.getName() + " :";
@@ -165,6 +165,12 @@ void Server::reply(int code, Client &client, const std::string &mask)
 	{
 	case RPL_ENDOFWHO:
 		message = prefix + mask + " :End of WHO list\r\n";
+		break;
+	case RPL_LISTSTART:
+		message = ":ircserv " + prefix + "Channel :Users Name\r\n";
+		break;
+	case RPL_LISTEND:
+		message = ":ircserv " + prefix + ":End of /LIST\r\n";
 		break;
 	case RPL_NAMREPLY:
 		message = prefix + "= " + mask + " :";

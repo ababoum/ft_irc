@@ -208,6 +208,11 @@ const std::string &	Client::getRealname() const
 	return _realname;
 }
 
+const std::string Client::getSource() const
+{
+	return std::string(_nickname + "!" + _username + "@" + _servername);
+}
+
 const std::vector<Channel *> &	Client::getJoinedChannels() const
 {
 	return _joined_channels;

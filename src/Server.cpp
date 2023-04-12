@@ -171,7 +171,7 @@ bool Server::reading(fd_set readfds)
 					client->setFatalError();
 				}
 			}
-			break;
+			return false;
 		}
 	}
 	return true;
@@ -192,6 +192,7 @@ void Server::writing(fd_set writefds)
 				DEBUG("Message sent: \n"
 					  << client->getMessageToSend());
 				client->clearMessageToSend();
+				break;
 			}
 			if (client->isFatalError())
 			{
@@ -243,7 +244,8 @@ void Server::parseCommands(Client &client)
 								  "QUIT",
 								  "OPER",
 								  "TOPIC",
-								  "NAMES"};
+								  "NAMES",
+								  "LIST"};
 	size_t nb_commands = sizeof(command_name) / sizeof(command_name[0]);
 	void (Server::*f[])(Client & client, const std::vector<std::string> &args) = {
 		&Server::pass,
@@ -261,7 +263,8 @@ void Server::parseCommands(Client &client)
 		&Server::quit,
 		&Server::oper,
 		&Server::topic,
-		&Server::names};
+		&Server::names,
+		&Server::list};
 
 	std::vector<std::string> lines = split(client.getMessageReceived(), "\r\n");
 	for (std::vector<std::string>::iterator it = lines.begin(); it != lines.end(); ++it)
