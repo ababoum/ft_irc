@@ -12,8 +12,6 @@
 # Points of attention
 
 * What happens when a channel is empty? (everyone left)
-* 
-
 
 
 # Useful commands and information
@@ -21,4 +19,10 @@
 Launch easily IRSSI with a ready-connection
 ```bash
 irssi -c 127.0.0.1 -p 6667 -w lala -n mynick
+```
+
+# How to transfer a file within IRSSI
+```bash
+/DCC SEND sarah "cat.png"
+/DCC GET bob "cat.png"
 ```
