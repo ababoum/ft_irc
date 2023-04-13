@@ -18,8 +18,8 @@ static void _bot(Client &client, const std::string &msg)
 	}
 
 	// Send the message to the target
-	std::string message = ":" + client.getNickname() +
-							" PRIVMSG " + msg + " :" + answer + "\r\n";
+	std::string message = ":" + client.getSource() +
+							" PRIVMSG " + "bot" + " :" + answer + "\r\n";
 	client.appendMessageToSend(message);
 }
 
@@ -50,7 +50,7 @@ void Server::notice(Client &client, const std::vector<std::string> &args)
 			return;
 		}
 		// Send the message to all the clients in the channel
-		std::string message = ":" + client.getNickname() +
+		std::string message = ":" + client.getSource() +
 							  " NOTICE " + args[1] + " :" + args[2] + "\r\n";
 		channel->broadcast(message, chan_client);
 	}
@@ -66,7 +66,7 @@ void Server::notice(Client &client, const std::vector<std::string> &args)
 		if (target == &client)
 			return;
 		// Send the message to the target
-		std::string message = ":" + client.getNickname() +
+		std::string message = ":" + client.getSource() +
 							  " NOTICE " + args[1] + " :" + args[2] + "\r\n";
 		target->appendMessageToSend(message);
 	}
@@ -102,7 +102,7 @@ void Server::privmsg(Client &client, const std::vector<std::string> &args)
 			return;
 		}
 		// Send the message to all the clients in the channel
-		std::string message = ":" + client.getNickname() +
+		std::string message = ":" + client.getSource() +
 							  " PRIVMSG " + args[1] + " :" + args[2] + "\r\n";
 		channel->broadcast(message, chan_client);
 	}
@@ -125,7 +125,7 @@ void Server::privmsg(Client &client, const std::vector<std::string> &args)
 		if (target == &client)
 			return;
 		// Send the message to the target
-		std::string message = ":" + client.getNickname() +
+		std::string message = ":" + client.getSource() +
 							  " PRIVMSG " + args[1] + " :" + args[2] + "\r\n";
 		target->appendMessageToSend(message);
 	}
