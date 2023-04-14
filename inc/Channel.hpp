@@ -6,6 +6,13 @@
 class Channel
 {
 public:
+
+	struct Modes
+	{
+		bool i;
+		bool t;
+	};
+
 	Channel(const std::string &name, Client *client);
 	Channel(const Channel &other);
 	~Channel();
@@ -39,15 +46,15 @@ public:
 	void setTopicSetBy(Client *client);
 	void setTopicSetAt(time_t timestamp);
 	void addToInvite(Client *client);
-	void addMode(char c);
-	void removeMode(char c);
+	bool addMode(char c, std::string nickname);
+	bool removeMode(char c, std::string nickname);
 
 private:
 	Channel();
 
 private:
 	std::string 			_name;
-	std::set<char>			_modes;
+	Modes					_modes;
 	std::vector<std::pair<std::string, Client *> >	_clients;
 	std::vector<Client *>	_operators;
 	std::vector<Client *>	_invite_list;

@@ -9,6 +9,8 @@ Channel::Channel(const std::string &name, Client *client)
 {
 	addClient("@", client);
 	addOperator(client);
+	_modes.i = false;
+	_modes.t = false;
 }
 
 Channel::Channel(const Channel &other)
@@ -33,6 +35,7 @@ Channel &Channel::operator=(const Channel &rhs)
 	_clients = rhs._clients;
 	_operators = rhs._operators;
 	_invite_list = rhs._invite_list;
+	_modes = rhs._modes;
 	return *this;
 }
 
@@ -86,16 +89,64 @@ void Channel::addToInvite(Client *client)
 		_invite_list.push_back(client);
 }
 
-void Channel::addMode(char c)
+bool Channel::addMode(char c, std::string nickname)
 {
-	_modes.insert(c);
+	Client *client_target = searchClient(nickname);
+	switch (c)
+	{
+		case 'i':
+			if (_modes.i)
+				return false;
+			_modes.i = true;
+			return true;
+		case 't':
+			if (_modes.t)
+				return false;
+			_modes.t = true;
+			return true;
+		case 'o':
+			if (!client_target)
+			{
+				FATAL_ERR("You must check the client exists in channel before changing his mode !\n");
+				return false;
+			}
+			if (isOperator(client_target))
+				return false;
+			addOperator(client_target);
+			return true;
+		default:
+			return false;
+	}
 }
 
-void Channel::removeMode(char c)
+bool Channel::removeMode(char c, std::string nickname)
 {
-	_modes.erase(c);
-	if (c == 'i')
-		_invite_list.clear();
+	Client *client_target = searchClient(nickname);
+	switch (c)
+	{
+		case 'i':
+			if (!_modes.i)
+				return false;
+			_modes.i = false;
+			return true;
+		case 't':
+			if (!_modes.t)
+				return false;
+			_modes.t = false;
+			return true;
+		case 'o':
+			if (!client_target)
+			{
+				FATAL_ERR("You must check the client exists in channel before changing his mode !\n");
+				return false;
+			}
+			if (!isOperator(client_target))
+				return false;
+			removeOp(client_target);
+			return true;
+		default:
+			return false;
+	}
 }
 
 void Channel::setTopic(const std::string &topic)
@@ -151,6 +202,14 @@ void Channel::addOperator(Client *client)
 			return;
 	}
 	_operators.push_back(client);
+	for (size_t i = 0; i < _clients.size(); i++)
+	{
+		if (_clients[i].second == client)
+		{
+			_clients[i].first = "@";
+			break;
+		}
+	}
 }
 
 void Channel::removeClient(Client *client)
@@ -202,6 +261,14 @@ void Channel::removeOp(Client *client)
 			break;
 		}
 	}
+	for (size_t i = 0; i < _clients.size(); i++)
+	{
+		if (_clients[i].second == client)
+		{
+			_clients[i].first = "";
+			break;
+		}
+	}
 }
 
 void Channel::removeOp(const std::string &nickname)
@@ -214,6 +281,14 @@ void Channel::removeOp(const std::string &nickname)
 			break;
 		}
 	}
+	for (size_t i = 0; i < _clients.size(); i++)
+	{
+		if (_clients[i].second->getNickname() == nickname)
+		{
+			_clients[i].first = "";
+			break;
+		}
+	}
 }
 
 void Channel::removeOp(const int fd)
@@ -223,6 +298,14 @@ void Channel::removeOp(const int fd)
 		if ((*it)->getFd() == fd)
 		{
 			_operators.erase(it);
+			break;
+		}
+	}
+	for (size_t i = 0; i < _clients.size(); i++)
+	{
+		if (_clients[i].second->getFd() == fd)
+		{
+			_clients[i].first = "";
 			break;
 		}
 	}
