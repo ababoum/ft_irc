@@ -39,11 +39,12 @@ static const std::string parseUserModestring(const std::string &modestring)
 	return std::string("+") + plus + std::string("-") + minus;
 }
 
-static const std::string parseChannelModestring(const std::string &modestring, std::vector<std::string> args)
+static void parseChannelModestring(const std::string &modestring, const std::vector<std::string> &args, std::string &modes, std::string &parameters_modes)
 {
 	bool add = true;
 	std::string plus;
 	std::string minus;
+	size_t args_index = 3;
 
 	(void)args;
 	for (size_t i = 0; i < modestring.size(); i++)
@@ -54,9 +55,14 @@ static const std::string parseChannelModestring(const std::string &modestring, s
 			add = false;
 		else
 		{
-			if (modestring[i] == '0')
+			if (modestring[i] == 'o' && args.size() > args_index)
 			{
-
+				if (add)
+					parameters_modes += "+o";
+				else
+					parameters_modes += "-o";
+				parameters_modes += args[args_index];
+				args_index++;
 			}
 			else if (plus.find(modestring[i]) == std::string::npos && minus.find(modestring[i]) == std::string::npos) 
 			{
@@ -67,24 +73,90 @@ static const std::string parseChannelModestring(const std::string &modestring, s
 			}
 		}
 	}
-	return std::string("+") + plus + std::string("-") + minus;
+	modes = std::string("+") + plus + std::string("-") + minus + parameters_modes;
 }
 
 
-void Server::applyModestring(const std::string &modestring, Channel &channel)
+std::string Server::applyModestring(const std::string &modes, const std::string &params_modes, Client &client, Channel &channel)
 {
 	bool add = true;
-	void (Channel::*f[])(char c) = {
+	bool (Channel::*f[])(char c, std::string nickname) = {
 		&Channel::removeMode,
 		&Channel::addMode};
+	std::string message = "+";
+	std::string parameters;
+	std::string nickname;
 
-	for (size_t i = 1; i < modestring.size(); i++)
+	// Add simple modes
+	for (size_t i = 1; i < modes.size(); i++)
 	{
-		if (modestring[i] == '-')
+		if (modes[i] == '-')
+		{
 			add = false;
-		else if (std::find(CHANNEL_MODES.begin(), CHANNEL_MODES.end(), modestring[i]) != CHANNEL_MODES.end())
-			(channel.*f[add])(modestring[i]);
+			message += "-";
+		}
+		// if the mode is not known to the server retourner une erreur
+		else if (std::find(CHANNEL_MODES.begin(), CHANNEL_MODES.end(), modes[i]) == CHANNEL_MODES.end())
+		{
+			reply(ERR_UNKNOWNMODE, client, std::string(modes[i], 1));
+		}
+		// sinon changer le mode et ajouter au message
+		else
+		{
+			if ((channel.*f[add])(modes[i], ""))
+				message += modes[i];
+		}
 	}
+	// Add modes that require parameters
+	for (size_t i = 0; i < params_modes.size(); i++)
+	{
+		if (params_modes[i] == '+')
+		{
+			add = true;
+			message += "+";
+			i++;
+		}
+		else if (params_modes[i] == '-')
+		{
+			add = false;
+			message += "-";
+			i++;
+		}
+		// enregistrer le nickname du client sur qui le mode o est appelé
+		else
+		{
+			while (i < params_modes.size() && params_modes[i] != '+' && params_modes[i] != '-')
+			{
+				nickname += params_modes[i];
+				i++;
+			}
+			// vérifier si le client existe sur le channel
+			Client *client_target = channel.searchClient(nickname);
+			if (!client_target)
+				reply(ERR_NOTONCHANNEL, client, channel);
+			else
+			{
+				if ((channel.*f[add])('o', nickname))
+				{
+					message += "o";
+					parameters += " " + nickname;
+				}
+			}
+			nickname.clear();
+			i--;
+		}
+	}
+	// Trim message from double + and -
+	for (size_t i = 1; i <= message.size(); i++)
+	{
+		if ((i == message.size() || message[i] == '+' || message[i] == '-') && 
+			(message[i - i] == '+' || message[i - 1] == '-'))
+		{
+			message.erase(i - 1, 1);
+			i--;
+		}
+	}
+	return message + parameters;
 }
 
 void Server::mode(Client &client, const std::vector<std::string> &args)
@@ -115,24 +187,24 @@ void Server::mode(Client &client, const std::vector<std::string> &args)
 				reply(RPL_CHANNELMODEIS, client, *channel);
 				return;
 			}
-			// If <modestring> is given,
+			// the user sending the command MUST have appropriate channel privileges on the target channel to change the modes given.
+			// If a user does not have appropriate privileges to change modes on the target channel, the server MUST NOT process the message, and ERR_CHANOPRIVSNEEDED (482) numeric is returned.
+			if (!channel->isOperator(&client))
+			{
+				// ERR_CHANOPRIVSNEEDED 482
+				reply(ERR_CHANOPRIVSNEEDED, client, *channel);
+				return;
+			}
 			else
 			{
-				std::vector<std::string> modearg;
-				if (args.size() == 4)
-					modearg = split(args[3], ",");
-				std::string modestring = parseChannelModestring(args[2], args);
-
-				// the user sending the command MUST have appropriate channel privileges on the target channel to change the modes given.
-
-				// If a user does not have appropriate privileges to change modes on the target channel, the server MUST NOT process the message, and ERR_CHANOPRIVSNEEDED (482) numeric is returned.
-				// If the user has permission to change modes on the target, the supplied modes will be applied based on the type of the mode (see below).
-				// For type A, B, and C modes, arguments will be sequentially obtained from <mode arguments>.
-				// If a type B or C mode does not have a parameter when being set, the server MUST ignore that mode.
-				// If a type A mode has been sent without an argument, the contents of the list MUST be sent to the user, unless it contains sensitive information the user is not allowed to access.
-				// When the server is done processing the modes, a MODE command is sent to all members of the channel containing the mode changes.
-				// Servers MAY choose to hide sensitive information when sending the mode changes.
-				
+				std::string modes; 
+				std::string parameters_mode;
+				std::string message; 
+			
+				parseChannelModestring(args[2], args, modes, parameters_mode);
+				message = applyModestring(modes, parameters_mode, client, *channel);
+				if (message.size() != 0)
+					client.appendMessageToSend(":" + client.getSource() + " MODE " + message);
 			}
 		}
 		// User mode
