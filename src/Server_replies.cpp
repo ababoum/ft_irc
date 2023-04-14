@@ -205,6 +205,9 @@ void Server::reply(int code, Client &client, const std::string &mask)
 	case ERR_NOSUCHNICK:
 		message = prefix + mask + " :No such nick/channel\r\n";
 		break;
+	case ERR_UNKNOWNMODE:
+		message = prefix + mask + " :is unknown mode char to me\r\n";
+		break;
 	case ERR_BADCHANMASK:
 		message = prefix + mask + " :Bad Channel Mask\r\n";
 		break;
