@@ -7,11 +7,13 @@
 * Concatenate the client commands when they are sent in parts or if the buffer is too long
 * Check the channel name value according to the RFC
 * Once MODE is implemented, review JOIN, TOPIC, NAMES, RPL_NAMEREPLY, LIST
+* Users modes : io
+* Channels modes : oit
 
 
 # Points of attention
 
-* What happens when a channel is empty? (everyone left)
+* What happens when a channel is empty? (everyone left) >> The channel is deleted
 
 
 # Useful commands and information
