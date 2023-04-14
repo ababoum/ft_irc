@@ -86,6 +86,17 @@ void Channel::addToInvite(Client *client)
 		_invite_list.push_back(client);
 }
 
+void Channel::addMode(char c)
+{
+	_modes.insert(c);
+}
+
+void Channel::removeMode(char c)
+{
+	_modes.erase(c);
+	if (c == 'i')
+		_invite_list.clear();
+}
 
 void Channel::setTopic(const std::string &topic)
 {

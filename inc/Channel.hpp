@@ -39,6 +39,8 @@ public:
 	void setTopicSetBy(Client *client);
 	void setTopicSetAt(time_t timestamp);
 	void addToInvite(Client *client);
+	void addMode(char c);
+	void removeMode(char c);
 
 private:
 	Channel();

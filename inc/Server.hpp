@@ -56,6 +56,7 @@ private:
 	void privmsg(Client &client, const std::vector<std::string> &args);
 	void notice(Client &client, const std::vector<std::string> &args);
 	void mode(Client &client, const std::vector<std::string> &args);
+	void applyModestring(const std::string &modestring, Channel &channel);
 	void quit(Client &client, const std::vector<std::string> &args);
 	void topic(Client &client, const std::vector<std::string> &args);
 	void names(Client &client, const std::vector<std::string> &args);

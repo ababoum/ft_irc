@@ -6,9 +6,14 @@
 //   Parameters: <target> [<modestring> [<mode arguments>...]]
 
 static const std::string CHANNEL_MODES = "oit";
+// o value = nickname of client
+// i no value
+// t no value
 static const std::string USER_MODES = "io";
+// o no value
+// i no value
 
-static const std::string parseModestring(const std::string &modestring)
+static const std::string parseUserModestring(const std::string &modestring)
 {
 	bool add = true;
 	std::string plus;
@@ -32,6 +37,54 @@ static const std::string parseModestring(const std::string &modestring)
 		}
 	}
 	return std::string("+") + plus + std::string("-") + minus;
+}
+
+static const std::string parseChannelModestring(const std::string &modestring, std::vector<std::string> args)
+{
+	bool add = true;
+	std::string plus;
+	std::string minus;
+
+	(void)args;
+	for (size_t i = 0; i < modestring.size(); i++)
+	{
+		if (modestring[i] == '+')
+			add = true;
+		else if (modestring[i] == '-')
+			add = false;
+		else
+		{
+			if (modestring[i] == '0')
+			{
+
+			}
+			else if (plus.find(modestring[i]) == std::string::npos && minus.find(modestring[i]) == std::string::npos) 
+			{
+				if (add)
+					plus += modestring[i];
+				else
+					minus += modestring[i];
+			}
+		}
+	}
+	return std::string("+") + plus + std::string("-") + minus;
+}
+
+
+void Server::applyModestring(const std::string &modestring, Channel &channel)
+{
+	bool add = true;
+	void (Channel::*f[])(char c) = {
+		&Channel::removeMode,
+		&Channel::addMode};
+
+	for (size_t i = 1; i < modestring.size(); i++)
+	{
+		if (modestring[i] == '-')
+			add = false;
+		else if (std::find(CHANNEL_MODES.begin(), CHANNEL_MODES.end(), modestring[i]) != CHANNEL_MODES.end())
+			(channel.*f[add])(modestring[i]);
+	}
 }
 
 void Server::mode(Client &client, const std::vector<std::string> &args)
@@ -65,7 +118,10 @@ void Server::mode(Client &client, const std::vector<std::string> &args)
 			// If <modestring> is given,
 			else
 			{
-				std::string modestring = parseModestring(args[2]);
+				std::vector<std::string> modearg;
+				if (args.size() == 4)
+					modearg = split(args[3], ",");
+				std::string modestring = parseChannelModestring(args[2], args);
 
 				// the user sending the command MUST have appropriate channel privileges on the target channel to change the modes given.
 
@@ -107,7 +163,7 @@ void Server::mode(Client &client, const std::vector<std::string> &args)
 			// If <modestring> is given,
 			else
 			{
-				std::string modestring = parseModestring(args[2]);
+				std::string modestring = parseUserModestring(args[2]);
 				// the supplied modes will be applied, and a MODE message will be sent to the user containing the changed modes. 
 				
 				// If one or more modes sent are not implemented on the server, the server MUST apply the modes that are implemented, and then send the ERR_UMODEUNKNOWNFLAG (501) in reply along with the MODE message.
