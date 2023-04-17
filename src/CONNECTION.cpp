@@ -119,7 +119,7 @@ void Server::oper(Client &client, const std::vector<std::string> &args)
 	if (status == "OPER" || status == "ALREADY OPER")
 	{
 		reply(RPL_YOUREOPER, client, args);
-		// TODO: add MODE message to indicat the client's new user modes
+		// TODO: add MODE message to indicate the client's new user modes
 	}
 	else
 	{

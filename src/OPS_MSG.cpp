@@ -1,6 +1,7 @@
 #include "Server.hpp"
 
 // KILL
+// RESTART
 
 
 // TODO: TEST KILL
@@ -28,7 +29,7 @@ void Server::kill(Client &client, const std::vector<std::string> &args)
     Client *target = searchClient(nickname);
     if (!target)
     {
-        reply(ERR_NOSUCHNICK, client, args);
+        reply(ERR_NOSUCHNICK, client, args[1]);
         return;
     }
 
@@ -54,4 +55,28 @@ void Server::kill(Client &client, const std::vector<std::string> &args)
     target->appendMessageToSend(kill_msg);
     // remove the client from the server
     throw std::runtime_error("Quit :" + args[1]);
+}
+
+void Server::restart(Client &client, const std::vector<std::string> &args)
+{
+    RUNTIME_MSG("restart function called\n");
+
+    (void)args;
+
+    // Check if the client is a server operator
+    if (!isServerOp(&client))
+    {
+        reply(ERR_NOPRIVILEGES, client);
+        return;
+    }
+
+    // Restart the server
+    if (_socket_fd)
+    {
+        close(_socket_fd);
+        _socket_fd = 0;
+    }
+    usleep(1000000); // Wait 1 second before restarting the server
+    _shutting_down = true;
+    launch();
 }

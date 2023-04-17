@@ -63,6 +63,7 @@ private:
 	void oper(Client &client, const std::vector<std::string> &args);
 	void kill(Client &client, const std::vector<std::string> &args);
 	void list(Client &client, const std::vector<std::string> &args);
+	void restart(Client &client, const std::vector<std::string> &args);
 
 private:
 	Server();
@@ -77,6 +78,7 @@ private:
 	std::vector<Client *>	_clients;
 	std::vector<Client *> 	_operators;
 	std::vector<Channel *>	_channels;
+	bool					_shutting_down;
 };
 
 #endif /* SERVER_HPP */

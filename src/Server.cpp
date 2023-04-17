@@ -1,12 +1,13 @@
 #include "Server.hpp"
 
 Server::Server()
-	: _socket_fd(0), _port(0), _password("")
+	: _socket_fd(0), _port(0), _password(""), _shutting_down(false)
 {
 }
 
 Server::Server(int port, std::string password)
-	: _name(SERVER_NAME), _socket_fd(-1), _port(port), _password(password)
+	: _name(SERVER_NAME), _socket_fd(-1), _port(port), _password(password),
+	_shutting_down(false)
 {
 	// Check args
 	launch();
@@ -91,6 +92,11 @@ void Server::routine(struct sockaddr_in &addr)
 
 	while (1)
 	{
+		if (_shutting_down)
+		{
+			_shutting_down = false;
+			return;
+		}
 		// DEBUG("Waiting for new connection\n");
 		FD_ZERO(&readfds);
 		FD_ZERO(&writefds);
@@ -240,12 +246,15 @@ void Server::parseCommands(Client &client)
 								  "WHO",
 								  "WHOIS",
 								  "PRIVMSG",
+								  "NOTICE",
 								  "MODE",
 								  "QUIT",
 								  "OPER",
 								  "TOPIC",
 								  "NAMES",
-								  "LIST"};
+								  "LIST",
+								  "KILL",
+								  "RESTART"};
 	size_t nb_commands = sizeof(command_name) / sizeof(command_name[0]);
 	void (Server::*f[])(Client & client, const std::vector<std::string> &args) = {
 		&Server::pass,
@@ -259,12 +268,15 @@ void Server::parseCommands(Client &client)
 		&Server::who,
 		&Server::whois,
 		&Server::privmsg,
+		&Server::notice,
 		&Server::mode,
 		&Server::quit,
 		&Server::oper,
 		&Server::topic,
 		&Server::names,
-		&Server::list};
+		&Server::list,
+		&Server::kill,
+		&Server::restart};
 
 	std::vector<std::string> lines = split(client.getMessageReceived(), "\r\n");
 	for (std::vector<std::string>::iterator it = lines.begin(); it != lines.end(); ++it)
