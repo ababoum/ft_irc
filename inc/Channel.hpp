@@ -48,6 +48,8 @@ public:
 	void addToInvite(Client *client);
 	bool addMode(char c, std::string nickname);
 	bool removeMode(char c, std::string nickname);
+	bool isInviteOnly() const;
+	bool isTopicProtected() const;
 
 private:
 	Channel();

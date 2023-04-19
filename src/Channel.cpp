@@ -164,6 +164,16 @@ void Channel::setTopicSetAt(time_t timestamp)
 	_topic_set_at = timestamp;
 }
 
+bool Channel::isInviteOnly() const
+{
+	return _modes.i;
+}
+
+bool Channel::isTopicProtected() const
+{
+	return _modes.t;
+}
+
 
 //==============================================================================
 // Functions

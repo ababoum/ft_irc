@@ -249,7 +249,11 @@ void Server::topic(Client &client, const std::vector<std::string> &args)
 	else
 	{
 		// if protected topic mode, verify permissions
-		// >> si pas de permission ERR_CHANOPRIVSNEED (482)
+		if (channel->isTopicProtected() && !channel->isOperator(&client))
+		{
+			reply(ERR_CHANOPRIVSNEEDED, client, *channel);
+			return ;
+		}
 		// change topic of channel
 		channel->setTopic(args[2]);
 		channel->setTopicSetBy(&client);
