@@ -87,11 +87,13 @@ void Server::reply(int code, Client &client, const Channel &channel)
 		{
 			const std::pair<std::string, Client *> tmp = channel.getClients()[j];
 			// ADD blocage if (invisible mode and requesting client not on chan!!!!!!!!!!!!)
-			if (j != 0)
+			if (message[message.size() - 1] != ':')
 				message += " ";
 			message += tmp.first + tmp.second->getNickname();
 		}
 		message += "\r\n";
+		if (message == prefix + "= " + channel.getName() + " :" + "\r\n")
+			message = "";
 		break;
 	case RPL_ENDOFNAMES:
 		message = prefix + channel.getName() + " :End of /NAMES list\r\n";
