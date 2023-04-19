@@ -138,7 +138,19 @@ void Server::join(Client &client, const std::vector<std::string> &args)
 	}
 	if (args[1] == "0")
 	{
-		// Send PART message to all chans the client is connected to
+		// Send PART message for all chans the client is connected to
+		std::vector<std::string> part_command;
+		std::vector<Channel *> joined_channels = client.getJoinedChannels();
+		part_command.push_back("PART");
+		part_command.push_back("");
+
+		for (size_t i = 0; i < joined_channels.size(); i++)
+		{
+			if (i != 0)
+				part_command[1] += ",";
+			part_command[1] += joined_channels[i]->getName();
+		}
+		part(client, part_command);
 		return;
 	}
 	std::vector<std::string> channels = split(args[1], ",");
