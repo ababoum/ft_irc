@@ -3,12 +3,10 @@
 // WHO
 // WHOIS
 
-
-// Warning: what happens if we query about both a channel and a nickname?
 void Server::who(Client &client, const std::vector<std::string> &args)
 {
 	RUNTIME_MSG("who function called\n");
-	
+
 	if (args.size() == 1)
 	{
 		reply(ERR_NEEDMOREPARAMS, client, args);
@@ -30,14 +28,19 @@ void Server::who(Client &client, const std::vector<std::string> &args)
 					found = _channels[j];
 					for (size_t k = 0; k < found->getClients().size(); k++)
 					{
-						reply(RPL_WHOREPLY, client, found, *found->getClients()[k].second);
+						// the client is listed only if he is not invisible
+						// or if he is in the same channel as the client who sent the command
+						if (!found->getClients()[k].second->isInvisible() ||
+							found->searchClient(client.getNickname()))
+						{
+							reply(RPL_WHOREPLY, client, found, *found->getClients()[k].second);
+						}
 					}
 					reply(RPL_ENDOFWHO, client, args[i]);
 				}
 			}
 			if (!found)
 			{
-				// 403
 				reply(ERR_NOSUCHCHANNEL, client, args[i]);
 			}
 		}
@@ -66,7 +69,7 @@ void Server::who(Client &client, const std::vector<std::string> &args)
 void Server::whois(Client &client, const std::vector<std::string> &args)
 {
 	RUNTIME_MSG("who function called\n");
-	
+
 	if (args.size() == 1)
 	{
 		reply(ERR_NONICKNAMEGIVEN, client, args);
@@ -74,24 +77,30 @@ void Server::whois(Client &client, const std::vector<std::string> &args)
 	}
 
 	// WHOIS command can have multiple arguments
+	// An arg can be a comma-separated list of nicknames
 	for (size_t i = 1; i < args.size(); i++)
 	{
-		// Check if the nickname exists
-		bool found = false;
-		for (size_t j = 0; j < _clients.size(); j++)
+		std::vector<std::string> nicks = split(args[i], ',');
+		for (size_t j = 0; j < nicks.size(); j++)
 		{
-			if (_clients[j]->getNickname() == args[i])
+			// Check if the nickname exists
+			bool found = false;
+			for (size_t j = 0; j < _clients.size(); j++)
 			{
-				found = true;
-				reply(RPL_WHOISUSER, client, NULL, *_clients[j]);
-				reply(RPL_WHOISCHANNELS, client, NULL, *_clients[j]);
-				// We can add more if necessary...
+				if (_clients[j]->getNickname() == nicks[i])
+				{
+					found = true;
+					reply(RPL_WHOISUSER, client, NULL, *_clients[j]);
+					reply(RPL_WHOISCHANNELS, client, NULL, *_clients[j]);
+					if (_clients[j]->isOperator())
+						reply(RPL_WHOISOPERATOR, client, NULL, *_clients[j]);
+					// We can add more if necessary...
+				}
 			}
-		}
-		if (!found)
-		{
-			// 401
-			reply(ERR_NOSUCHNICK, client, args[i]);
+			if (!found)
+			{
+				reply(ERR_NOSUCHNICK, client, args[i]);
+			}
 		}
 	}
 	reply(RPL_ENDOFWHOIS, client, args);

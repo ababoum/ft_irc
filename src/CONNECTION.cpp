@@ -115,11 +115,22 @@ void Server::oper(Client &client, const std::vector<std::string> &args)
 		return;
 	}
 
-	std::string status = addClientToServerOps(&client, args[1], args[2]);
-	if (status == "OPER" || status == "ALREADY OPER")
+	// Operators are hard-coded here
+	std::map<std::string, std::string> server_ops;
+	server_ops["admin"] = "admin";
+
+	std::string name(args[1]);
+	std::string password(args[2]);
+
+	if (client.isOperator())
 	{
 		reply(RPL_YOUREOPER, client, args);
-		// TODO: add MODE message to indicate the client's new user modes
+		return ;
+	}
+	if (server_ops.find(name) != server_ops.end() && server_ops[name] == password)
+	{
+		client.addMode('o');
+		reply(RPL_YOUREOPER, client, args);
 	}
 	else
 	{

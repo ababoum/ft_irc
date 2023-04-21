@@ -373,31 +373,3 @@ void Server::removeClientFromChannel(Client *client, Channel *channel)
 		delete channel;
 	}
 }
-
-bool Server::isServerOp(Client *client)
-{
-	return (std::find(_operators.begin(),
-					  _operators.end(),
-					  client) != _operators.end());
-}
-
-std::string Server::addClientToServerOps(Client *client, const std::string &name, const std::string &password)
-{
-	std::string reply;
-	std::map<std::string, std::string> server_ops;
-	server_ops["admin"] = "admin";
-
-	if (isServerOp(client))
-	{
-		reply = "ALREADY OPER";
-		return reply;
-	}
-	if (server_ops.find(name) != server_ops.end() && server_ops[name] == password)
-	{
-		_operators.push_back(client);
-		reply = "OPER";
-	}
-	else
-		reply = "NOT OPER";
-	return reply;
-}

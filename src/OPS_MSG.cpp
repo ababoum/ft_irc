@@ -19,7 +19,7 @@ void Server::kill(Client &client, const std::vector<std::string> &args)
     std::string message(args[2]);
 
     // check if the client has the right to kill
-    if (!isServerOp(&client))
+    if (!client.isOperator())
     {
         reply(ERR_NOPRIVILEGES, client);
         return;
@@ -64,7 +64,7 @@ void Server::restart(Client &client, const std::vector<std::string> &args)
     (void)args;
 
     // Check if the client is a server operator
-    if (!isServerOp(&client))
+    if (!client.isOperator())
     {
         reply(ERR_NOPRIVILEGES, client);
         return;

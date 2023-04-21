@@ -23,8 +23,6 @@ private:
 	Channel	*addChan(std::string name, Client *client);
 	Client *searchClient(std::string nickname);
 	void removeClientFromChannel(Client *client, Channel *channel);
-	std::string addClientToServerOps(Client *client, const std::string &name, const std::string &password);
-	bool isServerOp(Client *client);
 
 	void launch(void);
 	void routine(struct sockaddr_in &addr);
@@ -77,7 +75,6 @@ private:
 	int 					_port;
 	std::string				_password;
 	std::vector<Client *>	_clients;
-	std::vector<Client *> 	_operators;
 	std::vector<Channel *>	_channels;
 	bool					_shutting_down;
 };

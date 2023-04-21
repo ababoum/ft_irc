@@ -153,6 +153,9 @@ void Server::reply(int code, Client &client, Channel *channel, const Client &tar
 		}
 		message += "\r\n";
 		break;
+	case RPL_WHOISOPERATOR:
+		message = prefix + target.getNickname() + " :is an IRC operator\r\n";
+		break;
 
 	case RPL_INVITING:
 		message = prefix + target.getNickname() +
