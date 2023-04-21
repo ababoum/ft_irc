@@ -83,6 +83,11 @@ std::vector<Client *> const &Channel::getInviteList() const
 	return _invite_list;
 }
 
+bool Channel::isInvited(Client *client) const
+{
+	return std::find(_invite_list.begin(), _invite_list.end(), client) != _invite_list.end();
+}
+
 void Channel::addToInvite(Client *client)
 {
 	if (std::find(_invite_list.begin(), _invite_list.end(), client) == _invite_list.end())

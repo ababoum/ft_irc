@@ -84,20 +84,16 @@ void Server::whois(Client &client, const std::vector<std::string> &args)
 		for (size_t j = 0; j < nicks.size(); j++)
 		{
 			// Check if the nickname exists
-			bool found = false;
-			for (size_t j = 0; j < _clients.size(); j++)
+			Client *found = searchClient(nicks[j]);
+			if (found)
 			{
-				if (_clients[j]->getNickname() == nicks[i])
-				{
-					found = true;
-					reply(RPL_WHOISUSER, client, NULL, *_clients[j]);
-					reply(RPL_WHOISCHANNELS, client, NULL, *_clients[j]);
-					if (_clients[j]->isOperator())
-						reply(RPL_WHOISOPERATOR, client, NULL, *_clients[j]);
-					// We can add more if necessary...
-				}
+				reply(RPL_WHOISUSER, client, NULL, *_clients[j]);
+				reply(RPL_WHOISCHANNELS, client, NULL, *_clients[j]);
+				if (_clients[j]->isOperator())
+					reply(RPL_WHOISOPERATOR, client, NULL, *_clients[j]);
+				// We can add more if necessary...
 			}
-			if (!found)
+			else
 			{
 				reply(ERR_NOSUCHNICK, client, args[i]);
 			}

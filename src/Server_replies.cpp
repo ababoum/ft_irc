@@ -120,6 +120,9 @@ void Server::reply(int code, Client &client, const Channel &channel)
 	case ERR_CHANOPRIVSNEEDED:
 		message = prefix + channel.getName() + " :You're not channel operator\r\n";
 		break;
+	case ERR_INVITEONLYCHAN:
+		message = prefix + channel.getName() + " :Cannot join channel (+i)\r\n";
+		break;
 
 	default:
 		DEBUG("reply: unknown code: " << code << "\n");

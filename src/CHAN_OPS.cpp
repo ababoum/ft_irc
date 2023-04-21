@@ -166,6 +166,13 @@ void Server::join(Client &client, const std::vector<std::string> &args)
 		Channel *channel = searchChan(channels[i]);
 		if (!channel)
 			channel = addChan(channels[i], &client);
+
+		// Check if the channel is invite only and reply accordingly
+		if (channel->isInviteOnly() && !channel->isInvited(&client))
+		{
+			reply(ERR_INVITEONLYCHAN, client, *channel);
+			return;
+		}
 		channel->addClient("", &client);
 		client.addChan(channel);
 		// JOIN Message

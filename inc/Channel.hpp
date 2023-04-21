@@ -41,6 +41,7 @@ public:
 	Client *searchClient(const int fd) const;
 	bool isOperator(Client *client) const;
 	std::vector<Client *> const &getInviteList() const;
+	bool isInvited(Client *client) const;
 
 	void setTopic(const std::string &topic);
 	void setTopicSetBy(Client *client);
