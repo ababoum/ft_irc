@@ -5,7 +5,7 @@
 
 static void _bot(Client &client, const std::string &msg, const std::string &serv_name)
 {
-	std::string answer = "I'm a bot, I don't understand your message.";
+	std::string answer = "I'm a bot 🤖, I don't understand your message.";
 
 	if (to_lower(msg) == "hello")
 	{
@@ -57,6 +57,13 @@ void Server::notice(Client &client, const std::vector<std::string> &args)
 	}
 	else
 	{
+		// Check if the target is the bot
+		if (args[1] == "bot")
+		{
+			_bot(client, args[2], _name);
+			return;
+		}
+
 		// Check if the target exists
 		Client *target = searchClient(args[1]);
 		if (!target)
