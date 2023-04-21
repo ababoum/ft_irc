@@ -82,6 +82,7 @@ void Server::reply(int code, Client &client, const Channel &channel)
 			if (channel.isTopicProtected())
 				message += "t";
 		}
+		message += "\r\n";
 		break;
 	case RPL_NOTOPIC:
 		message = prefix + channel.getName() + " :No topic is set\r\n";
@@ -97,10 +98,14 @@ void Server::reply(int code, Client &client, const Channel &channel)
 		for (size_t j = 0; j < channel.getClients().size(); j++)
 		{
 			const std::pair<std::string, Client *> tmp = channel.getClients()[j];
-			// ADD blocage if (invisible mode and requesting client not on chan!!!!!!!!!!!!)
-			if (message[message.size() - 1] != ':')
-				message += " ";
-			message += tmp.first + tmp.second->getNickname();
+			// ADD blocage if (invisible mode and requesting client not on chan)
+			if (!tmp.second->isInvisible() || 
+				channel.searchClient(client.getNickname()))
+			{
+				if (message[message.size() - 1] != ':')
+					message += " ";
+				message += tmp.first + tmp.second->getNickname();
+			}
 		}
 		message += "\r\n";
 		if (message == prefix + "= " + channel.getName() + " :" + "\r\n")
@@ -192,6 +197,7 @@ void Server::reply(int code, Client &client, const std::string &mask)
 			if (client.isOperator())
 				message += "o";
 		}
+		message += "\r\n";
 		break;
 	case RPL_ENDOFWHO:
 		message = prefix + mask + " :End of WHO list\r\n";
@@ -207,6 +213,8 @@ void Server::reply(int code, Client &client, const std::string &mask)
 		for (size_t i = 0; i < _clients.size(); i++)
 		{
 			// if client is not invisible
+			if (!client.isInvisible())
+			{
 				std::vector<Channel *> channels = _clients[i]->getJoinedChannels();
 				int nb_visible_chan = 0;
 				for (size_t j = 0; j < channels.size(); j++)
@@ -220,8 +228,11 @@ void Server::reply(int code, Client &client, const std::string &mask)
 						message += " ";
 					message += _clients[i]->getNickname();
 				}
+			}
 		}
 		message += "\r\n";
+		if (message == prefix + "= " + mask + " :" + "\r\n")
+			message = "";
 		break;
 	case RPL_ENDOFNAMES:
 		message = prefix + mask + " :End of /NAMES list\r\n";
@@ -239,10 +250,10 @@ void Server::reply(int code, Client &client, const std::string &mask)
 		message = prefix + mask + " :Bad Channel Mask\r\n";
 		break;
 	case ERR_UMODEUNKNOWNFLAG:
-		message += prefix + ":Unknown MODE flag";
+		message += prefix + ":Unknown MODE flag\r\n";
 		break;
 	case ERR_USERSDONTMATCH:
-		message += prefix + ":Cant change mode for other users";
+		message += prefix + ":Cant change mode for other users\r\n";
 		break;
 
 	default:

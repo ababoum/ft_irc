@@ -98,7 +98,8 @@ std::string Server::applyModestring(const std::string &modes, const std::string 
 		// if the mode is not known to the server retourner une erreur
 		else if (std::find(CHANNEL_MODES.begin(), CHANNEL_MODES.end(), modes[i]) == CHANNEL_MODES.end())
 		{
-			reply(ERR_UNKNOWNMODE, client, std::string(modes[i], 1));
+			DEBUG(std::string(1, modes[i]) + "\n");
+			reply(ERR_UNKNOWNMODE, client, std::string(1, modes[i]));
 		}
 		// sinon changer le mode et ajouter au message
 		else
