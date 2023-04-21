@@ -72,6 +72,17 @@ void Server::reply(int code, Client &client, const Channel &channel)
 	case RPL_LIST:
 		message = ":ircserv " + prefix + channel.getName() + " " + ft_itoa(channel.getClients().size()) + " :" + channel.getTopic() + "\r\n";
 		break;
+	case RPL_CHANNELMODEIS:
+		message = prefix + channel.getName() + " ";
+		if (channel.isInviteOnly() || channel.isTopicProtected())
+		{
+			message += "+";
+			if (channel.isInviteOnly())
+				message += "i";
+			if (channel.isTopicProtected())
+				message += "t";
+		}
+		break;
 	case RPL_NOTOPIC:
 		message = prefix + channel.getName() + " :No topic is set\r\n";
 		break;
@@ -168,6 +179,17 @@ void Server::reply(int code, Client &client, const std::string &mask)
 
 	switch (code)
 	{
+	case RPL_UMODEIS:
+		message = prefix;
+		if (client.isInvisible() || client.isOperator())
+		{
+			message += "+";
+			if (client.isInvisible())
+				message += "i";
+			if (client.isOperator())
+				message += "o";
+		}
+		break;
 	case RPL_ENDOFWHO:
 		message = prefix + mask + " :End of WHO list\r\n";
 		break;
@@ -215,6 +237,9 @@ void Server::reply(int code, Client &client, const std::string &mask)
 		break;
 	case ERR_UMODEUNKNOWNFLAG:
 		message += prefix + ":Unknown MODE flag";
+		break;
+	case ERR_USERSDONTMATCH:
+		message += prefix + ":Cant change mode for other users";
 		break;
 
 	default:
