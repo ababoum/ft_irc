@@ -13,6 +13,8 @@ public:
 		bool t;
 	};
 
+	typedef std::vector<std::pair<std::string, Client *> > ClientList;
+
 	Channel(const std::string &name, Client *client);
 	Channel(const Channel &other);
 	~Channel();
@@ -34,6 +36,8 @@ public:
 
 	std::string getName() const;
 	std::string getTopic() const;
+	std::size_t getNbOperators() const;
+
 	Client *getTopicSetBy() const;
 	time_t getTopicSetAt() const;
 	std::vector<std::pair<std::string, Client *> > const &getClients() const;

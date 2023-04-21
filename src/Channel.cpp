@@ -83,6 +83,13 @@ std::vector<Client *> const &Channel::getInviteList() const
 	return _invite_list;
 }
 
+std::size_t Channel::getNbOperators() const
+{
+	return _operators.size();
+}
+
+
+
 bool Channel::isInvited(Client *client) const
 {
 	return std::find(_invite_list.begin(), _invite_list.end(), client) != _invite_list.end();

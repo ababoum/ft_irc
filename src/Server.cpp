@@ -1,5 +1,7 @@
 #include "Server.hpp"
 
+typedef std::vector<std::pair<std::string, Client *> > ClientList;
+
 Server::Server()
 	: _socket_fd(0), _port(0), _password(""), _shutting_down(false)
 {
@@ -379,7 +381,24 @@ Client *Server::searchClient(std::string nickname)
 
 void Server::removeClientFromChannel(Client *client, Channel *channel)
 {
+	// Elect a new channel operator if the client was the only one
+	if (channel->isOperator(client) && channel->getNbOperators() == 1)
+	{
+		ClientList clients = channel->getClients();
+		for (ClientList::iterator it = clients.begin(); it != clients.end(); ++it)
+		{
+			if (it->second != client)
+			{
+				channel->addOperator(it->second);
+				break;
+			}
+		}
+	}
+
+	// Remove the client from the channel
 	channel->removeClient(client);
+
+	// Delete the channel if it's empty after the client left
 	if (channel->getClients().empty())
 	{
 		_channels.erase(std::find(_channels.begin(), _channels.end(), channel));
