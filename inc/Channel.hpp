@@ -13,8 +13,6 @@ public:
 		bool t;
 	};
 
-	typedef std::vector<std::pair<std::string, Client *> > ClientList;
-
 	Channel(const std::string &name, Client *client);
 	Channel(const Channel &other);
 	~Channel();
@@ -43,7 +41,7 @@ public:
 	std::vector<std::pair<std::string, Client *> > const &getClients() const;
 	Client *searchClient(const std::string &nickname) const;
 	Client *searchClient(const int fd) const;
-	bool isOperator(Client *client) const;
+	bool isOperator(const Client *client) const;
 	std::vector<Client *> const &getInviteList() const;
 	bool isInvited(Client *client) const;
 

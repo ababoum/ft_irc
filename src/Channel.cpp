@@ -333,7 +333,7 @@ void Channel::removeOp(const int fd)
 	}
 }
 
-bool Channel::isOperator(Client *client) const
+bool Channel::isOperator(const Client *client) const
 {
 	for (size_t i = 0; i < _operators.size(); i++)
 	{

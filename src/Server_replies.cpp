@@ -143,7 +143,10 @@ void Server::reply(int code, Client &client, Channel *channel, const Client &tar
 	case RPL_WHOREPLY:
 		message = prefix + channel_name +
 				  " " + target.getUsername() + " " + target.getServername() +
-				  " " + target.getNickname() + " H :0 " + target.getRealname() +
+				  " " + target.getNickname() + " H" +
+				  std::string(target.isOperator() ? "*" : "") +
+				  std::string(channel->isOperator(&target) ? "@" : "") +
+				  ":0 " + target.getRealname() +
 				  "\r\n";
 		break;
 	case RPL_WHOISUSER:

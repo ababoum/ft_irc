@@ -120,8 +120,8 @@ void Server::kick(Client &client, const std::vector<std::string> &args)
 
 	client.appendMessageToSend(message);
 	// Remove client from channel
-	channel->removeClient(target_client);
 	target_client->removeChan(channel->getName());
+	removeClientFromChannel(target_client, channel);
 
 	// Broadcast kick message to all clients in the channel
 	channel->fullBroadcast(message);
