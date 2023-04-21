@@ -292,7 +292,7 @@ void Server::mode(Client &client, const std::vector<std::string> &args)
 				std::string modestring = parseUserModestring(args[2]);
 				std::string message = applyModestring(modestring, client);
 				if (message.size() != 0)
-					client.appendMessageToSend(":" + client.getSource() + " MODE " + target + " " + message + "/r/n");
+					client.appendMessageToSend(":" + client.getSource() + " MODE " + target + " " + message + "\r\n");
 			}
 		}
 	}
