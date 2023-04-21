@@ -14,6 +14,7 @@ public:
 	~Server();
 
 	Server &operator=(const Server &rhs);
+	void routine(void);
 
 private:
 	int getSocketFd(void) const;
@@ -25,7 +26,6 @@ private:
 	void removeClientFromChannel(Client *client, Channel *channel);
 
 	void launch(void);
-	void routine(struct sockaddr_in &addr);
 	bool reading(fd_set readfds);
 	void writing(fd_set writefds);
 	void closeConnection(std::vector<Client*>::iterator & it);
@@ -70,6 +70,7 @@ private:
 
 	// Attributes
 private:
+	struct sockaddr_in		_addr;
 	std::string				_name;
 	int 					_socket_fd;
 	int 					_port;

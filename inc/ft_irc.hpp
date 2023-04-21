@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <signal.h>
 #include <iostream>
 #include <cstdio>
 #include <arpa/inet.h>

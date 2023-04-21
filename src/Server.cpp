@@ -9,7 +9,6 @@ Server::Server(int port, std::string password)
 	: _name(SERVER_NAME), _socket_fd(-1), _port(port), _password(password),
 	_shutting_down(false)
 {
-	// Check args
 	launch();
 }
 
@@ -20,8 +19,24 @@ Server::Server(const Server &other)
 
 Server::~Server()
 {
+	RUNTIME_MSG("Server destructor called\n");
+
 	if (_socket_fd >= 0)
 		close(_socket_fd);
+
+	// Destroy clients
+	for (std::vector<Client *>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+	{
+		close((*it)->getFd());
+		delete *it;
+		DEBUG("Client fd " << (*it)->getFd() << " destroyed\n");
+	}
+
+	// Destroy channels
+	for (std::vector<Channel *>::iterator it = _channels.begin(); it != _channels.end(); ++it)
+	{
+		delete *it;
+	}	
 }
 
 Server &Server::operator=(const Server &rhs)
@@ -49,7 +64,6 @@ std::string Server::getPassword() const
 
 void Server::launch()
 {
-	struct sockaddr_in addr;
 	int opt = 1;
 
 	_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -65,11 +79,11 @@ void Server::launch()
 		perror("setsockopt");
 		return;
 	}
-	memset(&addr, 0, sizeof(addr));
-	addr.sin_family = AF_INET;
-	addr.sin_port = htons(_port);
-	addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	if (bind(_socket_fd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
+	memset(&_addr, 0, sizeof(_addr));
+	_addr.sin_family = AF_INET;
+	_addr.sin_port = htons(_port);
+	_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	if (bind(_socket_fd, (struct sockaddr *)&_addr, sizeof(_addr)) < 0)
 	{
 		perror("bind failed");
 		return;
@@ -81,10 +95,9 @@ void Server::launch()
 		return;
 	}
 	INFO("Listening on socket...\n");
-	routine(addr);
 }
 
-void Server::routine(struct sockaddr_in &addr)
+void Server::routine(void)
 {
 	socklen_t addr_len;
 	fd_set readfds;
@@ -127,8 +140,8 @@ void Server::routine(struct sockaddr_in &addr)
 			if (FD_ISSET(_socket_fd, &readfds))
 			{
 				DEBUG("New connection\n");
-				addr_len = sizeof(addr);
-				int _client_fd = accept(_socket_fd, (struct sockaddr *)&addr, &addr_len);
+				addr_len = sizeof(_addr);
+				int _client_fd = accept(_socket_fd, (struct sockaddr *)&_addr, &addr_len);
 				if (_client_fd < 0)
 				{
 					perror("In accept");
