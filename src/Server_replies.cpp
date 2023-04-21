@@ -82,6 +82,7 @@ void Server::reply(int code, Client &client, const Channel &channel)
 			if (channel.isTopicProtected())
 				message += "t";
 		}
+		message += "\r\n";
 		break;
 	case RPL_NOTOPIC:
 		message = prefix + channel.getName() + " :No topic is set\r\n";
@@ -99,7 +100,7 @@ void Server::reply(int code, Client &client, const Channel &channel)
 			const std::pair<std::string, Client *> tmp = channel.getClients()[j];
 			// ADD blocage if (invisible mode and requesting client not on chan)
 			if (!tmp.second->isInvisible() || 
-				std::find(client.getJoinedChannels().begin(), client.getJoinedChannels().end(), &channel) != client.getJoinedChannels().end())
+				channel.searchClient(client.getNickname()))
 			{
 				if (message[message.size() - 1] != ':')
 					message += " ";
@@ -193,6 +194,7 @@ void Server::reply(int code, Client &client, const std::string &mask)
 			if (client.isOperator())
 				message += "o";
 		}
+		message += "\r\n";
 		break;
 	case RPL_ENDOFWHO:
 		message = prefix + mask + " :End of WHO list\r\n";
@@ -245,10 +247,10 @@ void Server::reply(int code, Client &client, const std::string &mask)
 		message = prefix + mask + " :Bad Channel Mask\r\n";
 		break;
 	case ERR_UMODEUNKNOWNFLAG:
-		message += prefix + ":Unknown MODE flag";
+		message += prefix + ":Unknown MODE flag\r\n";
 		break;
 	case ERR_USERSDONTMATCH:
-		message += prefix + ":Cant change mode for other users";
+		message += prefix + ":Cant change mode for other users\r\n";
 		break;
 
 	default:

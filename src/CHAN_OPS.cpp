@@ -174,7 +174,6 @@ void Server::join(Client &client, const std::vector<std::string> &args)
 		// Broadcast join message to all other clients in the channel
 		// The message is the same as the one sent to the main client
 		channel->fullBroadcast(message);
-		// client.appendMessageToSend(message);
 		if (channel->getTopic().size() > 0)
 		{
 			reply(RPL_TOPIC, client, *channel);
@@ -270,14 +269,12 @@ void Server::names(Client &client, const std::vector<std::string> &args)
 	{
 		for (size_t i = 0; i < _channels.size(); i++)
 		{
-			// if channel mode is not secret OU si le client appartient au channel
-				reply(RPL_NAMREPLY, client, *_channels[i]);
-			// Dans tous les cas :
+			reply(RPL_NAMREPLY, client, *_channels[i]);
 			reply(RPL_ENDOFNAMES, client, *_channels[i]);
 		}
+		// Add list of clients on no chan or not in visible chan
 		reply(RPL_NAMREPLY, client, "*");
 		reply(RPL_ENDOFNAMES, client, "*");
-		// Add list of clients on no chan or not in visible chan
 	}
 	else
 	{
@@ -285,8 +282,8 @@ void Server::names(Client &client, const std::vector<std::string> &args)
 		for (size_t i = 0; i < channels_list.size(); i++)
 		{
 			Channel *tmp = searchChan(channels_list[i]);
-			// if channel name valid and existing and not secret
-			if (tmp /*and (not secret OU user has joined channel)*/)
+			// if channel name valid and existing
+			if (tmp)
 				reply(RPL_NAMREPLY, client, *tmp);
 			reply(RPL_ENDOFNAMES, client, channels_list[i]);
 		}
@@ -300,10 +297,8 @@ void Server::list(Client &client, const std::vector<std::string> &args)
 	if (args.size() == 1)
 	{
 		reply(RPL_LISTSTART, client, "");
-		// infos about all channels not secret
 		for (size_t i = 0; i < _channels.size(); i++)
 		{
-			// if not secret
 			reply(RPL_LIST, client, *_channels[i]);
 		}
 		reply(RPL_LISTEND, client, "");
