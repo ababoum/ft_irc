@@ -5,6 +5,8 @@ Client::Client(int fd)
 	, _message_received(""), _message_to_send("")
 	, _nickname(""), _username(""), _hostname(""), _servername(""), _realname("")
 {
+	_modes.i = false;
+	_modes.o = false;
 }
 
 Client::Client(const Client &other)
@@ -32,6 +34,8 @@ Client &Client::operator=(const Client &rhs)
 		_servername = rhs.getServername();
 		_realname = rhs.getRealname();
 		_joined_channels = rhs.getJoinedChannels();
+		_modes.i = rhs.isInvisible();
+		_modes.o = rhs.isOperator();
 	}
 	return *this;
 }
@@ -172,6 +176,15 @@ bool Client::isFatalError() const
 	return _fatal_error;
 }
 
+bool Client::isOperator() const
+{
+	return _modes.o;
+}
+
+bool Client::isInvisible() const
+{
+	return _modes.i;
+}
 
 const std::string &	Client::getMessageReceived() const
 {

@@ -8,6 +8,13 @@ class Channel;
 class Client
 {
 public:
+
+	struct Modes
+	{
+		bool i;
+		bool o;
+	};
+
 	Client(int fd);
 	Client(const Client &other);
 	Client &operator=(const Client &rhs);
@@ -36,6 +43,8 @@ public:
 	bool				isPassOk() const;
 	bool				isAuthentified() const;
 	bool				isFatalError() const;
+	bool				isOperator() const;
+	bool				isInvisible() const;
 	const std::string &	getMessageReceived() const;
 	const std::string &	getMessageToSend() const;
 	const std::string &	getNickname() const;
@@ -64,7 +73,7 @@ private:
 	std::string _servername;
 	std::string _realname;
 	std::vector<Channel *> _joined_channels;
-	std::string _mode;
+	Modes _modes;
 };
 
 #endif /* CLIENT_HPP */
