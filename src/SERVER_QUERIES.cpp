@@ -98,7 +98,6 @@ std::string Server::applyModestring(const std::string &modes, const std::string 
 		// if the mode is not known to the server retourner une erreur
 		else if (std::find(CHANNEL_MODES.begin(), CHANNEL_MODES.end(), modes[i]) == CHANNEL_MODES.end())
 		{
-			DEBUG(std::string(1, modes[i]) + "\n");
 			reply(ERR_UNKNOWNMODE, client, std::string(1, modes[i]));
 		}
 		// sinon changer le mode et ajouter au message
@@ -115,13 +114,11 @@ std::string Server::applyModestring(const std::string &modes, const std::string 
 		{
 			add = true;
 			message += "+";
-			i++;
 		}
 		else if (params_modes[i] == '-')
 		{
 			add = false;
 			message += "-";
-			i++;
 		}
 		// enregistrer le nickname du client sur qui le mode o est appelé
 		else
@@ -151,9 +148,18 @@ std::string Server::applyModestring(const std::string &modes, const std::string 
 	for (size_t i = 1; i <= message.size(); i++)
 	{
 		if ((i == message.size() || message[i] == '+' || message[i] == '-') && 
-			(message[i - i] == '+' || message[i - 1] == '-'))
+			(message[i - 1] == '+' || message[i - 1] == '-'))
 		{
 			message.erase(i - 1, 1);
+			i--;
+		}
+	}
+	for (size_t i = 1; i <= parameters.size(); i++)
+	{
+		if ((i == parameters.size() || parameters[i] == '+' || parameters[i] == '-') && 
+			(parameters[i - 1] == '+' || parameters[i - 1] == '-'))
+		{
+			parameters.erase(i - 1, 1);
 			i--;
 		}
 	}
@@ -188,14 +194,16 @@ std::string Server::applyModestring(const std::string &modes, Client &client)
 		else
 		{
 			if ((client.*f[add])(modes[i]))
-				message += modes[i];
+			{
+				message += std::string(1, modes[i]);
+			}
 		}
 	}
 	// Trim message from double + and -
 	for (size_t i = 1; i <= message.size(); i++)
 	{
 		if ((i == message.size() || message[i] == '+' || message[i] == '-') && 
-			(message[i - i] == '+' || message[i - 1] == '-'))
+			(message[i - 1] == '+' || message[i - 1] == '-'))
 		{
 			message.erase(i - 1, 1);
 			i--;
@@ -249,7 +257,7 @@ void Server::mode(Client &client, const std::vector<std::string> &args)
 				parseChannelModestring(args[2], args, modes, parameters_mode);
 				message = applyModestring(modes, parameters_mode, client, *channel);
 				if (message.size() != 0)
-					client.appendMessageToSend(":" + client.getSource() + " MODE " + target + " " + message);
+					client.appendMessageToSend(":" + client.getSource() + " MODE " + target + " " + message + "\r\n");
 			}
 		}
 		// User mode
@@ -284,7 +292,7 @@ void Server::mode(Client &client, const std::vector<std::string> &args)
 				std::string modestring = parseUserModestring(args[2]);
 				std::string message = applyModestring(modestring, client);
 				if (message.size() != 0)
-					client.appendMessageToSend(":" + client.getSource() + " MODE " + target + " " + message);
+					client.appendMessageToSend(":" + client.getSource() + " MODE " + target + " " + message + "/r/n");
 			}
 		}
 	}
