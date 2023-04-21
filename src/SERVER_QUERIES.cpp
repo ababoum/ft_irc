@@ -159,6 +159,50 @@ std::string Server::applyModestring(const std::string &modes, const std::string 
 	return message + parameters;
 }
 
+std::string Server::applyModestring(const std::string &modes, Client &client)
+{
+	bool add = true;
+	std::string message;
+	bool (Client::*f[])(char c) = {
+		&Client::removeMode,
+		&Client::addMode};
+
+	for (size_t i = 0; i < modes.size(); i++)
+	{
+		if (modes[i] == '+')
+		{
+			add = true;
+			message += "+";
+		}
+		else if (modes[i] == '-')
+		{
+			add = false;
+			message += "-";
+		}
+		// If one or more modes sent are not implemented on the server, the server MUST apply the modes that are implemented, and then send the ERR_UMODEUNKNOWNFLAG (501) in reply along with the MODE message.
+		else if (std::find(USER_MODES.begin(), USER_MODES.end(), modes[i]) == USER_MODES.end())
+		{
+			reply(ERR_UMODEUNKNOWNFLAG, client);
+		}
+		else
+		{
+			if ((client.*f[add])(modes[i]))
+				message += modes[i];
+		}
+	}
+	// Trim message from double + and -
+	for (size_t i = 1; i <= message.size(); i++)
+	{
+		if ((i == message.size() || message[i] == '+' || message[i] == '-') && 
+			(message[i - i] == '+' || message[i - 1] == '-'))
+		{
+			message.erase(i - 1, 1);
+			i--;
+		}
+	}
+	return message;
+}
+
 void Server::mode(Client &client, const std::vector<std::string> &args)
 {
 	if (args.size() < 2)
@@ -204,7 +248,7 @@ void Server::mode(Client &client, const std::vector<std::string> &args)
 				parseChannelModestring(args[2], args, modes, parameters_mode);
 				message = applyModestring(modes, parameters_mode, client, *channel);
 				if (message.size() != 0)
-					client.appendMessageToSend(":" + client.getSource() + " MODE " + message);
+					client.appendMessageToSend(":" + client.getSource() + " MODE " + target + " " + message);
 			}
 		}
 		// User mode
@@ -235,11 +279,11 @@ void Server::mode(Client &client, const std::vector<std::string> &args)
 			// If <modestring> is given,
 			else
 			{
-				std::string modestring = parseUserModestring(args[2]);
 				// the supplied modes will be applied, and a MODE message will be sent to the user containing the changed modes. 
-				
-				// If one or more modes sent are not implemented on the server, the server MUST apply the modes that are implemented, and then send the ERR_UMODEUNKNOWNFLAG (501) in reply along with the MODE message.
-				
+				std::string modestring = parseUserModestring(args[2]);
+				std::string message = applyModestring(modestring, client);
+				if (message.size() != 0)
+					client.appendMessageToSend(":" + client.getSource() + " MODE " + target + " " + message);
 			}
 		}
 	}

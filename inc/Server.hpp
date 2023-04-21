@@ -57,6 +57,7 @@ private:
 	void notice(Client &client, const std::vector<std::string> &args);
 	void mode(Client &client, const std::vector<std::string> &args);
 	std::string applyModestring(const std::string &modes, const std::string &params_modes, Client &client, Channel &channel);
+	std::string applyModestring(const std::string &modes, Client &client);
 	void quit(Client &client, const std::vector<std::string> &args);
 	void topic(Client &client, const std::vector<std::string> &args);
 	void names(Client &client, const std::vector<std::string> &args);

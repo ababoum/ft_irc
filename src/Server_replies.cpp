@@ -213,6 +213,9 @@ void Server::reply(int code, Client &client, const std::string &mask)
 	case ERR_BADCHANMASK:
 		message = prefix + mask + " :Bad Channel Mask\r\n";
 		break;
+	case ERR_UMODEUNKNOWNFLAG:
+		message += prefix + ":Unknown MODE flag";
+		break;
 
 	default:
 		DEBUG("reply: unknown code: " << code << "\n");

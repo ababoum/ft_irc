@@ -235,3 +235,41 @@ int Client::getFd() const
 {
 	return _fd;
 }
+
+bool Client::addMode(char c)
+{
+	switch (c)
+	{
+		case 'i':
+			if (_modes.i)
+				return false;
+			_modes.i = true;
+			return true;
+		case 'o':
+			if (_modes.o)
+				return false;
+			_modes.o = true;
+			return true;
+		default:
+			return false;
+	}
+}
+
+bool Client::removeMode(char c)
+{
+	switch (c)
+	{
+		case 'i':
+			if (!_modes.i)
+				return false;
+			_modes.i = false;
+			return true;
+		case 'o':
+			if (!_modes.o)
+				return false;
+			_modes.o = false;
+			return true;
+		default:
+			return false;
+	}
+}

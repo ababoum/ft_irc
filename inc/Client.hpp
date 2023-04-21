@@ -39,6 +39,8 @@ public:
 	void	setRealname(const std::string &real_name);
 	void	addChan(Channel *channel);
 	void 	removeChan(std::string name);
+	bool	addMode(char c);
+	bool	removeMode(char c);
 
 	bool				isPassOk() const;
 	bool				isAuthentified() const;
