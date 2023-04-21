@@ -97,10 +97,14 @@ void Server::reply(int code, Client &client, const Channel &channel)
 		for (size_t j = 0; j < channel.getClients().size(); j++)
 		{
 			const std::pair<std::string, Client *> tmp = channel.getClients()[j];
-			// ADD blocage if (invisible mode and requesting client not on chan!!!!!!!!!!!!)
-			if (message[message.size() - 1] != ':')
-				message += " ";
-			message += tmp.first + tmp.second->getNickname();
+			// ADD blocage if (invisible mode and requesting client not on chan)
+			if (!tmp.second->isInvisible() || 
+				std::find(client.getJoinedChannels().begin(), client.getJoinedChannels().end(), &channel) != client.getJoinedChannels().end())
+			{
+				if (message[message.size() - 1] != ':')
+					message += " ";
+				message += tmp.first + tmp.second->getNickname();
+			}
 		}
 		message += "\r\n";
 		if (message == prefix + "= " + channel.getName() + " :" + "\r\n")
@@ -204,6 +208,8 @@ void Server::reply(int code, Client &client, const std::string &mask)
 		for (size_t i = 0; i < _clients.size(); i++)
 		{
 			// if client is not invisible
+			if (!client.isInvisible())
+			{
 				std::vector<Channel *> channels = _clients[i]->getJoinedChannels();
 				int nb_visible_chan = 0;
 				for (size_t j = 0; j < channels.size(); j++)
@@ -217,8 +223,11 @@ void Server::reply(int code, Client &client, const std::string &mask)
 						message += " ";
 					message += _clients[i]->getNickname();
 				}
+			}
 		}
 		message += "\r\n";
+		if (message == prefix + "= " + mask + " :" + "\r\n")
+			message = "";
 		break;
 	case RPL_ENDOFNAMES:
 		message = prefix + mask + " :End of /NAMES list\r\n";
