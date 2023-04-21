@@ -68,7 +68,7 @@ void Server::who(Client &client, const std::vector<std::string> &args)
 
 void Server::whois(Client &client, const std::vector<std::string> &args)
 {
-	RUNTIME_MSG("who function called\n");
+	RUNTIME_MSG("whois function called\n");
 
 	if (args.size() == 1)
 	{
@@ -87,15 +87,15 @@ void Server::whois(Client &client, const std::vector<std::string> &args)
 			Client *found = searchClient(nicks[j]);
 			if (found)
 			{
-				reply(RPL_WHOISUSER, client, NULL, *_clients[j]);
-				reply(RPL_WHOISCHANNELS, client, NULL, *_clients[j]);
-				if (_clients[j]->isOperator())
-					reply(RPL_WHOISOPERATOR, client, NULL, *_clients[j]);
+				reply(RPL_WHOISUSER, client, NULL, *found);
+				reply(RPL_WHOISCHANNELS, client, NULL, *found);
+				if (found->isOperator())
+					reply(RPL_WHOISOPERATOR, client, NULL, *found);
 				// We can add more if necessary...
 			}
 			else
 			{
-				reply(ERR_NOSUCHNICK, client, args[i]);
+				reply(ERR_NOSUCHNICK, client, nicks[j]);
 			}
 		}
 	}
