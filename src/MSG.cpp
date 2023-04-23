@@ -106,7 +106,7 @@ void Server::privmsg(Client &client, const std::vector<std::string> &args)
 		Client *chan_client = channel->searchClient(client.getNickname());
 		if (!chan_client)
 		{
-			reply(ERR_NOTONCHANNEL, client, args[1]);
+			reply(ERR_NOTONCHANNEL, client, *channel);
 			return;
 		}
 		// Send the message to all the clients in the channel
