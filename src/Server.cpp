@@ -30,8 +30,8 @@ Server::~Server()
 	for (std::vector<Client *>::iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
 		close((*it)->getFd());
-		delete *it;
 		DEBUG("Client fd " << (*it)->getFd() << " destroyed\n");
+		delete *it;
 	}
 
 	// Destroy channels
