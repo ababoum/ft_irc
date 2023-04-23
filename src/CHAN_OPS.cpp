@@ -86,7 +86,7 @@ void Server::kick(Client &client, const std::vector<std::string> &args)
 	Channel *channel = searchChan(args[1]);
 	if (!channel)
 	{
-		reply(ERR_NOSUCHCHANNEL, client, args);
+		reply(ERR_NOSUCHCHANNEL, client, args[1]);
 		return;
 	}
 
