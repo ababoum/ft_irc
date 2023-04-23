@@ -36,6 +36,7 @@ void Server::nick(Client &client, const std::vector<std::string> &args)
 		reply(ERR_NONICKNAMEGIVEN, client, args);
 		return;
 	}
+	std::string old_nickname(client.getNickname());
 	std::string nickname(args[1]);
 	if (!Client::isNicknameValid(nickname))
 	{
@@ -54,13 +55,13 @@ void Server::nick(Client &client, const std::vector<std::string> &args)
 			return;
 		}
 	}
+	client.setNickname(args[1]);
 	if (client.isAuthentified())
-		client.appendMessageToSend(":" + client.getNickname() + " NICK :" + nickname + "\n");
+		client.appendMessageToSend(":" + old_nickname + " NICK :" + client.getNickname() + "\n");
 	else if (client.getUsername() != "")
 	{
 		authentificate(client);
 	}
-	client.setNickname(args[1]);
 }
 
 void Server::user(Client &client, const std::vector<std::string> &args)
