@@ -55,7 +55,7 @@ void Server::invite(Client &client, const std::vector<std::string> &args)
 		return;
 	}
 
-	std::string message = ":" + client.getNickname() +
+	std::string message = ":" + client.getSource() +
 						  " INVITE " + target + " " +
 						  channel->getName() + "\n";
 
@@ -114,7 +114,7 @@ void Server::kick(Client &client, const std::vector<std::string> &args)
 		return;
 	}
 
-	std::string message = ":" + client.getNickname() +
+	std::string message = ":" + client.getSource() +
 						  " KICK " + channel->getName() + " " +
 						  target + " :" + comment + "\n";
 
@@ -218,7 +218,7 @@ void Server::part(Client &client, const std::vector<std::string> &args)
 		}
 		// 1 PART message for each channel the client is leaving
 		// BROADCAST TO OTHER CLIENTS IN THE CHANNEL
-		std::string message = ":" + client.getNickname() + "!" + client.getUsername() + "@" + client.getServername() + " PART " + channel->getName();
+		std::string message = ":" + client.getSource() + " PART " + channel->getName();
 		if (args.size() > 2)
 			message += " " + args[2];
 		message += "\r\n";
