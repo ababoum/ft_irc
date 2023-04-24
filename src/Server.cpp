@@ -9,7 +9,7 @@ Server::Server()
 
 Server::Server(int port, std::string password)
 	: _name(SERVER_NAME), _socket_fd(-1), _port(port), _password(password),
-	_shutting_down(false)
+	  _shutting_down(false)
 {
 	launch();
 }
@@ -38,7 +38,7 @@ Server::~Server()
 	for (std::vector<Channel *>::iterator it = _channels.begin(); it != _channels.end(); ++it)
 	{
 		delete *it;
-	}	
+	}
 }
 
 Server &Server::operator=(const Server &rhs)
@@ -268,8 +268,7 @@ void Server::parseCommands(Client &client)
 								  "TOPIC",
 								  "NAMES",
 								  "LIST",
-								  "KILL",
-								  "RESTART"};
+								  "KILL"};
 	size_t nb_commands = sizeof(command_name) / sizeof(command_name[0]);
 	void (Server::*f[])(Client & client, const std::vector<std::string> &args) = {
 		&Server::pass,
@@ -290,8 +289,7 @@ void Server::parseCommands(Client &client)
 		&Server::topic,
 		&Server::names,
 		&Server::list,
-		&Server::kill,
-		&Server::restart};
+		&Server::kill};
 
 	std::vector<std::string> lines = split(client.getMessageReceived(), "\r\n");
 	for (std::vector<std::string>::iterator it = lines.begin(); it != lines.end(); ++it)
@@ -315,11 +313,7 @@ void Server::parseCommands(Client &client)
 		{
 			if (args[0] == command_name[i])
 			{
-				if (args[0] != "NICK"
-					&& args[0] != "USER"
-					&& args[0] != "PASS"
-					&& args[0] != "QUIT"
-					&& !client.isAuthentified())
+				if (args[0] != "NICK" && args[0] != "USER" && args[0] != "PASS" && args[0] != "QUIT" && !client.isAuthentified())
 				{
 					// 451
 					reply(ERR_NOTREGISTERED, client, args);
@@ -389,7 +383,12 @@ void Server::removeClientFromChannel(Client *client, Channel *channel)
 		{
 			if (it->second != client)
 			{
-				channel->addOperator(it->second);
+				std::vector<std::string> args;
+				args.push_back("MODE");
+				args.push_back(channel->getName());
+				args.push_back("+o");
+				args.push_back(it->second->getNickname());
+				mode(*client, args);
 				break;
 			}
 		}

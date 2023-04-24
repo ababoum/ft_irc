@@ -73,7 +73,7 @@ static void parseChannelModestring(const std::string &modestring, const std::vec
 			}
 		}
 	}
-	modes = std::string("+") + plus + std::string("-") + minus + parameters_modes;
+	modes = std::string("+") + plus + std::string("-") + minus;
 }
 
 
@@ -114,11 +114,13 @@ std::string Server::applyModestring(const std::string &modes, const std::string 
 		{
 			add = true;
 			message += "+";
+			i++;
 		}
 		else if (params_modes[i] == '-')
 		{
 			add = false;
 			message += "-";
+			i++;
 		}
 		// enregistrer le nickname du client sur qui le mode o est appelé
 		else
@@ -257,7 +259,7 @@ void Server::mode(Client &client, const std::vector<std::string> &args)
 				parseChannelModestring(args[2], args, modes, parameters_mode);
 				message = applyModestring(modes, parameters_mode, client, *channel);
 				if (message.size() != 0)
-					client.appendMessageToSend(":" + client.getSource() + " MODE " + target + " " + message + "\r\n");
+					channel->fullBroadcast(":" + client.getSource() + " MODE " + target + " " + message + "\r\n");
 			}
 		}
 		// User mode

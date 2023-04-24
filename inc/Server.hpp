@@ -62,7 +62,6 @@ private:
 	void oper(Client &client, const std::vector<std::string> &args);
 	void kill(Client &client, const std::vector<std::string> &args);
 	void list(Client &client, const std::vector<std::string> &args);
-	void restart(Client &client, const std::vector<std::string> &args);
 
 private:
 	Server();

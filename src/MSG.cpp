@@ -36,47 +36,55 @@ void Server::notice(Client &client, const std::vector<std::string> &args)
 	{
 		return;
 	}
-	// Check if the target is a channel
-	if (args[1][0] == '#')
-	{
-		Channel *channel = searchChan(args[1]);
-		if (!channel)
-		{
-			return;
-		}
-		// Check if the client is in the channel
-		Client *chan_client = channel->searchClient(client.getNickname());
-		if (!chan_client)
-		{
-			return;
-		}
-		// Send the message to all the clients in the channel
-		std::string message = ":" + client.getSource() +
-							  " NOTICE " + args[1] + " :" + args[2] + "\r\n";
-		channel->broadcast(message, chan_client);
-	}
-	else
-	{
-		// Check if the target is the bot
-		if (args[1] == "bot")
-		{
-			_bot(client, args[2], _name);
-			return;
-		}
 
-		// Check if the target exists
-		Client *target = searchClient(args[1]);
-		if (!target)
+	// Targets can be separated by commas
+	std::vector<std::string> targets = split(args[1], ',');
+
+	for (std::vector<std::string>::iterator it = targets.begin(); it != targets.end(); ++it)
+	{
+		std::string target_mask = *it;
+		// Check if the target is a channel
+		if (target_mask.size() > 0 && target_mask[0] == '#')
 		{
-			return;
+			Channel *channel = searchChan(target_mask);
+			if (!channel)
+			{
+				return;
+			}
+			// Check if the client is in the channel
+			Client *chan_client = channel->searchClient(client.getNickname());
+			if (!chan_client)
+			{
+				return;
+			}
+			// Send the message to all the clients in the channel
+			std::string message = ":" + client.getSource() +
+								  " NOTICE " + target_mask + " :" + args[2] + "\r\n";
+			channel->broadcast(message, chan_client);
 		}
-		// Abort if the message is self-sent
-		if (target == &client)
-			return;
-		// Send the message to the target
-		std::string message = ":" + client.getSource() +
-							  " NOTICE " + args[1] + " :" + args[2] + "\r\n";
-		target->appendMessageToSend(message);
+		else
+		{
+			// Check if the target is the bot
+			if (target_mask == "bot")
+			{
+				_bot(client, args[2], _name);
+				return;
+			}
+
+			// Check if the target exists
+			Client *target = searchClient(target_mask);
+			if (!target)
+			{
+				return;
+			}
+			// Abort if the message is self-sent
+			if (target == &client)
+				return;
+			// Send the message to the target
+			std::string message = ":" + client.getSource() +
+								  " NOTICE " + target_mask + " :" + args[2] + "\r\n";
+			target->appendMessageToSend(message);
+		}
 	}
 }
 
@@ -93,48 +101,56 @@ void Server::privmsg(Client &client, const std::vector<std::string> &args)
 		reply(ERR_NEEDMOREPARAMS, client, args);
 		return;
 	}
-	// Check if the target is a channel
-	if (args[1][0] == '#')
+
+	// Targets can be separated by commas
+	std::vector<std::string> targets = split(args[1], ',');
+
+	for (std::vector<std::string>::iterator it = targets.begin(); it != targets.end(); ++it)
 	{
-		Channel *channel = searchChan(args[1]);
-		if (!channel)
+		std::string target_mask = *it;
+		// Check if the target is a channel
+		if (target_mask.size() > 0 && target_mask[0] == '#')
 		{
-			reply(ERR_NOSUCHCHANNEL, client, args[1]);
-			return;
+			Channel *channel = searchChan(target_mask);
+			if (!channel)
+			{
+				reply(ERR_NOSUCHCHANNEL, client, target_mask);
+				continue;
+			}
+			// Check if the client is in the channel
+			Client *chan_client = channel->searchClient(client.getNickname());
+			if (!chan_client)
+			{
+				reply(ERR_NOTONCHANNEL, client, *channel);
+				continue;
+			}
+			// Send the message to all the clients in the channel
+			std::string message = ":" + client.getSource() +
+								  " PRIVMSG " + target_mask + " :" + args[2] + "\r\n";
+			channel->broadcast(message, chan_client);
 		}
-		// Check if the client is in the channel
-		Client *chan_client = channel->searchClient(client.getNickname());
-		if (!chan_client)
+		else
 		{
-			reply(ERR_NOTONCHANNEL, client, *channel);
-			return;
+			// Check if the target is the bot
+			if (target_mask == "bot")
+			{
+				_bot(client, args[2], _name);
+				continue;
+			}
+			// Check if the target exists
+			Client *target = searchClient(target_mask);
+			if (!target)
+			{
+				reply(ERR_NOSUCHNICK, client, target_mask);
+				continue;
+			}
+			// Abort if the message is self-sent
+			if (target == &client)
+				continue;
+			// Send the message to the target
+			std::string message = ":" + client.getSource() +
+								  " PRIVMSG " + target_mask + " :" + args[2] + "\r\n";
+			target->appendMessageToSend(message);
 		}
-		// Send the message to all the clients in the channel
-		std::string message = ":" + client.getSource() +
-							  " PRIVMSG " + args[1] + " :" + args[2] + "\r\n";
-		channel->broadcast(message, chan_client);
-	}
-	else
-	{
-		// Check if the target is the bot
-		if (args[1] == "bot")
-		{
-			_bot(client, args[2], _name);
-			return;
-		}
-		// Check if the target exists
-		Client *target = searchClient(args[1]);
-		if (!target)
-		{
-			reply(ERR_NOSUCHNICK, client, args[1]);
-			return;
-		}
-		// Abort if the message is self-sent
-		if (target == &client)
-			return;
-		// Send the message to the target
-		std::string message = ":" + client.getSource() +
-							  " PRIVMSG " + args[1] + " :" + args[2] + "\r\n";
-		target->appendMessageToSend(message);
 	}
 }

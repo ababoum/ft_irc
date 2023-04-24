@@ -46,11 +46,11 @@ irssi -c 127.0.0.1 -p 6667 -w lala -n mynick
 * With channel not joined OK
 * With channel joined OK
 
-## KICK >>> Problem with broadcast ? L'operateur recoit 2 messages, le kické n'en recoit aucun.
+## KICK
 * Without channel OK
 * Without nickname OK
 * With channel not joined OK
-* With channel joined OK execpt bad broadcast
+* With channel joined OK
 * With nickname not in channel OK
 * With nickname in channel OK
 * Without operator privileges OK

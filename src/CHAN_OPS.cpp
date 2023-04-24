@@ -118,13 +118,11 @@ void Server::kick(Client &client, const std::vector<std::string> &args)
 						  " KICK " + channel->getName() + " " +
 						  target + " :" + comment + "\n";
 
-	client.appendMessageToSend(message);
+	// Broadcast kick message to all clients in the channel
+	channel->fullBroadcast(message);
 	// Remove client from channel
 	target_client->removeChan(channel->getName());
 	removeClientFromChannel(target_client, channel);
-
-	// Broadcast kick message to all clients in the channel
-	channel->fullBroadcast(message);
 }
 
 void Server::join(Client &client, const std::vector<std::string> &args)
