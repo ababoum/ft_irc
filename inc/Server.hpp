@@ -76,7 +76,6 @@ private:
 	std::string				_password;
 	std::vector<Client *>	_clients;
 	std::vector<Channel *>	_channels;
-	bool					_shutting_down;
 };
 
 #endif /* SERVER_HPP */

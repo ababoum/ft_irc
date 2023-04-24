@@ -3,13 +3,12 @@
 typedef std::vector<std::pair<std::string, Client *> > ClientList;
 
 Server::Server()
-	: _socket_fd(0), _port(0), _password(""), _shutting_down(false)
+	: _socket_fd(0), _port(0), _password("")
 {
 }
 
 Server::Server(int port, std::string password)
-	: _name(SERVER_NAME), _socket_fd(-1), _port(port), _password(password),
-	  _shutting_down(false)
+	: _name(SERVER_NAME), _socket_fd(-1), _port(port), _password(password)
 {
 	launch();
 }
@@ -107,11 +106,6 @@ void Server::routine(void)
 
 	while (1)
 	{
-		if (_shutting_down)
-		{
-			_shutting_down = false;
-			return;
-		}
 		// DEBUG("Waiting for new connection\n");
 		FD_ZERO(&readfds);
 		FD_ZERO(&writefds);
@@ -166,8 +160,8 @@ bool Server::reading(fd_set readfds)
 		if (FD_ISSET(client->getFd(), &readfds))
 		{
 			DEBUG("New message\n");
-			DEBUG("Nb clients: " << _clients.size() << "\n");
-			DEBUG("Nb channels: " << _channels.size() << "\n");
+			// DEBUG("Nb clients: " << _clients.size() << "\n");
+			// DEBUG("Nb channels: " << _channels.size() << "\n");
 
 			char buffer[READ_SIZE + 1] = {0};
 			int read_val = read(client->getFd(), buffer, READ_SIZE);
@@ -315,7 +309,6 @@ void Server::parseCommands(Client &client)
 			{
 				if (args[0] != "NICK" && args[0] != "USER" && args[0] != "PASS" && args[0] != "QUIT" && !client.isAuthentified())
 				{
-					// 451
 					reply(ERR_NOTREGISTERED, client, args);
 				}
 				else
@@ -324,7 +317,6 @@ void Server::parseCommands(Client &client)
 			}
 			else if (i == nb_commands - 1 && client.isAuthentified())
 			{
-				// 421
 				reply(ERR_UNKNOWNCOMMAND, client, args);
 			}
 		}
@@ -342,7 +334,6 @@ void Server::authentificate(Client &client)
 		return;
 	}
 	client.setAuthentified();
-	// 001 RPL_WELCOME
 	reply(RPL_WELCOME, client);
 }
 

@@ -1,12 +1,9 @@
 # GENERAL TO-DO LIST
 
-* Change the Makefile back to c++ compiler at the end of the development
 * Users modes : io
 * Channels modes : oit
 
-
 # Points of attention
-
 
 # Useful commands and information
 
@@ -98,10 +95,6 @@ Il manque <host> ou <server>
 ## QUIT
 
 ## PING
-
-## RESTART
-* Without operator privileges OK
-RESTART quitte mais ne relance pas
 
 ## OPER
 * With wrong credentials OK

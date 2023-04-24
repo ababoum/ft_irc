@@ -1,7 +1,7 @@
 #include "Client.hpp"
 
 Client::Client(int fd)
-	: _fd(fd), _is_authentified(false), _fatal_error(false)
+	: _fd(fd), _pass(false), _is_authentified(false), _fatal_error(false)
 	, _message_received(""), _message_to_send("")
 	, _nickname(""), _username(""), _hostname(""), _servername(""), _realname("")
 {
@@ -24,6 +24,7 @@ Client &Client::operator=(const Client &rhs)
 	if (this != &rhs)
 	{
 		_fd = rhs.getFd();
+		_pass = rhs.isPassOk();
 		_is_authentified = rhs.isAuthentified();
 		_fatal_error = rhs.isFatalError();
 		_message_received = rhs.getMessageReceived();
@@ -110,6 +111,8 @@ bool	Client::isNicknameValid(const std::string &nickname)
 	else if (nickname[0] == '#' || nickname[0] == '&')
 		res = false;
 	else if (nickname.find('.') != std::string::npos)
+		res = false;
+	else if (nickname == "bot")
 		res = false;
 
 	return res;

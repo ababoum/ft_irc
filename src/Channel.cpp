@@ -11,6 +11,7 @@ Channel::Channel(const std::string &name, Client *client)
 	addOperator(client);
 	_modes.i = false;
 	_modes.t = false;
+	_topic_set_at = 0;
 }
 
 Channel::Channel(const Channel &other)
@@ -29,13 +30,13 @@ Channel::~Channel()
 Channel &Channel::operator=(const Channel &rhs)
 {
 	_name = rhs.getName();
-	_topic = rhs.getTopic();
-	_topic_set_by = rhs.getTopicSetBy();
-	_topic_set_at = rhs.getTopicSetAt();
+	_modes = rhs._modes;
 	_clients = rhs._clients;
 	_operators = rhs._operators;
 	_invite_list = rhs._invite_list;
-	_modes = rhs._modes;
+	_topic = rhs.getTopic();
+	_topic_set_by = rhs.getTopicSetBy();
+	_topic_set_at = rhs.getTopicSetAt();
 	return *this;
 }
 

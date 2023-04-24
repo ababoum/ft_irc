@@ -59,7 +59,6 @@ void Server::who(Client &client, const std::vector<std::string> &args)
 			}
 			if (!found)
 			{
-				// 401
 				reply(ERR_NOSUCHNICK, client, args[i]);
 			}
 		}

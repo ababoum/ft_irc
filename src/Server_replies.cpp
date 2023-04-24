@@ -164,6 +164,8 @@ void Server::reply(int code, Client &client, Channel *channel, const Client &tar
 			message += target.getJoinedChannels()[i]->getName();
 		}
 		message += "\r\n";
+		if (message == prefix + target.getNickname() + " :" + "\r\n")
+			message = "";
 		break;
 	case RPL_WHOISOPERATOR:
 		message = prefix + target.getNickname() + " :is an IRC operator\r\n";

@@ -9,18 +9,17 @@
 
 void Server::pass(Client &client, const std::vector<std::string> &args)
 {
-	std::cout << "pass function called" << std::endl;
+	RUNTIME_MSG("pass function called\n");
+
 	if (!client.isAuthentified() && (client.getNickname() != "" || !client.getUsername().empty()))
 		return;
 	if (args.size() < 2)
 	{
-		// 461 ERR_NEEDMOREPARAMS
 		reply(ERR_NEEDMOREPARAMS, client, args);
 		return;
 	}
 	if (client.isAuthentified())
 	{
-		// 462 ERR_ALREADYREGISTRED
 		reply(ERR_ALREADYREGISTRED, client, args);
 		return;
 	}
@@ -29,10 +28,9 @@ void Server::pass(Client &client, const std::vector<std::string> &args)
 
 void Server::nick(Client &client, const std::vector<std::string> &args)
 {
-	std::cout << "nick function called" << std::endl;
+	RUNTIME_MSG("nick function called\n");
 	if (args.size() < 2)
 	{
-		// 431 ERR_NONICKNAMEGIVEN
 		reply(ERR_NONICKNAMEGIVEN, client, args);
 		return;
 	}
@@ -40,7 +38,6 @@ void Server::nick(Client &client, const std::vector<std::string> &args)
 	std::string nickname(args[1]);
 	if (!Client::isNicknameValid(nickname))
 	{
-		// 432 ERR_ERRONEUSNICKNAME
 		reply(ERR_ERRONEUSNICKNAME, client, args);
 		return;
 	}
@@ -50,7 +47,6 @@ void Server::nick(Client &client, const std::vector<std::string> &args)
 	{
 		if ((*it)->getNickname() == nickname)
 		{
-			// 433 ERR_NICKNAMEINUSE;
 			reply(ERR_NICKNAMEINUSE, client, args);
 			return;
 		}
@@ -66,16 +62,14 @@ void Server::nick(Client &client, const std::vector<std::string> &args)
 
 void Server::user(Client &client, const std::vector<std::string> &args)
 {
-	std::cout << "user function called" << std::endl;
+	RUNTIME_MSG("user function called\n");
 	if (args.size() < 5)
 	{
-		// 461 ERR_NEEDMOREPARAMS
 		reply(ERR_NEEDMOREPARAMS, client, args);
 		return;
 	}
 	if (client.isAuthentified())
 	{
-		// 462 ERR_ALREADYREGISTRED
 		reply(ERR_ALREADYREGISTRED, client, args);
 		return;
 	}
